@@ -7,8 +7,8 @@
     <ProjectGuid>{1AF3A9E7-99BE-490A-A211-741AAFF1AEF2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HomeTeleport</RootNamespace>
-    <AssemblyName>HomeTeleport</AssemblyName>
+    <RootNamespace>PocketTeleporter</RootNamespace>
+    <AssemblyName>PocketTeleporter</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
