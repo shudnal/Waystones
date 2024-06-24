@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/package/thunderstore/HomeTeleport/HomeTeleport.dll
+/package/thunderstore/PocketTeleporter/HomeTeleport.dll
+/package/thunderstore/TeleportHome/HomeTeleport.dll
+/package/thunderstore/HomeTeleport.zip
+/package/thunderstore/PocketTeleporter.zip
+/package/thunderstore/TeleportHome.zip
