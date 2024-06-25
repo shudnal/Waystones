@@ -90,18 +90,17 @@ namespace PocketTeleporter
             if (seman.HaveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash))
             {
                 Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash);
-                CooldownData.SetCooldown(cooldownShort.Value);
             }
             else
             {
-                if (CooldownData.IsOnCooldown())
-                    Player.m_localPlayer.Message(MessageHud.MessageType.Center, $"$hud_powernotready: {CooldownData.GetCooldownString()}");
-                else if (IsNotInPosition(Player.m_localPlayer))
+                if (IsNotInPosition(Player.m_localPlayer))
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_cart_incorrectposition");
                 else if (Player.m_localPlayer.IsEncumbered())
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$se_encumbered_start");
                 else if (!Player.m_localPlayer.IsTeleportable())
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_noteleport");
+                else if (CooldownData.IsOnCooldown())
+                    Player.m_localPlayer.Message(MessageHud.MessageType.Center, $"$hud_powernotready: {CooldownData.GetCooldownString()}");
                 else if (targetPoint != Vector3.zero)
                 {
                     SE_PocketTeleporter se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash) as SE_PocketTeleporter;
@@ -109,6 +108,7 @@ namespace PocketTeleporter
                     {
                         se.targetPoint = targetPoint;
                         Player.m_localPlayer.AddNoise(50f);
+                        BaseAI.DoProjectileHitNoise(Player.m_localPlayer.transform.position, 50f, Player.m_localPlayer);
                     }
                 }
             }

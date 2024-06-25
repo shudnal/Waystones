@@ -47,6 +47,9 @@ namespace PocketTeleporter
         {
             base.UpdateStatusEffect(dt);
 
+            if (m_startEffectInstances == null)
+                return;
+
             main.startLifetime = 0.5f + 5.5f * (m_time / m_ttl);
             main.startSpeed = 4f - 3.5f * (m_time / m_ttl);
             main.simulationSpeed = 1f + (m_time / m_ttl);
@@ -112,10 +115,21 @@ namespace PocketTeleporter
         {
             base.Stop();
             
-            m_character?.GetZAnim().SetSpeed(1f);
+            if (m_character)
+            {
+                m_character.GetZAnim().SetSpeed(1f);
+                m_character.m_lookTransitionTime = 0f;
 
-            if (teleportTriggered)
-                CooldownData.SetCooldown(PocketTeleporter.cooldownFull.Value);
+                if (m_character == Player.m_localPlayer)
+                    CooldownData.SetCooldown(teleportTriggered ? PocketTeleporter.cooldownFull.Value : PocketTeleporter.cooldownShort.Value);
+            }
+        }
+
+        public override void OnDamaged(HitData hit, Character attacker)
+        {
+            base.OnDamaged(hit, attacker);
+            Stop();
+            m_time = m_ttl + 1;
         }
 
         private bool ControlLocalPlayer()
@@ -152,7 +166,7 @@ namespace PocketTeleporter
                 
                 Light light = pointLight.GetComponent<Light>();
                 light.cullingMask = s_lightMaskNonPlayer;
-                light.shadowStrength = 0.8f;
+                light.shadows = LightShadows.None;
                 light.intensity = 0f;
 
                 GameObject sparcs = Instantiate(waystone.transform.Find("WayEffect/Particle System sparcs"), vfx_PocketTeleporter.transform).gameObject;
