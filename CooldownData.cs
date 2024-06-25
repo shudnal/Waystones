@@ -1,61 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using UnityEngine;
 using static PocketTeleporter.PocketTeleporter;
+using HarmonyLib;
+using UnityEngine;
+using System.Text;
 
 namespace PocketTeleporter
 {
     [Serializable]
     public class CooldownData
     {
-        [Serializable]
-        public class WorldCooldownData
+        public long worldUID;
+        public string globalTime;
+        public double worldTime;
+
+        public double GetCooldown()
         {
-            public long worldUID;
-            public string globalTime;
-            public double worldTime;
-
-            public double GetCooldown()
-            {
-                if (!ZNet.instance)
-                    return 0;
-
-                if (cooldownTime.Value == CooldownTime.WorldTime)
-                    return worldTime == 0 ? 0 : Math.Max(worldTime - ZNet.instance.GetTimeSeconds(), 0);
-                else if (DateTime.TryParse(globalTime, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime time))
-                    return Math.Max((time - GetTime()).TotalSeconds, 0);
-
+            if (!ZNet.instance)
                 return 0;
-            }
 
-            public bool IsOnCooldown()
-            {
-                return GetCooldown() > 0;
-            }
+            if (cooldownTime.Value == CooldownTime.WorldTime)
+                return worldTime == 0 ? 0 : Math.Max(worldTime - ZNet.instance.GetTimeSeconds(), 0);
+            else if (DateTime.TryParse(globalTime, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime time))
+                return Math.Max((time - GetTime()).TotalSeconds, 0);
 
-            public void SetCooldown(double cooldown)
-            {
-                if (cooldownTime.Value == CooldownTime.GlobalTime)
-                    globalTime = GetTime().AddSeconds(cooldown).ToString(CultureInfo.InvariantCulture);
-                else
-                    worldTime = ZNet.instance.GetTimeSeconds() + cooldown;
-            }
+            return 0;
         }
 
-        public List<WorldCooldownData> worlds = new List<WorldCooldownData>();
-
-        internal WorldCooldownData GetWorldData(long uid, bool createIfEmpty = false)
+        public void SetCooldown(double cooldown)
         {
-            WorldCooldownData data = worlds.Find(d => d.worldUID == uid);
+            if (cooldownTime.Value == CooldownTime.GlobalTime)
+                globalTime = GetTime().AddSeconds(cooldown).ToString(CultureInfo.InvariantCulture);
+            else
+                worldTime = ZNet.instance.GetTimeSeconds() + cooldown;
+        }
+        
+        private static DateTime GetTime()
+        {
+            return DateTime.Now.ToUniversalTime();
+        }
+
+        internal static CooldownData GetWorldData(List<CooldownData> state, long uid, bool createIfEmpty = false)
+        {
+            CooldownData data = state.Find(d => d.worldUID == uid);
             if (createIfEmpty && data == null)
             {
-                data = new WorldCooldownData
+                data = new CooldownData
                 {
                     worldUID = ZNet.instance.GetWorldUID()
                 };
 
-                worlds.Add(data);
+                state.Add(data);
             }
 
             return data;
@@ -63,22 +59,22 @@ namespace PocketTeleporter
 
         internal static void SetCooldown(int cooldown)
         {
-            CooldownData state = GetState();
+            List<CooldownData> state = GetState();
 
-            state.GetWorldData(ZNet.instance.GetWorldUID(), createIfEmpty: true).SetCooldown(cooldown);
+            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).SetCooldown(cooldown);
 
-            Player.m_localPlayer.m_customData[customDataKey] = JsonUtility.ToJson(state);
+            Player.m_localPlayer.m_customData[customDataKey] = SaveCooldownDataList(state);
         }
 
         internal static bool IsOnCooldown()
         {
-            WorldCooldownData data = GetState().GetWorldData(ZNet.instance.GetWorldUID());
-            return data != null && data.IsOnCooldown();
+            CooldownData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
+            return data != null && data.GetCooldown() > 0;
         }
 
         internal static string GetCooldownString()
         {
-            WorldCooldownData data = GetState().GetWorldData(ZNet.instance.GetWorldUID());
+            CooldownData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
             return data == null ? "" : TimerString(data.GetCooldown());
         }
 
@@ -94,14 +90,40 @@ namespace PocketTeleporter
                 return new DateTime(span.Ticks).ToString(@"mm\m ss\s");
         }
 
-        private static DateTime GetTime()
+        private static List<CooldownData> GetState()
         {
-            return DateTime.Now.ToUniversalTime();
+            return Player.m_localPlayer.m_customData.TryGetValue(customDataKey, out string value) ? GetCooldownDataList(value) : new List<CooldownData>();
         }
 
-        private static CooldownData GetState()
+        private static List<CooldownData> GetCooldownDataList(string value)
         {
-            return Player.m_localPlayer.m_customData.TryGetValue(customDataKey, out string json) ? JsonUtility.FromJson<CooldownData>(json) : new CooldownData();
+            List<CooldownData> data = new List<CooldownData>();
+            SplitToLines(value).Do(line => data.Add(JsonUtility.FromJson<CooldownData>(line)));
+            return data;
+        }
+
+        private static string SaveCooldownDataList(List<CooldownData> list)
+        {
+            StringBuilder sb = new StringBuilder();
+            list.Do(data => sb.AppendLine(JsonUtility.ToJson(data)));
+            return sb.ToString();
+        }
+
+        public static IEnumerable<string> SplitToLines(string input)
+        {
+            if (input == null)
+            {
+                yield break;
+            }
+
+            using (System.IO.StringReader reader = new System.IO.StringReader(input))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    yield return line;
+                }
+            }
         }
     }
 }
