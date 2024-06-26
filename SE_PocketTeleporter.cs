@@ -22,8 +22,6 @@ namespace PocketTeleporter
 
         public static readonly int s_gpower = ZSyncAnimation.GetHash("gpower");
 
-        public static int s_lightMaskNonPlayer;
-
         public static Sprite iconPocketTeleporter;
         public static GameObject vfx_PocketTeleporter;
 
@@ -91,6 +89,8 @@ namespace PocketTeleporter
                 Vector3 dir = targetPoint - m_character.transform.position;
                 dir.Normalize();
                 m_startEffectInstances[0].transform.rotation = Quaternion.LookRotation(dir);
+
+                m_startEffectInstances[0].transform.localPosition = Vector3.MoveTowards(m_startEffectInstances[0].transform.localPosition, new Vector3(0, 1.5f, -0.3f), dt / 10f);
             }
         }
 
@@ -142,9 +142,6 @@ namespace PocketTeleporter
             if (!ZNetScene.instance)
                 return;
 
-            if (s_lightMaskNonPlayer == 0)
-                s_lightMaskNonPlayer = LayerMask.GetMask("Default", "static_solid", "Default_small", "piece", "piece_nonsolid", "terrain", "character_net", "character_ghost", "hitbox", "character_noenv", "vehicle");
-
             if (!(bool)vfx_PocketTeleporter)
             {
                 WayStone waystone = Resources.FindObjectsOfTypeAll<WayStone>().FirstOrDefault();
@@ -163,15 +160,17 @@ namespace PocketTeleporter
 
                 GameObject pointLight = Instantiate(waystone.transform.Find("WayEffect/Point light"), vfx_PocketTeleporter.transform).gameObject;
                 pointLight.name = vfx_PocketTeleporterLight;
-                
+                pointLight.transform.localPosition = new Vector3(0f, 0f, -0.2f);
+
                 Light light = pointLight.GetComponent<Light>();
-                light.cullingMask = s_lightMaskNonPlayer;
+                light.cullingMask = -1;
                 light.shadows = LightShadows.None;
                 light.intensity = 0f;
 
                 GameObject sparcs = Instantiate(waystone.transform.Find("WayEffect/Particle System sparcs"), vfx_PocketTeleporter.transform).gameObject;
                 sparcs.name = vfx_PocketTeleporterParticles;
-                
+                sparcs.transform.localPosition = new Vector3(0f, 0f, -0.1f);
+
                 ParticleSystem ps = sparcs.GetComponent<ParticleSystem>();
 
                 MainModule main = ps.main;
