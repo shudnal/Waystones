@@ -23,10 +23,16 @@ namespace PocketTeleporter
 
         internal static PocketTeleporter instance;
 
-        private static ConfigEntry<bool> configLocked;
-        private static ConfigEntry<bool> loggingEnabled;
-        private static ConfigEntry<KeyboardShortcut> shortcut;
-        
+        internal static ConfigEntry<bool> configLocked;
+        internal static ConfigEntry<bool> loggingEnabled;
+        internal static ConfigEntry<KeyboardShortcut> shortcut;
+        internal static ConfigEntry<float> directionSensitivity;
+        internal static ConfigEntry<float> directionSensitivityThreshold;
+        internal static ConfigEntry<float> fadeMax;
+        internal static ConfigEntry<float> fadeDelta;
+        internal static ConfigEntry<float> slowFactor;
+        internal static ConfigEntry<float> fovDelta;
+
         internal static ConfigEntry<CooldownTime> cooldownTime;
         internal static ConfigEntry<int> cooldownFull;
         internal static ConfigEntry<int> cooldownShort;
@@ -59,6 +65,30 @@ namespace PocketTeleporter
             LoadIcons();
         }
 
+        public void ConfigInit()
+        {
+            config("General", "NexusID", 2832, "Nexus mod ID for updates", false);
+
+            configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
+            loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
+
+            shortcut = config("Direction search", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y, new KeyCode[0] { }), "Enter/exit direction mode.");
+            directionSensitivity = config("Direction search", "Sensivity", defaultValue: 2f, "Angle between look direction and target direction for location to appear in direction mode");
+            directionSensitivityThreshold = config("Direction search", "Sensivity threshold", defaultValue: 6f, "Angle between look direction and target direction for location to start appearing in direction mode");
+            fadeMax = config("Direction search", "Screen fade max", defaultValue: 0.98f, "Angle between look direction and target direction for location to start appearing in direction mode");
+            fadeDelta = config("Direction search", "Screen fade delta", defaultValue: 0.1f, "Angle between look direction and target direction for location to start appearing in direction mode");
+            slowFactor = config("Direction search", "Slow factor", defaultValue: 0.2f, "Multiplier of speed ​​of time and look");
+            fovDelta = config("Direction search", "FoV delta", defaultValue: 40f, "How much camera FoV can be changed");
+
+            cooldownTime = config("Teleport cooldown", "Time", defaultValue: CooldownTime.WorldTime, "Time type to calculate cooldown." +
+                                                                                                     "\nWorld time - calculate from time passed in game world" +
+                                                                                                     "\nGlobal time - calculate from real world time");
+            cooldownFull = config("Teleport cooldown", "Teleportation successful", defaultValue: 7200, "Cooldown to be set after successfull teleportation");
+            cooldownShort = config("Teleport cooldown", "Teleportation interrupted", defaultValue: 300, "Cooldown to be set if teleportation was interrupted");
+
+            particlesCollision = config("Misc", "Particles physics collision", defaultValue: false, "Make particles emitted while teleporting collide with objects. Restart required.");
+        }
+
         private void OnDestroy()
         {
             Config.Save();
@@ -74,17 +104,28 @@ namespace PocketTeleporter
             if (Player.m_localPlayer == null)
                 return;
 
-            if (shortcut.Value.IsDown() /*|| ZInput.GetButton("AltPlace") && ZInput.GetButton("Crouch") && ZInput.GetButton("Jump") ||
-                                           ZInput.GetButton("JoyAltPlace") && ZInput.GetButton("JoyCrouch") && ZInput.GetButton("JoyJump")*/)
-            {
-                TeleportAttempt(GetSpawnPoint());
-            }
+            if (shortcut.Value.IsDown())
+                Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash);
+
+            DirectionSearch.Update();
+
+            // $placeofmystery	Загадочное место - смотреть вверх
+            // $npc_haldor
+            // $npc_hildir
+            // start temple
+            // last tombstone
+            // last ship
+            // last location in 5 min
+            // Ставим waystone, включаем, садимся, входим в режим поиска, улетаем, сохраняем последнюю позицию, на объект TimedDestruction
         }
 
-        private static void TeleportAttempt(Vector3 targetPoint)
+        public static void TeleportAttempt(Vector3 targetPoint, string message)
         {
             if (!CanCast())
                 return;
+
+            if (!message.IsNullOrWhiteSpace())
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, message);
 
             SEMan seman = Player.m_localPlayer.GetSEMan();
             if (seman.HaveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash))
@@ -101,7 +142,7 @@ namespace PocketTeleporter
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_noteleport");
                 else if (CooldownData.IsOnCooldown())
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, $"$hud_powernotready: {CooldownData.GetCooldownString()}");
-                else if (targetPoint != Vector3.zero)
+                else
                 {
                     SE_PocketTeleporter se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash) as SE_PocketTeleporter;
                     if (se != null)
@@ -109,20 +150,11 @@ namespace PocketTeleporter
                         se.targetPoint = targetPoint;
                         Player.m_localPlayer.AddNoise(50f);
                         BaseAI.DoProjectileHitNoise(Player.m_localPlayer.transform.position, 50f, Player.m_localPlayer);
+                        if (!message.IsNullOrWhiteSpace())
+                            MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, message);
                     }
                 }
             }
-        }
-
-        private static Vector3 GetSpawnPoint()
-        {
-            PlayerProfile playerProfile = Game.instance.GetPlayerProfile();
-            if (playerProfile.HaveCustomSpawnPoint())
-            {
-                return playerProfile.GetCustomSpawnPoint();
-            }
-
-            return playerProfile.GetHomePoint();
         }
 
         public static bool CanCast()
@@ -146,22 +178,6 @@ namespace PocketTeleporter
         {
             if (loggingEnabled.Value)
                 instance.Logger.LogInfo(data);
-        }
-        public void ConfigInit()
-        {
-            config("General", "NexusID", 2832, "Nexus mod ID for updates", false);
-
-            configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
-            loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
-            shortcut = config("General", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Home, new KeyCode[1] { KeyCode.LeftShift }), "Shortcut.");
-
-            cooldownTime = config("Teleport cooldown", "Time", defaultValue: CooldownTime.WorldTime, "Time type to calculate cooldown." +
-                                                                                                     "\nWorld time - calculate from time passed in game world" +
-                                                                                                     "\nGlobal time - calculate from real world time");
-            cooldownFull = config("Teleport cooldown", "Teleportation successful", defaultValue: 7200, "Cooldown to be set after successfull teleportation");
-            cooldownShort = config("Teleport cooldown", "Teleportation interrupted", defaultValue: 300, "Cooldown to be set if teleportation was interrupted");
-
-            particlesCollision = config("Misc", "Particles collision", defaultValue: false, "Make particles emitted while teleporting collide with objects. Restart required.");
         }
 
         ConfigEntry<T> config<T>(string group, string name, T defaultValue, ConfigDescription description, bool synchronizedSetting = true)
@@ -247,6 +263,6 @@ namespace PocketTeleporter
                     mouseLook = Vector2.zero;
             }
         }
-        
+
     }
 }

@@ -68,9 +68,7 @@ namespace PocketTeleporter
                 }
 
                 if (localPlayer.m_lookTransitionTime > 0f)
-                {
                     localPlayer.transform.rotation = localPlayer.m_lookYaw;
-                }
 
                 localPlayer.SetMouseLookForward(false);
                 localPlayer.m_lookPitch = Mathf.MoveTowards(localPlayer.m_lookPitch, 0f, dt * 5f);
