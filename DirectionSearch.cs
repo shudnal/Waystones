@@ -3,11 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Policy;
 using UnityEngine;
-using UnityEngine.UI;
 using static PocketTeleporter.PocketTeleporter;
-using static PrivilegeManager;
 
 namespace PocketTeleporter
 {
@@ -264,7 +261,7 @@ namespace PocketTeleporter
                 if (!activated)
                     return;
 
-                __result *= Mathf.Max(slowFactor.Value, 0.1f);// * (targetFoV / defaultFoV);
+                __result *= Mathf.Max(slowFactor.Value, 0.1f);
             }
         }
 
@@ -276,7 +273,7 @@ namespace PocketTeleporter
                 if (!activated)
                     return;
 
-                __result *= Mathf.Max(slowFactor.Value, 0.1f);// * (targetFoV / defaultFoV);
+                __result *= Mathf.Max(slowFactor.Value, 0.1f);
             }
         }
 
