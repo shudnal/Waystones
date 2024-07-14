@@ -66,6 +66,8 @@ namespace PocketTeleporter
             } 
 
             activated = false;
+            current = null;
+            currentAngle = 0f;
         }
 
         internal static void FillDirections()
@@ -74,15 +76,16 @@ namespace PocketTeleporter
 
             directions.Add(new Direction("$piece_bed_currentspawn", GetSpawnPoint()));
 
-            if (ZoneSystem.instance.FindClosestLocation("StartTemple", Player.m_localPlayer.transform.position, out ZoneSystem.LocationInstance location))
-                directions.Add(new Direction("StartTemple", location.m_position));
-
-            List<ZoneSystem.LocationInstance> locations = new List<ZoneSystem.LocationInstance>();
-            if (ZoneSystem.instance.FindLocations("Vendor_BlackForest", ref locations) && locations.Count == 1)
-                directions.Add(new Direction("$npc_haldor", locations[0].m_position));
-
-            if (ZoneSystem.instance.FindLocations("Hildir_camp", ref locations) && locations.Count == 1)
-                directions.Add(new Direction("$npc_hildir", locations[0].m_position));
+            ZoneSystem.instance.GetLocationIcons(ZoneSystem.instance.tempIconList);
+            foreach (KeyValuePair<Vector3, string> loc in ZoneSystem.instance.tempIconList)
+            {
+                if (loc.Value == "StartTemple")
+                    directions.Add(new Direction("StartTemple", loc.Key));
+                else if (loc.Value == "Vendor_BlackForest")
+                    directions.Add(new Direction("$npc_haldor", loc.Key));
+                else if (loc.Value == "Hildir_camp")
+                    directions.Add(new Direction("$npc_hildir", loc.Key));
+            }
         }
 
         internal static Vector3 GetSpawnPoint()
@@ -98,22 +101,32 @@ namespace PocketTeleporter
 
         internal static void Update()
         {
-            if (shortcut.Value.IsDown())
+            if (shortcut.Value.IsDown() && CanCast())
                 Toggle();
-
-            if (current != null && (ZInput.GetButton("Use") || ZInput.GetButton("JoyUse")))
+            else if (activated
+                && (ZInput.GetKeyDown(KeyCode.Escape) ||
+                    ZInput.GetButtonDown("JoyMenu") ||
+                    ZInput.GetButtonDown("Block") ||
+                    ZInput.GetButtonDown("JoyBlock") ||
+                    ZInput.GetButtonDown("JoyButtonB"))
+                && CanCast())
             {
                 Exit();
+            }
+
+            if (current != null && (ZInput.GetButton("Use") || ZInput.GetButton("JoyUse")) && CanCast())
+            {
                 if (current == placeOfMystery)
                     current.position = GetRandomPoint();
 
                 TeleportAttempt(current.position, current.name);
+                Exit();
             }
 
-            current = null;
-            currentAngle = 0f;
             if (!activated)
                 return;
+
+            current = null;
 
             targetFoV -= Mathf.Clamp(ZInput.GetMouseScrollWheel(), -1f, 1f);
             if (ZInput.GetButton("JoyAltKeys") && !Hud.InRadial())
