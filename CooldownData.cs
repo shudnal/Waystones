@@ -15,7 +15,7 @@ namespace PocketTeleporter
         public string globalTime;
         public double worldTime;
 
-        public double GetCooldown()
+        private double GetCooldownTime()
         {
             if (!ZNet.instance)
                 return 0;
@@ -28,14 +28,25 @@ namespace PocketTeleporter
             return 0;
         }
 
-        public void SetCooldown(double cooldown)
+        private void SetCooldownTime(double cooldown)
         {
             if (cooldownTime.Value == CooldownTime.GlobalTime)
                 globalTime = GetTime().AddSeconds(cooldown).ToString(CultureInfo.InvariantCulture);
             else
                 worldTime = ZNet.instance.GetTimeSeconds() + cooldown;
         }
-        
+
+        public static double GetCooldownTimeToTarget(Vector3 target)
+        {
+            float distance = Utils.DistanceXZ(Player.m_localPlayer.transform.position, target);
+            if (distance < cooldownDistanceMinimum.Value)
+                return cooldownMinimum.Value;
+            else if (distance > cooldownDistanceMaximum.Value)
+                return cooldownMaximum.Value;
+
+            return Mathf.Lerp(cooldownMinimum.Value, cooldownMaximum.Value, (distance - cooldownDistanceMinimum.Value) / (cooldownDistanceMaximum.Value - cooldownDistanceMinimum.Value));
+        }
+
         private static DateTime GetTime()
         {
             return DateTime.Now.ToUniversalTime();
@@ -57,11 +68,11 @@ namespace PocketTeleporter
             return data;
         }
 
-        internal static void SetCooldown(int cooldown)
+        public static void SetCooldown(double cooldown)
         {
             List<CooldownData> state = GetState();
 
-            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).SetCooldown(cooldown);
+            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).SetCooldownTime(cooldown);
 
             Player.m_localPlayer.m_customData[customDataKey] = SaveCooldownDataList(state);
         }
@@ -69,16 +80,16 @@ namespace PocketTeleporter
         internal static bool IsOnCooldown()
         {
             CooldownData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
-            return data != null && data.GetCooldown() > 0;
+            return data != null && data.GetCooldownTime() > 0;
         }
 
         internal static string GetCooldownString()
         {
             CooldownData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
-            return data == null ? "" : TimerString(data.GetCooldown());
+            return data == null ? "" : TimerString(data.GetCooldownTime());
         }
 
-        private static string TimerString(double seconds)
+        public static string TimerString(double seconds)
         {
             if (seconds < 60)
                 return DateTime.FromBinary(599266080000000000).AddSeconds(seconds).ToString(@"ss\s");

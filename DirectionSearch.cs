@@ -15,39 +15,50 @@ namespace PocketTeleporter
             public string name;
             public Vector3 position;
             public Color color;
+            public double cooldown;
 
             public Direction(string name, Vector3 position)
             {
                 this.name = name; 
                 this.position = position;
                 color = Color.yellow;
+                cooldown = CooldownData.GetCooldownTimeToTarget(position);
+            }
+
+            public string GetHoverText()
+            {
+                return Localization.instance.Localize($"\n[<color={ColorUtility.ToHtmlStringRGB(color)}><b>$KEY_Use</b></color>] $inventory_move: {name}\n$se_shield_ttl: {CooldownData.TimerString(cooldown)}");
             }
         }
 
         private static List<Direction> directions = new List<Direction>();
         private static Direction current;
         private static bool activated;
-        private static Direction placeOfMystery = new Direction("$placeofmystery", Vector2.zero);
+        private static readonly Direction placeOfMystery = new Direction("$placeofmystery", Vector2.zero);
         private static float currentAngle;
 
         private static float defaultFoV;
         private static float targetFoV;
 
         public static CanvasGroup screenBlackener;
+        public static AudioSource screenBlackenerSfx;
 
         internal static void Toggle()
         {
             if (activated)
                 Exit();
-            else
+            else if (useShortcutToEnter.Value)
                 Enter();
         }
 
         internal static void Enter()
         {
+            if (!CanCast())
+                return;
+
             if (!activated)
             {
-                Game.FadeTimeScale(slowFactor.Value, 4f);
+                Game.FadeTimeScale(slowFactorTime.Value, 4f);
                 targetFoV = defaultFoV;
             }
 
@@ -57,11 +68,14 @@ namespace PocketTeleporter
 
         internal static void Exit()
         {
+            if (!CanCast())
+                return;
+
             if (activated)
             {
                 GameCamera.instance.m_fov = defaultFoV;
 
-                if (Game.m_timeScale >= slowFactor.Value)
+                if (Game.m_timeScale >= slowFactorTime.Value)
                     Game.FadeTimeScale(1f, 2f);
             } 
 
@@ -101,15 +115,12 @@ namespace PocketTeleporter
 
         internal static void Update()
         {
-            if (shortcut.Value.IsDown() && CanCast())
+            if (shortcut.Value.IsDown())
                 Toggle();
             else if (activated
-                && (ZInput.GetKeyDown(KeyCode.Escape) ||
-                    ZInput.GetButtonDown("JoyMenu") ||
-                    ZInput.GetButtonDown("Block") ||
+                && (ZInput.GetButtonDown("Block") ||
                     ZInput.GetButtonDown("JoyBlock") ||
-                    ZInput.GetButtonDown("JoyButtonB"))
-                && CanCast())
+                    ZInput.GetButtonDown("JoyButtonB")))
             {
                 Exit();
             }
@@ -119,7 +130,7 @@ namespace PocketTeleporter
                 if (current == placeOfMystery)
                     current.position = GetRandomPoint();
 
-                TeleportAttempt(current.position, current.name);
+                TeleportAttempt(current.position, current.cooldown, current.name);
                 Exit();
             }
 
@@ -169,9 +180,14 @@ namespace PocketTeleporter
             return directionSensitivity.Value * targetFoV / defaultFoV;
         }
 
-        private static float GetCurrentSensivityThreshold()
+        private static float GetCurrentScreenSensivityThreshold()
         {
             return directionSensitivityThreshold.Value * targetFoV / defaultFoV;
+        }
+
+        private static float GetCurrentSfxSensivityThreshold()
+        {
+            return sfxSensitivityThreshold.Value * targetFoV / defaultFoV;
         }
 
         private static Vector3 GetRandomPoint()
@@ -212,7 +228,7 @@ namespace PocketTeleporter
             {
                 if (activated && current != null)
                 {
-                    __instance.m_hoverName.SetText(Localization.instance.Localize($"\n[<color=yellow><b>$KEY_Use</b></color>] $inventory_move: {current.name}"));
+                    __instance.m_hoverName.SetText(current.GetHoverText());
                     __instance.m_crosshair.color = __instance.m_hoverName.text.Length > 0 ? Color.yellow : new Color(1f, 1f, 1f, 0.5f);
                 }
             }
@@ -234,6 +250,18 @@ namespace PocketTeleporter
                 UnityEngine.Object.Destroy(blocker.transform.Find("Sleeping").gameObject);
                 UnityEngine.Object.Destroy(blocker.transform.Find("Teleporting").gameObject);
 
+                // sfx Magic_CollectorLoop
+                GameObject prefab = ZNetScene.instance.GetPrefab("guard_stone");
+                if (prefab != null)
+                {
+                    GameObject sfx = UnityEngine.Object.Instantiate(prefab.transform.Find("WayEffect/sfx").gameObject, blocker.transform);
+                    sfx.name = "sfx";
+                    sfx.AddComponent<FollowPlayer>();
+                    sfx.SetActive(true);
+
+                    screenBlackenerSfx = sfx.GetComponent<AudioSource>();
+                }
+
                 screenBlackener = blocker.GetComponent<CanvasGroup>();
                 screenBlackener.gameObject.SetActive(false);
 
@@ -249,11 +277,15 @@ namespace PocketTeleporter
                 if (activated)
                 {
                     screenBlackener.gameObject.SetActive(value: true);
-                    screenBlackener.alpha = Mathf.MoveTowards(screenBlackener.alpha, fadeMax.Value - (1f - Mathf.Clamp01(currentAngle / Mathf.Max(GetCurrentSensivityThreshold(), GetCurrentSensivity()))) * fadeDelta.Value, dt);
+                    screenBlackener.alpha = Mathf.MoveTowards(screenBlackener.alpha, Mathf.Lerp(fadeMin.Value, fadeMax.Value, currentAngle / Mathf.Max(GetCurrentScreenSensivityThreshold(), GetCurrentSensivity())), dt);
+                    screenBlackenerSfx.volume = Mathf.MoveTowards(screenBlackenerSfx.volume, Mathf.Lerp(sfxMax.Value, sfxMin.Value, currentAngle / Mathf.Max(GetCurrentSfxSensivityThreshold(), GetCurrentSensivity())), dt * 3);
+                    screenBlackenerSfx.pitch = Mathf.MoveTowards(screenBlackenerSfx.pitch, Mathf.Lerp(sfxPitchMax.Value, sfxPitchMin.Value, currentAngle / Mathf.Max(GetCurrentSfxSensivityThreshold(), GetCurrentSensivity())), dt);
                 }
                 else
                 {
                     screenBlackener.alpha = Mathf.MoveTowards(screenBlackener.alpha, 0f, dt / 2f);
+                    screenBlackenerSfx.volume = Mathf.MoveTowards(screenBlackenerSfx.volume, 0f, dt);
+                    screenBlackenerSfx.pitch = Mathf.MoveTowards(screenBlackenerSfx.pitch, 1f, dt);
                     if (screenBlackener.alpha <= 0f)
                         screenBlackener.gameObject.SetActive(value: false);
                 }
@@ -274,7 +306,7 @@ namespace PocketTeleporter
                 if (!activated)
                     return;
 
-                __result *= Mathf.Max(slowFactor.Value, 0.1f);
+                __result *= Mathf.Max(slowFactorLook.Value, 0.01f);
             }
         }
 
@@ -286,7 +318,7 @@ namespace PocketTeleporter
                 if (!activated)
                     return;
 
-                __result *= Mathf.Max(slowFactor.Value, 0.1f);
+                __result *= Mathf.Max(slowFactorLook.Value, 0.01f);
             }
         }
 
@@ -300,7 +332,9 @@ namespace PocketTeleporter
                 yield return AccessTools.Method(typeof(Game), nameof(Game.Unpause));
                 yield return AccessTools.Method(typeof(Game), nameof(Game.Pause));
                 yield return AccessTools.Method(typeof(ZoneSystem), nameof(ZoneSystem.Start));
+                yield return AccessTools.Method(typeof(ZoneSystem), nameof(ZoneSystem.OnDestroy));
                 yield return AccessTools.Method(typeof(FejdStartup), nameof(FejdStartup.Start));
+                yield return AccessTools.Method(typeof(FejdStartup), nameof(FejdStartup.OnDestroy));
             }
 
             private static void Postfix() => Exit();
@@ -329,5 +363,22 @@ namespace PocketTeleporter
                     __instance.m_zoomSens = __state;
             }
         }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.SetControls))]
+        public static class Player_SetControls_SearchModeExit
+        {
+            private static void Postfix(Player __instance, Vector3 movedir, bool attack, bool secondaryAttack, bool block, bool jump, bool crouch, bool run, bool autoRun, bool dodge)
+            {
+                if (!activated)
+                    return;
+
+                if (__instance != Player.m_localPlayer)
+                    return;
+
+                if (movedir.magnitude > 0.05f || attack  || secondaryAttack ||  block ||  jump || crouch || run || autoRun || dodge)
+                    activated = false;
+            }
+        }
+
     }
 }

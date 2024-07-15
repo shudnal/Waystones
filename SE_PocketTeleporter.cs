@@ -37,6 +37,8 @@ namespace PocketTeleporter
         [NonSerialized]
         public Vector3 targetPoint = Vector3.zero;
         [NonSerialized]
+        public double targetCooldown = 0;
+        [NonSerialized]
         private bool lookDirTriggered;
         [NonSerialized]
         private bool teleportTriggered;
@@ -119,7 +121,7 @@ namespace PocketTeleporter
                 m_character.m_lookTransitionTime = 0f;
 
                 if (m_character == Player.m_localPlayer)
-                    CooldownData.SetCooldown(teleportTriggered ? PocketTeleporter.cooldownFull.Value : PocketTeleporter.cooldownShort.Value);
+                    CooldownData.SetCooldown(teleportTriggered ? targetCooldown : PocketTeleporter.cooldownShort.Value);
             }
         }
 
