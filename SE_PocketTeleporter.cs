@@ -121,7 +121,7 @@ namespace PocketTeleporter
                 m_character.m_lookTransitionTime = 0f;
 
                 if (m_character == Player.m_localPlayer)
-                    CooldownData.SetCooldown(teleportTriggered ? targetCooldown : PocketTeleporter.cooldownShort.Value);
+                    WorldData.SetCooldown(teleportTriggered ? targetCooldown : PocketTeleporter.cooldownShort.Value);
             }
         }
 

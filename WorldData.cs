@@ -9,11 +9,14 @@ using System.Text;
 namespace PocketTeleporter
 {
     [Serializable]
-    public class CooldownData
+    public class WorldData
     {
         public long worldUID;
         public string globalTime;
         public double worldTime;
+        public Vector3 lastTombstone;
+        public Vector3 lastShip;
+        public Vector3 lastPosition;
 
         private double GetCooldownTime()
         {
@@ -38,6 +41,10 @@ namespace PocketTeleporter
 
         public static double GetCooldownTimeToTarget(Vector3 target)
         {
+            // Random point
+            if (target == Vector3.zero)
+                return cooldownMinimum.Value;
+
             float distance = Utils.DistanceXZ(Player.m_localPlayer.transform.position, target);
             if (distance < cooldownDistanceMinimum.Value)
                 return cooldownMinimum.Value;
@@ -52,12 +59,12 @@ namespace PocketTeleporter
             return DateTime.Now.ToUniversalTime();
         }
 
-        internal static CooldownData GetWorldData(List<CooldownData> state, long uid, bool createIfEmpty = false)
+        internal static WorldData GetWorldData(List<WorldData> state, long uid, bool createIfEmpty = false)
         {
-            CooldownData data = state.Find(d => d.worldUID == uid);
+            WorldData data = state.Find(d => d.worldUID == uid);
             if (createIfEmpty && data == null)
             {
-                data = new CooldownData
+                data = new WorldData
                 {
                     worldUID = ZNet.instance.GetWorldUID()
                 };
@@ -70,22 +77,22 @@ namespace PocketTeleporter
 
         public static void SetCooldown(double cooldown)
         {
-            List<CooldownData> state = GetState();
+            List<WorldData> state = GetState();
 
             GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).SetCooldownTime(cooldown);
 
-            Player.m_localPlayer.m_customData[customDataKey] = SaveCooldownDataList(state);
+            Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
         }
 
         internal static bool IsOnCooldown()
         {
-            CooldownData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
+            WorldData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
             return data != null && data.GetCooldownTime() > 0;
         }
 
         internal static string GetCooldownString()
         {
-            CooldownData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
+            WorldData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
             return data == null ? "" : TimerString(data.GetCooldownTime());
         }
 
@@ -97,23 +104,25 @@ namespace PocketTeleporter
             TimeSpan span = TimeSpan.FromSeconds(seconds);
             if (span.Hours > 0)
                 return $"{(int)span.TotalHours}{new DateTime(span.Ticks).ToString(@"\h mm\m")}";
+            else if (span.Seconds == 0)
+                return new DateTime(span.Ticks).ToString(@"mm\m");
             else
                 return new DateTime(span.Ticks).ToString(@"mm\m ss\s");
         }
 
-        private static List<CooldownData> GetState()
+        private static List<WorldData> GetState()
         {
-            return Player.m_localPlayer.m_customData.TryGetValue(customDataKey, out string value) ? GetCooldownDataList(value) : new List<CooldownData>();
+            return Player.m_localPlayer.m_customData.TryGetValue(customDataKey, out string value) ? GetWorldDataList(value) : new List<WorldData>();
         }
 
-        private static List<CooldownData> GetCooldownDataList(string value)
+        private static List<WorldData> GetWorldDataList(string value)
         {
-            List<CooldownData> data = new List<CooldownData>();
-            SplitToLines(value).Do(line => data.Add(JsonUtility.FromJson<CooldownData>(line)));
+            List<WorldData> data = new List<WorldData>();
+            SplitToLines(value).Do(line => data.Add(JsonUtility.FromJson<WorldData>(line)));
             return data;
         }
 
-        private static string SaveCooldownDataList(List<CooldownData> list)
+        private static string SaveWorldDataList(List<WorldData> list)
         {
             StringBuilder sb = new StringBuilder();
             list.Do(data => sb.AppendLine(JsonUtility.ToJson(data)));

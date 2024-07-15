@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DirectionSearch.cs" />
-    <Compile Include="CooldownData.cs" />
+    <Compile Include="WorldData.cs" />
     <Compile Include="CustomPrefabs.cs" />
     <Compile Include="PocketTeleporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

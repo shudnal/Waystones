@@ -52,7 +52,7 @@ namespace PocketTeleporter
 
         public static string configDirectory;
 
-        public const string customDataKey = "PocketTeleporterCooldown";
+        public const string customDataKey = "PocketTeleporter";
 
         public enum CooldownTime
         {
@@ -156,8 +156,8 @@ namespace PocketTeleporter
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$se_encumbered_start");
                 else if (!Player.m_localPlayer.IsTeleportable())
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_noteleport");
-                else if (CooldownData.IsOnCooldown())
-                    Player.m_localPlayer.Message(MessageHud.MessageType.Center, $"$hud_powernotready: {CooldownData.GetCooldownString()}");
+                else if (WorldData.IsOnCooldown())
+                    Player.m_localPlayer.Message(MessageHud.MessageType.Center, $"$hud_powernotready: {WorldData.GetCooldownString()}");
                 else
                 {
                     SE_PocketTeleporter se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash) as SE_PocketTeleporter;

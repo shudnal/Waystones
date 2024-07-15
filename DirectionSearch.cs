@@ -22,12 +22,12 @@ namespace PocketTeleporter
                 this.name = name; 
                 this.position = position;
                 color = Color.yellow;
-                cooldown = CooldownData.GetCooldownTimeToTarget(position);
+                cooldown = WorldData.GetCooldownTimeToTarget(position);
             }
 
             public string GetHoverText()
             {
-                return Localization.instance.Localize($"\n[<color={ColorUtility.ToHtmlStringRGB(color)}><b>$KEY_Use</b></color>] $inventory_move: {name}\n$se_shield_ttl: {CooldownData.TimerString(cooldown)}");
+                return Localization.instance.Localize($"\n[<color=#{ColorUtility.ToHtmlStringRGB(color)}><b>$KEY_Use</b></color>] $inventory_move: {name} <color=#add8e6>({WorldData.TimerString(cooldown)})</color>");
             }
         }
 
@@ -335,6 +335,7 @@ namespace PocketTeleporter
                 yield return AccessTools.Method(typeof(ZoneSystem), nameof(ZoneSystem.OnDestroy));
                 yield return AccessTools.Method(typeof(FejdStartup), nameof(FejdStartup.Start));
                 yield return AccessTools.Method(typeof(FejdStartup), nameof(FejdStartup.OnDestroy));
+                yield return AccessTools.Method(typeof(Player), nameof(Player.SetSleeping));
             }
 
             private static void Postfix() => Exit();
@@ -375,10 +376,82 @@ namespace PocketTeleporter
                 if (__instance != Player.m_localPlayer)
                     return;
 
-                if (movedir.magnitude > 0.05f || attack  || secondaryAttack ||  block ||  jump || crouch || run || autoRun || dodge)
-                    activated = false;
+                if (movedir.magnitude > 0.05f || attack || secondaryAttack || block || jump || crouch || run || autoRun || dodge)
+                    Exit();
             }
         }
 
+        [HarmonyPatch(typeof(Fireplace), nameof(Fireplace.GetHoverText))]
+        internal class Fireplace_GetHoverText_HoverTextWithSearchAction
+        {
+            internal static Fireplace activeFireplace;
+
+            private static void Postfix(Fireplace __instance, ref string __result)
+            {
+                activeFireplace = null;
+
+                if (!Player.m_localPlayer.IsSitting() || Player.m_localPlayer.InInterior())
+                    return;
+
+                string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
+                if (__result.IndexOf(Localization.instance.Localize(altKey)) != -1)
+                    return;
+
+                if (WorldData.IsOnCooldown())
+                {
+                    __result += Localization.instance.Localize($"\n$hud_powernotready: {WorldData.GetCooldownString()}");
+                }
+                else if (Player.m_localPlayer.GetSEMan().HaveStatusEffect(SEMan.s_statusEffectWet))
+                {
+                    if (__result.IndexOf("$msg_bedwet") <= 0)
+                        __result += Localization.instance.Localize("\n$msg_bedwet");
+                }
+                else if (Player.m_localPlayer.IsSensed())
+                {
+                    if (__result.IndexOf("$msg_bedenemiesnearby") <= 0)
+                        __result += Localization.instance.Localize("\n$msg_bedenemiesnearby");
+                }
+                else
+                {
+                    __result += Localization.instance.Localize($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $menu_start");
+                    activeFireplace = __instance;
+                }
+            }
+        }
+
+        private static bool CanSearch()
+        {
+            return Player.m_localPlayer != null && !Player.m_localPlayer.IsSleeping() && Player.m_localPlayer.IsSitting() && !Player.m_localPlayer.InInterior() && !Player.m_localPlayer.GetSEMan().HaveStatusEffect(SEMan.s_statusEffectWet) && !Player.m_localPlayer.IsSensed();
+        }
+
+        [HarmonyPatch(typeof(Fireplace), nameof(Fireplace.Interact))]
+        private class Fireplace_Interact_EnterSearchMode
+        {
+            [HarmonyAfter(new string[1] { "shudnal.JustSleep" })]
+            private static bool Prefix(Fireplace __instance, Humanoid user, bool hold, bool alt)
+            {
+                if (!alt || hold || user != Player.m_localPlayer || !CanSearch() || Fireplace_GetHoverText_HoverTextWithSearchAction.activeFireplace != __instance)
+                    return true;
+
+                Enter();
+                return false;
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.GetHoverObject))]
+        public static class Player_GetHoverObject_SearchMode
+        {
+            private static bool Prefix(Player __instance, ref GameObject __result)
+            {
+                if (__instance != Player.m_localPlayer)
+                    return true;
+
+                if (!activated)
+                    return true;
+                
+                __result = null;
+                return false;
+            }
+        }
     }
 }
