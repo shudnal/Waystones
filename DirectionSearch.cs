@@ -8,7 +8,7 @@ using static PocketTeleporter.PocketTeleporter;
 
 namespace PocketTeleporter
 {
-    internal class DirectionSearch
+    public class DirectionSearch
     {
         public class Direction
         {
@@ -27,14 +27,14 @@ namespace PocketTeleporter
 
             public string GetHoverText()
             {
-                return Localization.instance.Localize($"\n[<color=#{ColorUtility.ToHtmlStringRGB(color)}><b>$KEY_Use</b></color>] $inventory_move: {name} <color=#add8e6>({WorldData.TimerString(cooldown)})</color>");
+                return Localization.instance.Localize($"\n[<color=#{ColorUtility.ToHtmlStringRGB(color)}><b>$KEY_Use</b></color>] {GetLocalization(localizationTeleportTo, "$inventory_move")}: {name} <color=#add8e6>({WorldData.TimerString(cooldown)})</color>");
             }
         }
 
         private static List<Direction> directions = new List<Direction>();
         private static Direction current;
         private static bool activated;
-        private static readonly Direction placeOfMystery = new Direction("$placeofmystery", Vector2.zero);
+        private static readonly Direction placeOfMystery = new Direction(GetLocalization(localizationRandomPoint, "$placeofmystery"), Vector2.zero);
         private static float currentAngle;
 
         private static float defaultFoV;
@@ -42,6 +42,8 @@ namespace PocketTeleporter
 
         public static CanvasGroup screenBlackener;
         public static AudioSource screenBlackenerSfx;
+
+        public static bool saveNextGroundPositionAsShipLocation;
 
         internal static void Toggle()
         {
@@ -88,18 +90,24 @@ namespace PocketTeleporter
         {
             directions.Clear();
 
-            directions.Add(new Direction("$piece_bed_currentspawn", GetSpawnPoint()));
+            directions.Add(new Direction(GetLocalization(localizationSpawnPoint, "$piece_bed_currentspawn"), GetSpawnPoint()));
 
             ZoneSystem.instance.GetLocationIcons(ZoneSystem.instance.tempIconList);
             foreach (KeyValuePair<Vector3, string> loc in ZoneSystem.instance.tempIconList)
             {
                 if (loc.Value == "StartTemple")
-                    directions.Add(new Direction("StartTemple", loc.Key));
+                    directions.Add(new Direction(GetLocalization(localizationStartTemple, "Sacrificial Stones"), loc.Key));
                 else if (loc.Value == "Vendor_BlackForest")
                     directions.Add(new Direction("$npc_haldor", loc.Key));
                 else if (loc.Value == "Hildir_camp")
                     directions.Add(new Direction("$npc_hildir", loc.Key));
             }
+
+            PlayerProfile profile = Game.instance.GetPlayerProfile();
+            if (profile.HaveDeathPoint())
+                directions.Add(new Direction(GetLocalization(localizationLastTombstone, "Last tombstone"), profile.GetDeathPoint()));
+
+            directions.AddRange(WorldData.GetSavedDirections());
         }
 
         internal static Vector3 GetSpawnPoint()
@@ -413,7 +421,7 @@ namespace PocketTeleporter
                 }
                 else
                 {
-                    __result += Localization.instance.Localize($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $menu_start");
+                    __result += Localization.instance.Localize($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] {GetLocalization(localizationStartSearch, "$menu_start")}");
                     activeFireplace = __instance;
                 }
             }
@@ -451,6 +459,34 @@ namespace PocketTeleporter
                 
                 __result = null;
                 return false;
+            }
+        }
+
+        [HarmonyPatch(typeof(Ship), nameof(Ship.OnTriggerExit))]
+        public static class Ship_OnTriggerExit_LastShipPosition
+        {
+            private static void Postfix(Collider collider)
+            {
+                if (Player.m_localPlayer != collider.GetComponent<Player>())
+                    return;
+
+                saveNextGroundPositionAsShipLocation = true;
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.FixedUpdate))]
+        public static class Player_FixedUpdate_SaveLastShipPosition
+        {
+            private static void Postfix(Player __instance)
+            {
+                if (__instance != Player.m_localPlayer)
+                    return;
+
+                if (saveNextGroundPositionAsShipLocation && __instance.IsOnGround())
+                {
+                    saveNextGroundPositionAsShipLocation = false;
+                    WorldData.SaveLastShip(Player.m_localPlayer.transform.position);
+                }
             }
         }
     }

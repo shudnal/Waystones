@@ -50,6 +50,15 @@ namespace PocketTeleporter
 
         internal static ConfigEntry<bool> particlesCollision;
 
+        internal static ConfigEntry<string> localizationLastTombstone;
+        internal static ConfigEntry<string> localizationLastShip;
+        internal static ConfigEntry<string> localizationLastLocation;
+        internal static ConfigEntry<string> localizationTeleportTo;
+        internal static ConfigEntry<string> localizationStartTemple;
+        internal static ConfigEntry<string> localizationSpawnPoint;
+        internal static ConfigEntry<string> localizationStartSearch;
+        internal static ConfigEntry<string> localizationRandomPoint;
+
         public static string configDirectory;
 
         public const string customDataKey = "PocketTeleporter";
@@ -108,6 +117,15 @@ namespace PocketTeleporter
             cooldownShort = config("Teleport cooldown", "Teleportation interrupted", defaultValue: 120, "Cooldown to be set if teleportation was interrupted");
 
             particlesCollision = config("Misc", "Particles physics collision", defaultValue: false, "Make particles emitted while teleporting collide with objects. Restart required.");
+
+            localizationLastTombstone = config("Localization", "Last tombstone", defaultValue: "Last tombstone", "Name of location of last tombstone");
+            localizationLastShip = config("Localization", "Last ship", defaultValue: "Last ship", "Name of location of last ship");
+            localizationLastLocation = config("Localization", "Last location", defaultValue: "Last location", "Name of location of last location you teleported from");
+            localizationStartTemple = config("Localization", "Last tombstone", defaultValue: "Sacrificial Stones", "Name of location of last tombstone");
+            localizationSpawnPoint = config("Localization", "Spawn point", defaultValue: "$piece_bed_currentspawn", "Name of location of current spawn point (bed)");
+            localizationRandomPoint = config("Localization", "Random place", defaultValue: "$placeofmystery", "Name of location where you teleport to random place");
+            localizationStartSearch = config("Localization", "Start search mode", defaultValue: "$menu_start", "Label on fireplace hover");
+            localizationTeleportTo = config("Localization", "Teleport to", defaultValue: "$inventory_move", "Label on location hover");
         }
 
         private void OnDestroy()
@@ -129,10 +147,11 @@ namespace PocketTeleporter
                 Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash);
 
             DirectionSearch.Update();
+        }
 
-            // last tombstone
-            // last ship
-            // last location
+        public static string GetLocalization(ConfigEntry<string> config, string defaultValue)
+        {
+            return config.Value.IsNullOrWhiteSpace() ? defaultValue : config.Value;
         }
 
         public static void TeleportAttempt(Vector3 targetPoint, double cooldown, string message)

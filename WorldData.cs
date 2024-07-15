@@ -14,9 +14,47 @@ namespace PocketTeleporter
         public long worldUID;
         public string globalTime;
         public double worldTime;
-        public Vector3 lastTombstone;
-        public Vector3 lastShip;
-        public Vector3 lastPosition;
+        public Vector3 lastShip = Vector3.zero;
+        public Vector3 lastPosition = Vector3.zero;
+
+        public static List<DirectionSearch.Direction> GetSavedDirections()
+        {
+            List<DirectionSearch.Direction> result = new List<DirectionSearch.Direction>();
+
+            WorldData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
+            if (data == null)
+                return result;
+
+            if (data.lastShip != Vector3.zero)
+                result.Add(new DirectionSearch.Direction(GetLocalization(localizationLastShip, "Last ship"), data.lastShip));
+
+            if (data.lastPosition != Vector3.zero)
+                result.Add(new DirectionSearch.Direction(GetLocalization(localizationLastLocation, "Last location"), data.lastPosition));
+
+            return result;
+        }
+
+        public static void SaveLastPosition(Vector3 position)
+        {
+            List<WorldData> state = GetState();
+
+            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).lastPosition = position;
+
+            Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
+
+            LogInfo("Last teleport location saved: " + position);
+        }
+
+        public static void SaveLastShip(Vector3 position)
+        {
+            List<WorldData> state = GetState();
+
+            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).lastShip = position;
+
+            Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
+
+            LogInfo("Last ship location saved: " + position);
+        }
 
         private double GetCooldownTime()
         {
@@ -129,7 +167,7 @@ namespace PocketTeleporter
             return sb.ToString();
         }
 
-        public static IEnumerable<string> SplitToLines(string input)
+        private static IEnumerable<string> SplitToLines(string input)
         {
             if (input == null)
             {

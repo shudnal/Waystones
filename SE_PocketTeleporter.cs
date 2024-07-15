@@ -80,6 +80,7 @@ namespace PocketTeleporter
                 if (!teleportTriggered && GetRemaningTime() < 0.75f && targetPoint != Vector3.zero)
                 {
                     localPlayer.TeleportTo(targetPoint, localPlayer.transform.rotation, distantTeleport: true);
+                    WorldData.SaveLastPosition(localPlayer.transform.position);
                     teleportTriggered = true;
                 }
             }
