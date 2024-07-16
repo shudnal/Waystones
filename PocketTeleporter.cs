@@ -26,7 +26,13 @@ namespace PocketTeleporter
         internal static ConfigEntry<bool> configLocked;
         internal static ConfigEntry<bool> loggingEnabled;
         internal static ConfigEntry<KeyboardShortcut> shortcut;
+
         internal static ConfigEntry<bool> useShortcutToEnter;
+        internal static ConfigEntry<bool> allowEncumbered;
+        internal static ConfigEntry<bool> allowNonTeleportableItems;
+        internal static ConfigEntry<bool> emitNoiseOnTeleportation;
+        internal static ConfigEntry<bool> ignoreWetToStartSearch;
+        internal static ConfigEntry<bool> ignoreSensedToStartSearch;
 
         internal static ConfigEntry<float> directionSensitivity;
         internal static ConfigEntry<float> directionSensitivityThreshold;
@@ -47,8 +53,14 @@ namespace PocketTeleporter
         internal static ConfigEntry<int> cooldownDistanceMaximum;
         internal static ConfigEntry<int> cooldownDistanceMinimum;
         internal static ConfigEntry<int> cooldownShort;
+        internal static ConfigEntry<int> cooldownSearchMode;
 
         internal static ConfigEntry<bool> particlesCollision;
+        internal static ConfigEntry<int> particlesMaxAmount;
+        internal static ConfigEntry<int> particlesMinRateOverTime;
+        internal static ConfigEntry<int> particlesMaxRateOverTime;
+        internal static ConfigEntry<int> particlesMinForceOverTime;
+        internal static ConfigEntry<int> particlesMaxForceOverTime;
 
         internal static ConfigEntry<string> localizationLastTombstone;
         internal static ConfigEntry<string> localizationLastShip;
@@ -92,7 +104,13 @@ namespace PocketTeleporter
             configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
             loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
             shortcut = config("General", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y), "Exit direction search mode and stop teleporting shortcut");
-            useShortcutToEnter = config("General", "Use shortcut to enter search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut");
+            
+            useShortcutToEnter = config("Restrictions", "Use shortcut to enter search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut. If not set - you have to sit in front of the fire to start search mode.");
+            allowEncumbered = config("Restrictions", "Use teleportation when encumbered", defaultValue: false, "If enabled then encumbrance check will be omitted.");
+            allowNonTeleportableItems = config("Restrictions", "Use teleportation with nonteleportable items", defaultValue: false, "If enabled then inventory check will be omitted.");
+            emitNoiseOnTeleportation = config("Restrictions", "Emit noise on teleportation", defaultValue: true, "If enabled then you will attract attention of nearby enemies on teleportation start.");
+            ignoreWetToStartSearch = config("Restrictions", "Ignore wet status to start search", defaultValue: false, "If enabled then Wet status check before search start will be omitted.");
+            ignoreSensedToStartSearch = config("Restrictions", "Ignore nearby enemies to start search", defaultValue: false, "If enabled then Sensed by nearby enemies check before search start will be omitted.");
 
             directionSensitivity = config("Search mode", "Target sensitivity threshold", defaultValue: 2f, "Angle between look direction and target direction for location to appear in search mode");
             directionSensitivityThreshold = config("Search mode", "Screen sensitivity threshold", defaultValue: 6f, "Angle between look direction and target direction for location to start appearing in search mode");
@@ -110,22 +128,30 @@ namespace PocketTeleporter
             cooldownTime = config("Teleport cooldown", "Time", defaultValue: CooldownTime.WorldTime, "Time type to calculate cooldown." +
                                                                                                      "\nWorld time - calculate from time passed in game world" +
                                                                                                      "\nGlobal time - calculate from real world time");
-            cooldownDistanceMaximum = config("Teleport cooldown", "Teleportation successful maximum distance", defaultValue: 5000, "If teleportation distance is larger then that cooldown will be set to maximum. World radius is 10000.");
-            cooldownDistanceMinimum = config("Teleport cooldown", "Teleportation successful minimum distance", defaultValue: 500, "If teleportation distance is smaller then that cooldown will be set to minimum. World radius is 10000.");
-            cooldownMaximum = config("Teleport cooldown", "Teleportation successful maximum cooldown", defaultValue: 7200, "Maximal cooldown to be set after successfull teleportation");
-            cooldownMinimum = config("Teleport cooldown", "Teleportation successful minimum cooldown", defaultValue: 600, "Minimal cooldown to be set after successfull teleportation");
-            cooldownShort = config("Teleport cooldown", "Teleportation interrupted", defaultValue: 120, "Cooldown to be set if teleportation was interrupted");
+            cooldownDistanceMaximum = config("Teleport cooldown", "Teleportation distance maximum", defaultValue: 5000, "If teleportation distance is larger then that cooldown will be set to maximum. World radius is 10000.");
+            cooldownDistanceMinimum = config("Teleport cooldown", "Teleportation distance minimum", defaultValue: 500, "If teleportation distance is smaller then that cooldown will be set to minimum. World radius is 10000.");
+            cooldownMaximum = config("Teleport cooldown", "Teleportation cooldown maximum", defaultValue: 7200, "Maximal cooldown to be set after successfull teleportation");
+            cooldownMinimum = config("Teleport cooldown", "Teleportation cooldown minimum", defaultValue: 600, "Minimal cooldown to be set after successfull teleportation");
+            cooldownShort = config("Teleport cooldown", "Teleportation interrupted cooldown", defaultValue: 120, "Cooldown to be set if teleportation was interrupted");
+            cooldownSearchMode = config("Teleport cooldown", "Search mode cooldown", defaultValue: 120, "Cooldown to be set on search mode exit");
 
-            particlesCollision = config("Misc", "Particles physics collision", defaultValue: false, "Make particles emitted while teleporting collide with objects. Restart required.");
-
-            localizationLastTombstone = config("Localization", "Last tombstone", defaultValue: "Last tombstone", "Name of location of last tombstone");
-            localizationLastShip = config("Localization", "Last ship", defaultValue: "Last ship", "Name of location of last ship");
+            localizationLastTombstone = config("Localization", "Last tombstone", defaultValue: "Last tombstone", "Name of location of last death point");
+            localizationLastShip = config("Localization", "Last ship", defaultValue: "Last ship", "Name of last location where you get off the ship and touched the ground");
             localizationLastLocation = config("Localization", "Last location", defaultValue: "Last location", "Name of location of last location you teleported from");
-            localizationStartTemple = config("Localization", "Last tombstone", defaultValue: "Sacrificial Stones", "Name of location of last tombstone");
+            localizationStartTemple = config("Localization", "Sacrificial Stones", defaultValue: "Sacrificial Stones", "Name of location of start temple with sacrificial stones");
             localizationSpawnPoint = config("Localization", "Spawn point", defaultValue: "$piece_bed_currentspawn", "Name of location of current spawn point (bed)");
             localizationRandomPoint = config("Localization", "Random place", defaultValue: "$placeofmystery", "Name of location where you teleport to random place");
             localizationStartSearch = config("Localization", "Start search mode", defaultValue: "$menu_start", "Label on fireplace hover");
             localizationTeleportTo = config("Localization", "Teleport to", defaultValue: "$inventory_move", "Label on location hover");
+
+            particlesCollision = config("Teleportation effect", "Particles physics collision", defaultValue: false, "Make particles emitted while teleporting collide with objects. Restart required.");
+            particlesMaxAmount = config("Teleportation effect", "Particles amount maximum", defaultValue: 8000, "Maximum amount of particles emitted. Restart required.");
+            particlesMaxRateOverTime = config("Teleportation effect", "Particles rate over time maximum", defaultValue: 4000, "Maximum amount of particles emitted per second at the curve end. Restart required.");
+            particlesMinRateOverTime = config("Teleportation effect", "Particles rate over time minimum", defaultValue: 50, "Minimum amount of particles emitted per second at the curve start. Restart required.");
+            particlesMaxForceOverTime = config("Teleportation effect", "Particles force over time maximum", defaultValue: 10, "Maximum emission force of particles emitted at the curve end. Restart required.");
+            particlesMinForceOverTime = config("Teleportation effect", "Particles force over time minimum", defaultValue: 5, "Minimum emission force of particles emitted at the curve start. Restart required.");
+
+            InitCommands();
         }
 
         private void OnDestroy()
@@ -149,18 +175,26 @@ namespace PocketTeleporter
             DirectionSearch.Update();
         }
 
+        public static void InitCommands()
+        {
+            new Terminal.ConsoleCommand("setteleportercooldown", "seconds", delegate (Terminal.ConsoleEventArgs args)
+            {
+                WorldData.SetCooldown(args.TryParameterInt(1, 0));
+            }, isCheat: true);
+        }
+
         public static string GetLocalization(ConfigEntry<string> config, string defaultValue)
         {
             return config.Value.IsNullOrWhiteSpace() ? defaultValue : config.Value;
         }
 
-        public static void TeleportAttempt(Vector3 targetPoint, double cooldown, string message)
+        public static void TeleportAttempt(Vector3 targetPoint, double cooldown, string location)
         {
             if (!CanCast())
                 return;
 
-            if (!message.IsNullOrWhiteSpace())
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, message);
+            if (!location.IsNullOrWhiteSpace())
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"{GetLocalization(localizationTeleportTo, "$inventory_move")}: {location}");
 
             SEMan seman = Player.m_localPlayer.GetSEMan();
             if (seman.HaveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash))
@@ -171,9 +205,9 @@ namespace PocketTeleporter
             {
                 if (IsNotInPosition(Player.m_localPlayer))
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_cart_incorrectposition");
-                else if (Player.m_localPlayer.IsEncumbered())
+                else if (!allowEncumbered.Value && Player.m_localPlayer.IsEncumbered())
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$se_encumbered_start");
-                else if (!Player.m_localPlayer.IsTeleportable())
+                else if (!allowNonTeleportableItems.Value && !Player.m_localPlayer.IsTeleportable())
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_noteleport");
                 else if (WorldData.IsOnCooldown())
                     Player.m_localPlayer.Message(MessageHud.MessageType.Center, $"$hud_powernotready: {WorldData.GetCooldownString()}");
@@ -184,10 +218,19 @@ namespace PocketTeleporter
                     {
                         se.targetPoint = targetPoint;
                         se.targetCooldown = cooldown;
-                        Player.m_localPlayer.AddNoise(50f);
-                        BaseAI.DoProjectileHitNoise(Player.m_localPlayer.transform.position, 50f, Player.m_localPlayer);
-                        if (!message.IsNullOrWhiteSpace())
-                            MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, message);
+                        
+                        if (emitNoiseOnTeleportation.Value)
+                        {
+                            Player.m_localPlayer.AddNoise(50f);
+                            BaseAI.DoProjectileHitNoise(Player.m_localPlayer.transform.position, 50f, Player.m_localPlayer);
+                        }
+
+                        if (!location.IsNullOrWhiteSpace())
+                        {
+                            MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, $"{GetLocalization(localizationTeleportTo, "$inventory_move")}: {location}");
+                            se.m_name = location;
+                            LogInfo($"Teleport initiated to {location} pos {targetPoint} cooldown {WorldData.TimerString(cooldown)}");
+                        }
                     }
                 }
             }

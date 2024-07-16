@@ -25,10 +25,10 @@ namespace PocketTeleporter
             if (data == null)
                 return result;
 
-            if (data.lastShip != Vector3.zero)
+            if (data.lastShip != null && data.lastShip != Vector3.zero)
                 result.Add(new DirectionSearch.Direction(GetLocalization(localizationLastShip, "Last ship"), data.lastShip));
 
-            if (data.lastPosition != Vector3.zero)
+            if (data.lastPosition != null && data.lastPosition != Vector3.zero)
                 result.Add(new DirectionSearch.Direction(GetLocalization(localizationLastLocation, "Last location"), data.lastPosition));
 
             return result;
@@ -115,11 +115,16 @@ namespace PocketTeleporter
 
         public static void SetCooldown(double cooldown)
         {
+            if (!ZNet.instance)
+                return;
+
             List<WorldData> state = GetState();
 
             GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).SetCooldownTime(cooldown);
 
             Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
+
+            LogInfo($"Cooldown set {TimerString(cooldown)}");
         }
 
         internal static bool IsOnCooldown()

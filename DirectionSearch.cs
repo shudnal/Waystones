@@ -58,19 +58,27 @@ namespace PocketTeleporter
             if (!CanCast())
                 return;
 
+            if (useShortcutToEnter.Value && WorldData.IsOnCooldown())
+            {
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, Localization.instance.Localize($"\n$hud_powernotready: {WorldData.GetCooldownString()}"));
+                return;
+            }
+
             if (!activated)
             {
                 Game.FadeTimeScale(slowFactorTime.Value, 4f);
                 targetFoV = defaultFoV;
+
+                LogInfo($"Search mode activated at {Player.m_localPlayer.transform.position}");
             }
 
             FillDirections();
             activated = true;
         }
 
-        internal static void Exit()
+        internal static void Exit(bool force = false)
         {
-            if (!CanCast())
+            if (!CanCast() && !force)
                 return;
 
             if (activated)
@@ -78,8 +86,13 @@ namespace PocketTeleporter
                 GameCamera.instance.m_fov = defaultFoV;
 
                 if (Game.m_timeScale >= slowFactorTime.Value)
-                    Game.FadeTimeScale(1f, 2f);
-            } 
+                    Game.FadeTimeScale(1f, 1f);
+
+                if (!WorldData.IsOnCooldown())
+                    WorldData.SetCooldown(cooldownSearchMode.Value);
+               
+                LogInfo($"Search mode ended");
+            }
 
             activated = false;
             current = null;
@@ -108,6 +121,8 @@ namespace PocketTeleporter
                 directions.Add(new Direction(GetLocalization(localizationLastTombstone, "Last tombstone"), profile.GetDeathPoint()));
 
             directions.AddRange(WorldData.GetSavedDirections());
+
+            directions.Do(d => LogInfo($"{Localization.instance.Localize(d.name)} {d.position} {WorldData.TimerString(d.cooldown)}"));
         }
 
         internal static Vector3 GetSpawnPoint()
@@ -141,6 +156,9 @@ namespace PocketTeleporter
                 TeleportAttempt(current.position, current.cooldown, current.name);
                 Exit();
             }
+
+            if (activated && !CanCast())
+                Exit(force: true);
 
             if (!activated)
                 return;
@@ -344,9 +362,12 @@ namespace PocketTeleporter
                 yield return AccessTools.Method(typeof(FejdStartup), nameof(FejdStartup.Start));
                 yield return AccessTools.Method(typeof(FejdStartup), nameof(FejdStartup.OnDestroy));
                 yield return AccessTools.Method(typeof(Player), nameof(Player.SetSleeping));
+                yield return AccessTools.Method(typeof(Player), nameof(Player.UseHotbarItem));
+                yield return AccessTools.Method(typeof(Player), nameof(Player.StartGuardianPower));
+                yield return AccessTools.Method(typeof(Player), nameof(Player.StopEmote));
             }
 
-            private static void Postfix() => Exit();
+            private static void Postfix() => Exit(force: true);
         }
 
         [HarmonyPatch(typeof(GameCamera), nameof(GameCamera.Awake))]
@@ -385,7 +406,7 @@ namespace PocketTeleporter
                     return;
 
                 if (movedir.magnitude > 0.05f || attack || secondaryAttack || block || jump || crouch || run || autoRun || dodge)
-                    Exit();
+                    Exit(force: true);
             }
         }
 
@@ -409,12 +430,12 @@ namespace PocketTeleporter
                 {
                     __result += Localization.instance.Localize($"\n$hud_powernotready: {WorldData.GetCooldownString()}");
                 }
-                else if (Player.m_localPlayer.GetSEMan().HaveStatusEffect(SEMan.s_statusEffectWet))
+                else if (!ignoreWetToStartSearch.Value && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SEMan.s_statusEffectWet))
                 {
                     if (__result.IndexOf("$msg_bedwet") <= 0)
                         __result += Localization.instance.Localize("\n$msg_bedwet");
                 }
-                else if (Player.m_localPlayer.IsSensed())
+                else if (!ignoreSensedToStartSearch.Value && Player.m_localPlayer.IsSensed())
                 {
                     if (__result.IndexOf("$msg_bedenemiesnearby") <= 0)
                         __result += Localization.instance.Localize("\n$msg_bedenemiesnearby");
@@ -442,6 +463,24 @@ namespace PocketTeleporter
                     return true;
 
                 Enter();
+                return false;
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.FindHoverObject))]
+        public static class Player_FindHoverObject_SearchMode
+        {
+            private static bool Prefix(Player __instance, out GameObject hover, out Character hoverCreature)
+            {
+                hover = null;
+                hoverCreature = null;
+
+                if (__instance != Player.m_localPlayer)
+                    return true;
+
+                if (!activated)
+                    return true;
+
                 return false;
             }
         }
@@ -481,8 +520,8 @@ namespace PocketTeleporter
             {
                 if (__instance != Player.m_localPlayer)
                     return;
-
-                if (saveNextGroundPositionAsShipLocation && __instance.IsOnGround())
+                 
+                if (saveNextGroundPositionAsShipLocation && __instance.IsOnGround() && !__instance.InWater() && __instance.GetStandingOnShip() == null)
                 {
                     saveNextGroundPositionAsShipLocation = false;
                     WorldData.SaveLastShip(Player.m_localPlayer.transform.position);

@@ -73,7 +73,7 @@ namespace PocketTeleporter
                     localPlayer.transform.rotation = localPlayer.m_lookYaw;
 
                 localPlayer.SetMouseLookForward(false);
-                localPlayer.m_lookPitch = Mathf.MoveTowards(localPlayer.m_lookPitch, 0f, dt * 5f);
+                localPlayer.m_lookPitch = Mathf.MoveTowards(localPlayer.m_lookPitch, 0f, dt * 10f);
 
                 localPlayer.GetZAnim().SetSpeed(0.125f);
 
@@ -175,7 +175,7 @@ namespace PocketTeleporter
                 ParticleSystem ps = sparcs.GetComponent<ParticleSystem>();
 
                 MainModule main = ps.main;
-                main.maxParticles = 8000;
+                main.maxParticles = PocketTeleporter.particlesMaxAmount.Value;
                 main.duration = 20f;
                 main.simulationSpace = ParticleSystemSimulationSpace.World;
 
@@ -187,7 +187,7 @@ namespace PocketTeleporter
 
                 MinMaxCurve rot = emission.rateOverTime;
                 rot.mode = ParticleSystemCurveMode.Curve;
-                rot.curve = AnimationCurve.Linear(0, 50, 1, 4000);
+                rot.curve = AnimationCurve.Linear(0, PocketTeleporter.particlesMinRateOverTime.Value, 1, PocketTeleporter.particlesMaxRateOverTime.Value);
 
                 emission.rateOverTime = rot;
 
@@ -203,7 +203,7 @@ namespace PocketTeleporter
 
                 MinMaxCurve forceZ = force.z;
                 forceZ.mode = ParticleSystemCurveMode.Curve;
-                forceZ.curve = AnimationCurve.Linear(0, 5, 1, 10);
+                forceZ.curve = AnimationCurve.Linear(0, PocketTeleporter.particlesMinForceOverTime.Value, 1, PocketTeleporter.particlesMaxForceOverTime.Value);
 
                 force.z = forceZ;
                 force.zMultiplier = 3;
