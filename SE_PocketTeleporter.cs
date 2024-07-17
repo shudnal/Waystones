@@ -110,6 +110,8 @@ namespace PocketTeleporter
             main = effect.transform.Find(vfx_PocketTeleporterParticles).GetComponent<ParticleSystem>().main;
 
             light = effect.transform.Find(vfx_PocketTeleporterLight).GetComponent<Light>();
+
+            character.StopEmote();
         }
 
         public override void Stop()
