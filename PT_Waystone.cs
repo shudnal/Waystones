@@ -2,9 +2,6 @@
 
 public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
 {
-    [TextArea]
-    public string m_activateMessage = "You touch the cold stone surface and you think of home.";
-
     public GameObject m_activeObject;
 
     public EffectList m_activeEffect = new EffectList();
@@ -23,16 +20,14 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
     public string GetHoverText()
     {
         if (m_activeObject.activeSelf)
-        {
-            return "Activated waystone";
-        }
+            return Localization.instance.Localize("$pt_piece_waystone_activated\n[<color=yellow><b>$KEY_Use</b></color>] $pt_tooltip_start_search");
 
-        return Localization.instance.Localize("Waystone\n[<color=yellow><b>$KEY_Use</b></color>] Activate");
+        return Localization.instance.Localize("$pt_piece_waystone_name\n[<color=yellow><b>$KEY_Use</b></color>] $pt_piece_waystone_activate");
     }
 
     public string GetHoverName()
     {
-        return "Waystone";
+        return "$pt_piece_waystone_name";
     }
 
     public bool Interact(Humanoid character, bool hold, bool alt)
@@ -42,7 +37,7 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
 
         if (!m_activeObject.activeSelf)
         {
-            character.Message(MessageHud.MessageType.Center, m_activateMessage);
+            character.Message(MessageHud.MessageType.Center, "$pt_piece_waystone_activation");
             m_activeObject.SetActive(value: true);
             m_activeEffect.Create(base.gameObject.transform.position, base.gameObject.transform.rotation);
         }

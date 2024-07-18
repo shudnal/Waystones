@@ -1,12 +1,8 @@
 ﻿using HarmonyLib;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using static MeleeWeaponTrail;
 using static PocketTeleporter.PocketTeleporter;
 using static UnityEngine.ParticleSystem;
 
@@ -18,6 +14,9 @@ namespace PocketTeleporter
         internal static GameObject waystonePrefab;
         internal const string waystoneName = "PocketTeleporter_WayStone";
         public static int waystoneHash = waystoneName.GetStableHashCode();
+
+        public const string waystonePieceName = "$pt_piece_waystone_name";
+        public const string waystonePieceDescription = "$pt_piece_waystone_description";
 
         public static void RegisterPiece()
         {
@@ -65,7 +64,8 @@ namespace PocketTeleporter
 
                 Piece piece = CustomPrefabs.AddComponent(waystonePrefab, typeof(Piece)) as Piece;
                 piece.m_icon = iconWaystone;
-                piece.m_name = "Waystone";
+                piece.m_name = waystonePieceName;
+                piece.m_description = waystonePieceDescription;
                 piece.m_clipGround = true;
                 piece.m_clipEverything = true;
                 piece.m_notOnTiltingSurface = true;

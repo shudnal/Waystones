@@ -27,14 +27,14 @@ namespace PocketTeleporter
 
             public string GetHoverText()
             {
-                return Localization.instance.Localize($"\n[<color=#{ColorUtility.ToHtmlStringRGB(color)}><b>$KEY_Use</b></color>] {GetLocalization(localizationTeleportTo, "$inventory_move")}: {name} <color=#add8e6>({WorldData.TimerString(cooldown)})</color>");
+                return Localization.instance.Localize($"\n[<color=#{ColorUtility.ToHtmlStringRGB(color)}><b>$KEY_Use</b></color>] $pt_tooltip_teleport_to {name} <color=#add8e6>({WorldData.TimerString(cooldown)})</color>");
             }
         }
 
         private static List<Direction> directions = new List<Direction>();
         private static Direction current;
         private static bool activated;
-        private static readonly Direction placeOfMystery = new Direction(GetLocalization(localizationRandomPoint, "$placeofmystery"), Vector2.zero);
+        private static readonly Direction placeOfMystery = new Direction("$pt_location_random_point", Vector2.zero);
         private static float currentAngle;
 
         private static float defaultFoV;
@@ -103,13 +103,13 @@ namespace PocketTeleporter
         {
             directions.Clear();
 
-            directions.Add(new Direction(GetLocalization(localizationSpawnPoint, "$piece_bed_currentspawn"), GetSpawnPoint()));
+            directions.Add(new Direction("$pt_location_spawn_point", GetSpawnPoint()));
 
             ZoneSystem.instance.GetLocationIcons(ZoneSystem.instance.tempIconList);
             foreach (KeyValuePair<Vector3, string> loc in ZoneSystem.instance.tempIconList)
             {
                 if (loc.Value == "StartTemple")
-                    directions.Add(new Direction(GetLocalization(localizationStartTemple, "Sacrificial Stones"), loc.Key));
+                    directions.Add(new Direction("$pt_location_start_temple", loc.Key));
                 else if (loc.Value == "Vendor_BlackForest")
                     directions.Add(new Direction("$npc_haldor", loc.Key));
                 else if (loc.Value == "Hildir_camp")
@@ -118,7 +118,7 @@ namespace PocketTeleporter
 
             PlayerProfile profile = Game.instance.GetPlayerProfile();
             if (profile.HaveDeathPoint())
-                directions.Add(new Direction(GetLocalization(localizationLastTombstone, "Last tombstone"), profile.GetDeathPoint()));
+                directions.Add(new Direction("$pt_location_last_tombstone", profile.GetDeathPoint()));
 
             directions.AddRange(WorldData.GetSavedDirections());
 
@@ -442,7 +442,7 @@ namespace PocketTeleporter
                 }
                 else
                 {
-                    __result += Localization.instance.Localize($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] {GetLocalization(localizationStartSearch, "$menu_start")}");
+                    __result += Localization.instance.Localize($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $pt_tooltip_start_search");
                     activeFireplace = __instance;
                 }
             }

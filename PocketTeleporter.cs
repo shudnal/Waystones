@@ -7,6 +7,7 @@ using System.Linq;
 using System.IO;
 using System.Reflection;
 using UnityEngine.Rendering;
+using LocalizationManager;
 
 namespace PocketTeleporter
 {
@@ -63,15 +64,6 @@ namespace PocketTeleporter
         internal static ConfigEntry<int> particlesMinForceOverTime;
         internal static ConfigEntry<int> particlesMaxForceOverTime;
 
-        internal static ConfigEntry<string> localizationLastTombstone;
-        internal static ConfigEntry<string> localizationLastShip;
-        internal static ConfigEntry<string> localizationLastLocation;
-        internal static ConfigEntry<string> localizationTeleportTo;
-        internal static ConfigEntry<string> localizationStartTemple;
-        internal static ConfigEntry<string> localizationSpawnPoint;
-        internal static ConfigEntry<string> localizationStartSearch;
-        internal static ConfigEntry<string> localizationRandomPoint;
-
         public static string configDirectory;
 
         public const string customDataKey = "PocketTeleporter";
@@ -96,6 +88,8 @@ namespace PocketTeleporter
             configDirectory = Path.Combine(Paths.ConfigPath, pluginID);
             
             LoadIcons();
+
+            Localizer.Load();
         }
 
         public void ConfigInit()
@@ -136,15 +130,6 @@ namespace PocketTeleporter
             cooldownMinimum = config("Teleport cooldown", "Teleportation cooldown minimum", defaultValue: 600, "Minimal cooldown to be set after successfull teleportation");
             cooldownShort = config("Teleport cooldown", "Teleportation interrupted cooldown", defaultValue: 120, "Cooldown to be set if teleportation was interrupted");
             cooldownSearchMode = config("Teleport cooldown", "Search mode cooldown", defaultValue: 120, "Cooldown to be set on search mode exit");
-
-            localizationLastTombstone = config("Localization", "Last tombstone", defaultValue: "Last tombstone", "Name of location of last death point");
-            localizationLastShip = config("Localization", "Last ship", defaultValue: "Last ship", "Name of last location where you get off the ship and touched the ground");
-            localizationLastLocation = config("Localization", "Last location", defaultValue: "Last location", "Name of location of last location you teleported from");
-            localizationStartTemple = config("Localization", "Sacrificial Stones", defaultValue: "Sacrificial Stones", "Name of location of start temple with sacrificial stones");
-            localizationSpawnPoint = config("Localization", "Spawn point", defaultValue: "$piece_bed_currentspawn", "Name of location of current spawn point (bed)");
-            localizationRandomPoint = config("Localization", "Random place", defaultValue: "$placeofmystery", "Name of location where you teleport to random place");
-            localizationStartSearch = config("Localization", "Start search mode", defaultValue: "$menu_start", "Label on fireplace hover");
-            localizationTeleportTo = config("Localization", "Teleport to", defaultValue: "$inventory_move", "Label on location hover");
 
             particlesCollision = config("Teleportation effect", "Particles physics collision", defaultValue: false, "Make particles emitted while teleporting collide with objects. Restart required.");
             particlesMaxAmount = config("Teleportation effect", "Particles amount maximum", defaultValue: 8000, "Maximum amount of particles emitted. Restart required.");
@@ -196,7 +181,7 @@ namespace PocketTeleporter
                 return;
 
             if (!location.IsNullOrWhiteSpace())
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"{GetLocalization(localizationTeleportTo, "$inventory_move")}: {location}");
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"$pt_tooltip_teleport_to {location}");
 
             SEMan seman = Player.m_localPlayer.GetSEMan();
             if (seman.HaveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash))
@@ -229,7 +214,7 @@ namespace PocketTeleporter
 
                         if (!location.IsNullOrWhiteSpace())
                         {
-                            MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, $"{GetLocalization(localizationTeleportTo, "$inventory_move")}: {location}");
+                            MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, $"$pt_message_teleporting_to {location}");
                             se.m_name = location;
                             LogInfo($"Teleport initiated to {location} pos {targetPoint} cooldown {WorldData.TimerString(cooldown)}");
                         }

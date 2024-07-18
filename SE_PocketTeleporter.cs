@@ -17,8 +17,8 @@ namespace PocketTeleporter
         public const string vfx_PocketTeleporterSfx = "Sfx";
         public const string vfx_PocketTeleporterLight = "Light";
 
-        public const string statusEffectName = "$se_PocketTeleporter_name";
-        public const string statusEffectTooltip = "$se_PocketTeleporter_tooltip";
+        public const string statusEffectName = "$se_pocketteleporter_name";
+        public const string statusEffectTooltip = "$se_pocketteleporter_tooltip";
 
         public static readonly int s_gpower = ZSyncAnimation.GetHash("gpower");
 
@@ -269,46 +269,6 @@ namespace PocketTeleporter
             private static void Postfix(ObjectDB __instance)
             {
                 ObjectDB_Awake_AddStatusEffects.AddCustomStatusEffects(__instance);
-            }
-        }
-
-        [HarmonyPatch(typeof(FejdStartup), nameof(FejdStartup.SetupGui))]
-        public static class FejdStartup_SetupGui_AddLocalizedWords
-        {
-            private static void Postfix()
-            {
-                Localization_SetupLanguage_AddLocalizedWords.AddTranslations(Localization.instance);
-            }
-        }
-
-        [HarmonyPatch(typeof(Localization), nameof(Localization.SetupLanguage))]
-        public static class Localization_SetupLanguage_AddLocalizedWords
-        {
-            private static void Postfix(Localization __instance)
-            {
-                AddTranslations(__instance);
-            }
-
-            public static void AddTranslations(Localization localization)
-            {
-                localization.AddWord(statusEffectName.Replace("$", ""), GetName(localization));
-                localization.AddWord(statusEffectTooltip.Replace("$", ""), GetTooltip(localization));
-            }
-
-            private static string GetName(Localization localization)
-            {
-                return GetTranslation(localization, "$npc_dvergrmage_random_goodbye1").Replace(".", "");
-            }
-
-            private static string GetTooltip(Localization localization)
-            {
-                return GetTranslation(localization, "$npc_dvergrmage_random_goodbye4", "Teleporting").Replace(".", "");
-            }
-
-            private static string GetTranslation(Localization localization, string word, string defaultValue = "")
-            {
-                string key = word.Replace("$", "");
-                return localization.m_translations.ContainsKey(key) ? localization.m_translations[key] : defaultValue;
             }
         }
     }

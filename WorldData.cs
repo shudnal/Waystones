@@ -26,10 +26,10 @@ namespace PocketTeleporter
                 return result;
 
             if (data.lastShip != null && data.lastShip != Vector3.zero)
-                result.Add(new DirectionSearch.Direction(GetLocalization(localizationLastShip, "Last ship"), data.lastShip));
+                result.Add(new DirectionSearch.Direction("$pt_location_last_ship", data.lastShip));
 
             if (data.lastPosition != null && data.lastPosition != Vector3.zero)
-                result.Add(new DirectionSearch.Direction(GetLocalization(localizationLastLocation, "Last location"), data.lastPosition));
+                result.Add(new DirectionSearch.Direction("$pt_location_last_location", data.lastPosition));
 
             return result;
         }
