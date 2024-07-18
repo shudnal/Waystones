@@ -44,6 +44,15 @@ namespace PocketTeleporter
 
             return clonedPrefab;
         }
+        
+        internal static Component AddComponent(GameObject gameObject, System.Type type)
+        {
+            prefabInit = true;
+            Component component = gameObject.AddComponent(type);
+            prefabInit = false;
+
+            return component;
+        }
 
         [HarmonyPatch(typeof(ZNetView), nameof(ZNetView.Awake))]
         public static class ZNetView_Awake_AddPrefab
@@ -80,5 +89,25 @@ namespace PocketTeleporter
             private static bool Prefix() => !prefabInit;
         }
 
+        [HarmonyPatch(typeof(Piece), nameof(Piece.Awake))]
+        public static class Piece_Awake_AddPrefab
+        {
+            [HarmonyPriority(Priority.First)]
+            private static bool Prefix() => !prefabInit;
+        }
+
+        [HarmonyPatch(typeof(WearNTear), nameof(WearNTear.Awake))]
+        public static class WearNTear_Awake_AddPrefab
+        {
+            [HarmonyPriority(Priority.First)]
+            private static bool Prefix() => !prefabInit;
+        }
+
+        [HarmonyPatch(typeof(WearNTear), nameof(WearNTear.Start))]
+        public static class WearNTear_Start_AddPrefab
+        {
+            [HarmonyPriority(Priority.First)]
+            private static bool Prefix() => !prefabInit;
+        }
     }
 }

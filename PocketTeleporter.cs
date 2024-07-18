@@ -26,6 +26,7 @@ namespace PocketTeleporter
         internal static ConfigEntry<bool> configLocked;
         internal static ConfigEntry<bool> loggingEnabled;
         internal static ConfigEntry<KeyboardShortcut> shortcut;
+        internal static ConfigEntry<string> pieceRecipe;
 
         internal static ConfigEntry<bool> useShortcutToEnter;
         internal static ConfigEntry<bool> allowEncumbered;
@@ -104,7 +105,8 @@ namespace PocketTeleporter
             configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
             loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
             shortcut = config("General", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y), "Exit direction search mode and stop teleporting shortcut");
-            
+            pieceRecipe = config("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
+
             useShortcutToEnter = config("Restrictions", "Use shortcut to enter search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut. If not set - you have to sit in front of the fire to start search mode.");
             allowEncumbered = config("Restrictions", "Use teleportation when encumbered", defaultValue: false, "If enabled then encumbrance check will be omitted.");
             allowNonTeleportableItems = config("Restrictions", "Use teleportation with nonteleportable items", defaultValue: false, "If enabled then inventory check will be omitted.");
@@ -274,6 +276,7 @@ namespace PocketTeleporter
         private void LoadIcons()
         {
             LoadIcon("SE_PocketTeleporter.png", ref SE_PocketTeleporter.iconPocketTeleporter);
+            LoadIcon("icon_waystone.png", ref PieceWaystone.iconWaystone);
         }
 
         internal static void LoadIcon(string filename, ref Sprite icon)
