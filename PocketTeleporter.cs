@@ -33,8 +33,9 @@ namespace PocketTeleporter
         internal static ConfigEntry<bool> allowEncumbered;
         internal static ConfigEntry<bool> allowNonTeleportableItems;
         internal static ConfigEntry<bool> emitNoiseOnTeleportation;
-        internal static ConfigEntry<bool> ignoreWetToStartSearch;
-        internal static ConfigEntry<bool> ignoreSensedToStartSearch;
+        internal static ConfigEntry<bool> allowWet;
+        internal static ConfigEntry<bool> allowSensed;
+        internal static ConfigEntry<bool> allowNonSitting;
 
         internal static ConfigEntry<float> directionSensitivity;
         internal static ConfigEntry<float> directionSensitivityThreshold;
@@ -101,12 +102,13 @@ namespace PocketTeleporter
             shortcut = config("General", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y), "Exit direction search mode and stop teleporting shortcut");
             pieceRecipe = config("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
 
-            useShortcutToEnter = config("Restrictions", "Use shortcut to enter search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut. If not set - you have to sit in front of the fire to start search mode.");
-            allowEncumbered = config("Restrictions", "Use teleportation when encumbered", defaultValue: false, "If enabled then encumbrance check will be omitted.");
-            allowNonTeleportableItems = config("Restrictions", "Use teleportation with nonteleportable items", defaultValue: false, "If enabled then inventory check will be omitted.");
             emitNoiseOnTeleportation = config("Restrictions", "Emit noise on teleportation", defaultValue: true, "If enabled then you will attract attention of nearby enemies on teleportation start.");
-            ignoreWetToStartSearch = config("Restrictions", "Ignore wet status to start search", defaultValue: false, "If enabled then Wet status check before search start will be omitted.");
-            ignoreSensedToStartSearch = config("Restrictions", "Ignore nearby enemies to start search", defaultValue: false, "If enabled then Sensed by nearby enemies check before search start will be omitted.");
+            allowEncumbered = config("Restrictions", "Ignore encumbered to start search", defaultValue: false, "If enabled then encumbrance check before search start will be omitted.");
+            allowNonTeleportableItems = config("Restrictions", "Ignore nonteleportable items to start search", defaultValue: false, "If enabled then inventory check before search start will be omitted.");
+            allowWet = config("Restrictions", "Ignore wet status to start search", defaultValue: false, "If enabled then Wet status check before search start will be omitted.");
+            allowSensed = config("Restrictions", "Ignore nearby enemies to start search", defaultValue: false, "If enabled then Sensed by nearby enemies check before search start will be omitted.");
+            allowNonSitting = config("Restrictions", "Ignore sitting to start search", defaultValue: false, "If enabled then sitting position check before search start will be omitted.");
+            useShortcutToEnter = config("Restrictions", "Use shortcut to enter search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut. If not set - you have to sit in front of the waystone to start search mode.");
 
             directionSensitivity = config("Search mode", "Target sensitivity threshold", defaultValue: 2f, "Angle between look direction and target direction for location to appear in search mode");
             directionSensitivityThreshold = config("Search mode", "Screen sensitivity threshold", defaultValue: 6f, "Angle between look direction and target direction for location to start appearing in search mode");
@@ -170,11 +172,6 @@ namespace PocketTeleporter
             }, isCheat: true);
         }
 
-        public static string GetLocalization(ConfigEntry<string> config, string defaultValue)
-        {
-            return config.Value.IsNullOrWhiteSpace() ? defaultValue : config.Value;
-        }
-
         public static void TeleportAttempt(Vector3 targetPoint, double cooldown, string location)
         {
             if (!CanCast())
@@ -190,15 +187,7 @@ namespace PocketTeleporter
             }
             else
             {
-                if (IsNotInPosition(Player.m_localPlayer))
-                    Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_cart_incorrectposition");
-                else if (!allowEncumbered.Value && Player.m_localPlayer.IsEncumbered())
-                    Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$se_encumbered_start");
-                else if (!allowNonTeleportableItems.Value && !Player.m_localPlayer.IsTeleportable())
-                    Player.m_localPlayer.Message(MessageHud.MessageType.Center, "$msg_noteleport");
-                else if (WorldData.IsOnCooldown())
-                    Player.m_localPlayer.Message(MessageHud.MessageType.Center, $"$hud_powernotready: {WorldData.GetCooldownString()}");
-                else
+                if (PT_WayStone.IsSearchAllowed(Player.m_localPlayer))
                 {
                     SE_PocketTeleporter se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash) as SE_PocketTeleporter;
                     if (se != null)
@@ -232,12 +221,6 @@ namespace PocketTeleporter
                     !Console.IsVisible() && !Menu.IsVisible() && TextViewer.instance != null &&
                     !TextViewer.instance.IsVisible() && !TextInput.IsVisible() &&
                     !Minimap.IsOpen() && !GameCamera.InFreeFly() && !StoreGui.IsVisible() && !InventoryGui.IsVisible();
-        }
-
-        public static bool IsNotInPosition(Player player)
-        {
-            return player.IsAttachedToShip() || player.IsAttached() || player.IsDead() || player.IsRiding() || player.IsSleeping() ||
-                   player.IsTeleporting() || player.InPlaceMode() || player.InBed() || player.InCutscene() || player.InInterior();
         }
 
         public static void LogInfo(object data)

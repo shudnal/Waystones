@@ -8,7 +8,7 @@ using static PocketTeleporter.PocketTeleporter;
 
 namespace PocketTeleporter
 {
-    public class DirectionSearch
+    public static class DirectionSearch
     {
         public class Direction
         {
@@ -49,7 +49,7 @@ namespace PocketTeleporter
         {
             if (activated)
                 Exit();
-            else if (useShortcutToEnter.Value)
+            else if (useShortcutToEnter.Value && PT_WayStone.IsSearchAllowed(Player.m_localPlayer))
                 Enter();
         }
 
@@ -57,12 +57,6 @@ namespace PocketTeleporter
         {
             if (!CanCast())
                 return;
-
-            if (useShortcutToEnter.Value && WorldData.IsOnCooldown())
-            {
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, Localization.instance.Localize($"\n$hud_powernotready: {WorldData.GetCooldownString()}"));
-                return;
-            }
 
             if (!activated)
             {
@@ -407,63 +401,6 @@ namespace PocketTeleporter
 
                 if (movedir.magnitude > 0.05f || attack || secondaryAttack || block || jump || crouch || run || autoRun || dodge)
                     Exit(force: true);
-            }
-        }
-
-        [HarmonyPatch(typeof(Fireplace), nameof(Fireplace.GetHoverText))]
-        internal class Fireplace_GetHoverText_HoverTextWithSearchAction
-        {
-            internal static Fireplace activeFireplace;
-
-            private static void Postfix(Fireplace __instance, ref string __result)
-            {
-                activeFireplace = null;
-
-                if (!Player.m_localPlayer.IsSitting() || Player.m_localPlayer.InInterior())
-                    return;
-
-                string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
-                if (__result.IndexOf(Localization.instance.Localize(altKey)) != -1)
-                    return;
-
-                if (WorldData.IsOnCooldown())
-                {
-                    __result += Localization.instance.Localize($"\n$hud_powernotready: {WorldData.GetCooldownString()}");
-                }
-                else if (!ignoreWetToStartSearch.Value && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SEMan.s_statusEffectWet))
-                {
-                    if (__result.IndexOf("$msg_bedwet") <= 0)
-                        __result += Localization.instance.Localize("\n$msg_bedwet");
-                }
-                else if (!ignoreSensedToStartSearch.Value && Player.m_localPlayer.IsSensed())
-                {
-                    if (__result.IndexOf("$msg_bedenemiesnearby") <= 0)
-                        __result += Localization.instance.Localize("\n$msg_bedenemiesnearby");
-                }
-                else
-                {
-                    __result += Localization.instance.Localize($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $pt_tooltip_start_search");
-                    activeFireplace = __instance;
-                }
-            }
-        }
-
-        private static bool CanSearch()
-        {
-            return Player.m_localPlayer != null && !Player.m_localPlayer.IsSleeping() && Player.m_localPlayer.IsSitting() && !Player.m_localPlayer.InInterior() && !Player.m_localPlayer.GetSEMan().HaveStatusEffect(SEMan.s_statusEffectWet) && !Player.m_localPlayer.IsSensed();
-        }
-
-        [HarmonyPatch(typeof(Fireplace), nameof(Fireplace.Interact))]
-        private class Fireplace_Interact_EnterSearchMode
-        {
-            [HarmonyAfter(new string[1] { "shudnal.JustSleep" })]
-            private static bool Prefix(Fireplace __instance, Humanoid user, bool hold, bool alt)
-            {
-                if (!alt || hold || user != Player.m_localPlayer || !CanSearch() || Fireplace_GetHoverText_HoverTextWithSearchAction.activeFireplace != __instance)
-                    return true;
-
-                Enter();
-                return false;
             }
         }
 

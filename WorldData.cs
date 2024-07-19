@@ -16,6 +16,7 @@ namespace PocketTeleporter
         public double worldTime;
         public Vector3 lastShip = Vector3.zero;
         public Vector3 lastPosition = Vector3.zero;
+        public Vector3 markedPosition = Vector3.zero;
 
         public static List<DirectionSearch.Direction> GetSavedDirections()
         {
@@ -31,7 +32,21 @@ namespace PocketTeleporter
             if (data.lastPosition != null && data.lastPosition != Vector3.zero)
                 result.Add(new DirectionSearch.Direction("$pt_location_last_location", data.lastPosition));
 
+            if (data.markedPosition != null && data.markedPosition != Vector3.zero)
+                result.Add(new DirectionSearch.Direction("$pt_location_marked_location", data.markedPosition));
+
             return result;
+        }
+
+        public static void SaveMarkedPosition(Vector3 position)
+        {
+            List<WorldData> state = GetState();
+
+            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).markedPosition = position;
+
+            Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
+
+            LogInfo("Marked location saved: " + position);
         }
 
         public static void SaveLastPosition(Vector3 position)

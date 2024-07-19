@@ -2,6 +2,7 @@
     "pt_location_last_tombstone": "Last tombstone",
     "pt_location_last_ship": "Last ship",
     "pt_location_last_location": "Last location",
+    "pt_location_marked_location": "Marked location",
     "pt_location_start_temple": "Sacrificial Stones",
     "pt_location_spawn_point": "Current spawn point",
     "pt_location_random_point": "Mysterious location",
@@ -15,4 +16,6 @@
     "pt_piece_waystone_activation": "You touch the cold stone surface and you think of home",
     "pt_piece_waystone_activated": "Activated waystone",
     "pt_piece_waystone_activate": "Activate",
+    "pt_piece_waystone_mark": "Mark location",
+    "pt_piece_waystone_sit": "Sit to interact"
 }

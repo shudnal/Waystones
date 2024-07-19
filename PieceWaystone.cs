@@ -127,20 +127,11 @@ namespace PocketTeleporter
                 wnt.m_damages.m_poison = HitData.DamageModifier.Immune;
                 wnt.m_damages.m_spirit = HitData.DamageModifier.Immune;
 
-                GameObject stone_pile = ZNetScene.instance.GetPrefab("stone_pile");
-                if (stone_pile != null)
-                {
-                    piece.m_placeEffect.m_effectPrefabs = stone_pile.GetComponent<Piece>().m_placeEffect.m_effectPrefabs.ToArray();
-                    wnt.m_destroyedEffect.m_effectPrefabs = stone_pile.GetComponent<WearNTear>().m_destroyedEffect.m_effectPrefabs.ToArray();
-                    wnt.m_hitEffect.m_effectPrefabs = stone_pile.GetComponent<WearNTear>().m_hitEffect.m_effectPrefabs.ToArray();
-                }
-
                 WayStone original = waystonePrefab.GetComponent<WayStone>();
 
                 PT_WayStone.initial = true;
 
                 PT_WayStone pt_waystone = waystonePrefab.AddComponent<PT_WayStone>();
-                pt_waystone.m_activeEffect.m_effectPrefabs = original.m_activeEffect.m_effectPrefabs.ToArray();
 
                 PT_WayStone.initial = false;
 
@@ -151,8 +142,21 @@ namespace PocketTeleporter
             
             if ((bool)waystonePrefab)
             {
-                // TODO Relink m_effectPrefabs on load
-                // by name
+                GameObject stone_pile = ZNetScene.instance.GetPrefab("stone_pile");
+                if (stone_pile != null)
+                {
+                    waystonePrefab.GetComponent<Piece>().m_placeEffect.m_effectPrefabs = stone_pile.GetComponent<Piece>().m_placeEffect.m_effectPrefabs.ToArray();
+                    waystonePrefab.GetComponent<WearNTear>().m_destroyedEffect.m_effectPrefabs = stone_pile.GetComponent<WearNTear>().m_destroyedEffect.m_effectPrefabs.ToArray();
+                    waystonePrefab.GetComponent<WearNTear>().m_hitEffect.m_effectPrefabs = stone_pile.GetComponent<WearNTear>().m_hitEffect.m_effectPrefabs.ToArray();
+                }
+
+                WayStone waystone = Resources.FindObjectsOfTypeAll<WayStone>().FirstOrDefault(obj => obj.name == "Waystone");
+                if (waystone != null)
+                    waystonePrefab.GetComponent<PT_WayStone>().m_activateEffect.m_effectPrefabs = waystone.m_activeEffect.m_effectPrefabs.ToArray();
+
+                PrivateArea privateArea = ZNetScene.instance.GetPrefab("guard_stone")?.GetComponent<PrivateArea>();
+                if (privateArea != null)
+                    waystonePrefab.GetComponent<PT_WayStone>().m_markEffect.m_effectPrefabs = privateArea.m_addPermittedEffect.m_effectPrefabs.ToArray();
 
                 if (ZNetScene.instance.m_namedPrefabs.ContainsKey(waystoneHash))
                 {
