@@ -86,7 +86,7 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
 
         Vector3 markedPosition = WorldData.GetMarkedPositionTooltip();
 
-        if (markedPosition == Vector3.one || Utils.DistanceXZ(Player.m_localPlayer.transform.position, markedPosition) > 5f)
+        if (markedPosition == Vector3.one || Utils.DistanceXZ(Player.m_localPlayer.transform.position, markedPosition) > 10f)
         {
             string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
             sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $pt_piece_waystone_mark");
