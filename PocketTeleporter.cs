@@ -99,8 +99,9 @@ namespace PocketTeleporter
 
             configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
             loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
-            shortcut = config("General", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y), "Exit direction search mode and stop teleporting shortcut");
             pieceRecipe = config("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
+
+            pieceRecipe.SettingChanged += (sender, args) => PieceWaystone.SetPieceRequirements();
 
             emitNoiseOnTeleportation = config("Restrictions", "Emit noise on teleportation", defaultValue: true, "If enabled then you will attract attention of nearby enemies on teleportation start.");
             allowEncumbered = config("Restrictions", "Ignore encumbered to start search", defaultValue: false, "If enabled then encumbrance check before search start will be omitted.");
@@ -108,7 +109,8 @@ namespace PocketTeleporter
             allowWet = config("Restrictions", "Ignore wet status to start search", defaultValue: false, "If enabled then Wet status check before search start will be omitted.");
             allowSensed = config("Restrictions", "Ignore nearby enemies to start search", defaultValue: false, "If enabled then Sensed by nearby enemies check before search start will be omitted.");
             allowNonSitting = config("Restrictions", "Ignore sitting to start search", defaultValue: false, "If enabled then sitting position check before search start will be omitted.");
-            useShortcutToEnter = config("Restrictions", "Use shortcut to enter search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut. If not set - you have to sit in front of the waystone to start search mode.");
+            useShortcutToEnter = config("Restrictions", "Use shortcut to toggle search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut. If not set - you have to sit in front of the waystone to start search mode.");
+            shortcut = config("Restrictions", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y), "Enter/Exit direction search mode [Not Synced with Server]", false);
 
             directionSensitivity = config("Search mode", "Target sensitivity threshold", defaultValue: 2f, "Angle between look direction and target direction for location to appear in search mode");
             directionSensitivityThreshold = config("Search mode", "Screen sensitivity threshold", defaultValue: 6f, "Angle between look direction and target direction for location to start appearing in search mode");
@@ -158,8 +160,16 @@ namespace PocketTeleporter
             if (Player.m_localPlayer == null)
                 return;
 
-            if (shortcut.Value.IsDown())
-                Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash);
+            if ((Chat.instance == null || !Chat.instance.HasFocus()) && !Console.IsVisible() && !Menu.IsVisible() && (bool)TextViewer.instance && !TextViewer.instance.IsVisible() && !Player.m_localPlayer.InCutscene() && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash))
+            {
+                if (ZInput.GetButtonDown("Block") || ZInput.GetButtonDown("JoyBlock") || ZInput.GetButtonDown("JoyButtonB"))
+                {
+                    ZInput.ResetButtonStatus("Block");
+                    ZInput.ResetButtonStatus("JoyBlock");
+                    ZInput.ResetButtonStatus("JoyButtonB");
+                    Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash);
+                }
+            }
 
             DirectionSearch.Update();
         }

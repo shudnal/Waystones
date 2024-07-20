@@ -56,7 +56,7 @@ namespace PocketTeleporter
                 Light light = waystonePrefab.transform.Find("Point light (1)").GetComponent<Light>();
                 light.intensity = 1.1f;
 
-                waystonePrefab.GetComponentInChildren<EffectArea>().m_type = EffectArea.Type.NoMonsters;
+                waystonePrefab.GetComponentInChildren<EffectArea>().m_type = EffectArea.Type.Fire;
                 
                 ZNetView netview = CustomPrefabs.AddComponent(waystonePrefab, typeof(ZNetView)) as ZNetView;
                 netview.m_persistent = true;
@@ -71,35 +71,6 @@ namespace PocketTeleporter
                 piece.m_notOnTiltingSurface = true;
                 piece.m_noClipping = true;
                 piece.m_randomTarget = false;
-
-                List<Piece.Requirement> requirements = new List<Piece.Requirement>();
-                foreach (string requirement in pieceRecipe.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    string[] req = requirement.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (req.Length != 2)
-                        continue;
-
-                    int amount = int.Parse(req[1]);
-                    if (amount <= 0)
-                        continue;
-
-                    var prefab = ObjectDB.instance.GetItemPrefab(req[0].Trim());
-                    if (prefab == null)
-                        continue;
-
-                    requirements.Add(new Piece.Requirement()
-                    {
-                        m_amount = amount,
-                        m_resItem = prefab.GetComponent<ItemDrop>(),
-                        m_recover = true
-                    });
-                };
-
-                piece.m_resources = requirements.ToArray();
-
-                PieceTable hammer = Resources.FindObjectsOfTypeAll<PieceTable>().FirstOrDefault(ws => ws.name == "_HammerPieceTable");
-                if (hammer != null)
-                    hammer.m_pieces.Add(waystonePrefab);
 
                 WearNTear wnt = CustomPrefabs.AddComponent(waystonePrefab, typeof(WearNTear)) as WearNTear;
 
@@ -137,6 +108,17 @@ namespace PocketTeleporter
 
                 UnityEngine.Object.Destroy(original);
 
+                GameObject point = new GameObject("GuidePoint");
+                point.transform.SetParent(waystonePrefab.transform);
+                point.transform.localPosition = new Vector3(-0.5f, 8.9f, -1.3f);
+
+                GuidePoint guidePoint = CustomPrefabs.AddComponent(point, typeof(GuidePoint)) as GuidePoint;
+                guidePoint.m_text.m_alwaysSpawn = false;
+                guidePoint.m_text.m_key = "pt_waystone";
+                guidePoint.m_text.m_topic = "$pt_tutorial_waystone_topic";
+                guidePoint.m_text.m_label = "$pt_tutorial_waystone_label";
+                guidePoint.m_text.m_text = "$pt_tutorial_waystone_text";
+
                 LogInfo("Waystone prefab added");
             }
             
@@ -158,6 +140,10 @@ namespace PocketTeleporter
                 if (privateArea != null)
                     waystonePrefab.GetComponent<PT_WayStone>().m_markEffect.m_effectPrefabs = privateArea.m_addPermittedEffect.m_effectPrefabs.ToArray();
 
+                GuidePoint guidePoint = ZNetScene.instance.GetPrefab("piece_workbench")?.GetComponentInChildren<GuidePoint>();
+                if (guidePoint != null)
+                    waystonePrefab.GetComponentInChildren<GuidePoint>().m_ravenPrefab = guidePoint.m_ravenPrefab;
+
                 if (ZNetScene.instance.m_namedPrefabs.ContainsKey(waystoneHash))
                 {
                     ZNetScene.instance.m_prefabs.Remove(ZNetScene.instance.m_namedPrefabs[waystoneHash]);
@@ -166,7 +152,46 @@ namespace PocketTeleporter
 
                 ZNetScene.instance.m_prefabs.Add(waystonePrefab);
                 ZNetScene.instance.m_namedPrefabs.Add(waystoneHash, waystonePrefab);
+
+                SetPieceRequirements();
+
+                PieceTable hammer = Resources.FindObjectsOfTypeAll<PieceTable>().FirstOrDefault(ws => ws.name == "_HammerPieceTable");
+                if (hammer != null && !hammer.m_pieces.Contains(waystonePrefab))
+                    hammer.m_pieces.Add(waystonePrefab);
             }
+        }
+
+        public static void SetPieceRequirements()
+        {
+            if (waystonePrefab == null)
+                return;
+
+            Piece piece = waystonePrefab.GetComponent<Piece>();
+
+            List<Piece.Requirement> requirements = new List<Piece.Requirement>();
+            foreach (string requirement in pieceRecipe.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] req = requirement.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                if (req.Length != 2)
+                    continue;
+
+                int amount = int.Parse(req[1]);
+                if (amount <= 0)
+                    continue;
+
+                var prefab = ObjectDB.instance.GetItemPrefab(req[0].Trim());
+                if (prefab == null)
+                    continue;
+
+                requirements.Add(new Piece.Requirement()
+                {
+                    m_amount = amount,
+                    m_resItem = prefab.GetComponent<ItemDrop>(),
+                    m_recover = true
+                });
+            };
+
+            piece.m_resources = requirements.ToArray();
         }
 
         [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]

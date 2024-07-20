@@ -18,11 +18,13 @@ namespace PocketTeleporter
         public Vector3 lastPosition = Vector3.zero;
         public Vector3 markedPosition = Vector3.zero;
 
+        private static Vector3 _markedPosition;
+
         public static List<DirectionSearch.Direction> GetSavedDirections()
         {
             List<DirectionSearch.Direction> result = new List<DirectionSearch.Direction>();
 
-            WorldData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
+            WorldData data = GetWorldData(GetState());
             if (data == null)
                 return result;
 
@@ -38,13 +40,26 @@ namespace PocketTeleporter
             return result;
         }
 
+        public static Vector3 GetMarkedPositionTooltip()
+        {
+            if (_markedPosition != Vector3.zero)
+                return _markedPosition;
+
+            WorldData worldData = GetWorldData(GetState());
+            
+            _markedPosition = worldData == null ? Vector3.one : worldData.markedPosition;
+            return _markedPosition;
+        }
+
         public static void SaveMarkedPosition(Vector3 position)
         {
             List<WorldData> state = GetState();
 
-            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).markedPosition = position;
+            GetWorldData(state, createIfEmpty: true).markedPosition = position;
 
             Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
+
+            _markedPosition = position;
 
             LogInfo("Marked location saved: " + position);
         }
@@ -53,7 +68,7 @@ namespace PocketTeleporter
         {
             List<WorldData> state = GetState();
 
-            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).lastPosition = position;
+            GetWorldData(state, createIfEmpty: true).lastPosition = position;
 
             Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
 
@@ -64,7 +79,7 @@ namespace PocketTeleporter
         {
             List<WorldData> state = GetState();
 
-            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).lastShip = position;
+            GetWorldData(state, createIfEmpty: true).lastShip = position;
 
             Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
 
@@ -112,14 +127,15 @@ namespace PocketTeleporter
             return DateTime.Now.ToUniversalTime();
         }
 
-        internal static WorldData GetWorldData(List<WorldData> state, long uid, bool createIfEmpty = false)
+        internal static WorldData GetWorldData(List<WorldData> state, bool createIfEmpty = false)
         {
+            long uid = ZNet.instance.GetWorldUID();
             WorldData data = state.Find(d => d.worldUID == uid);
             if (createIfEmpty && data == null)
             {
                 data = new WorldData
                 {
-                    worldUID = ZNet.instance.GetWorldUID()
+                    worldUID = uid
                 };
 
                 state.Add(data);
@@ -135,7 +151,7 @@ namespace PocketTeleporter
 
             List<WorldData> state = GetState();
 
-            GetWorldData(state, ZNet.instance.GetWorldUID(), createIfEmpty: true).SetCooldownTime(cooldown);
+            GetWorldData(state, createIfEmpty: true).SetCooldownTime(cooldown);
 
             Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
 
@@ -144,13 +160,13 @@ namespace PocketTeleporter
 
         internal static bool IsOnCooldown()
         {
-            WorldData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
+            WorldData data = GetWorldData(GetState());
             return data != null && data.GetCooldownTime() > 0;
         }
 
         internal static string GetCooldownString()
         {
-            WorldData data = GetWorldData(GetState(), ZNet.instance.GetWorldUID());
+            WorldData data = GetWorldData(GetState());
             return data == null ? "" : TimerString(data.GetCooldownTime());
         }
 

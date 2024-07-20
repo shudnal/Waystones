@@ -84,8 +84,19 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
         sb.Append("$pt_piece_waystone_activated");
         sb.Append("\n[<color=yellow><b>$KEY_Use</b></color>] $pt_tooltip_start_search");
 
-        string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
-        return Localization.instance.Localize(sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $pt_piece_waystone_mark").ToString());
+        Vector3 markedPosition = WorldData.GetMarkedPositionTooltip();
+
+        if (markedPosition == Vector3.one || Utils.DistanceXZ(Player.m_localPlayer.transform.position, markedPosition) > 5f)
+        {
+            string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
+            sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $pt_piece_waystone_mark");
+        }
+        else
+        {
+            sb.Append($"\n\n<color=#add8e6>$pt_location_marked_location</color>");
+        }
+
+        return Localization.instance.Localize(sb.ToString());
     }
 
     public string GetHoverName()

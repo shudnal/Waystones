@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using UnityEngine;
 using static PocketTeleporter.PocketTeleporter;
 
@@ -14,20 +15,24 @@ namespace PocketTeleporter
         {
             public string name;
             public Vector3 position;
-            public Color color;
             public double cooldown;
 
             public Direction(string name, Vector3 position)
             {
                 this.name = name; 
                 this.position = position;
-                color = Color.yellow;
                 cooldown = WorldData.GetCooldownTimeToTarget(position);
             }
 
+            public static readonly StringBuilder _sb = new StringBuilder(3);
+
             public string GetHoverText()
             {
-                return Localization.instance.Localize($"\n[<color=#{ColorUtility.ToHtmlStringRGB(color)}><b>$KEY_Use</b></color>] $pt_tooltip_teleport_to {name} <color=#add8e6>({WorldData.TimerString(cooldown)})</color>");
+                _sb.Clear();
+                _sb.Append(name);
+                _sb.Append($"\n[<color=yellow><b>$KEY_Use</b></color>] $pt_tooltip_teleport_to");
+                _sb.Append($"\n\n$pt_tooltip_cooldown_after_teleport <color=#add8e6>{WorldData.TimerString(cooldown)}</color>");
+                return Localization.instance.Localize(_sb.ToString());
             }
         }
 

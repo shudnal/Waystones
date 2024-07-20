@@ -109,5 +109,12 @@ namespace PocketTeleporter
             [HarmonyPriority(Priority.First)]
             private static bool Prefix() => !prefabInit;
         }
+
+        [HarmonyPatch(typeof(GuidePoint), nameof(GuidePoint.Start))]
+        public static class GuidePoint_Start_AddPrefab
+        {
+            [HarmonyPriority(Priority.First)]
+            private static bool Prefix() => !prefabInit;
+        }
     }
 }
