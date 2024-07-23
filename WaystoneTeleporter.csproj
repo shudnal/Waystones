@@ -7,8 +7,8 @@
     <ProjectGuid>{1AF3A9E7-99BE-490A-A211-741AAFF1AEF2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PocketTeleporter</RootNamespace>
-    <AssemblyName>PocketTeleporter</AssemblyName>
+    <RootNamespace>WaystoneTeleporter</RootNamespace>
+    <AssemblyName>WaystoneTeleporter</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -37,7 +37,7 @@
     <Compile Include="PT_Waystone.cs" />
     <Compile Include="WorldData.cs" />
     <Compile Include="CustomPrefabs.cs" />
-    <Compile Include="PocketTeleporter.cs" />
+    <Compile Include="WaystoneTeleporter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SE_PocketTeleporter.cs" />
   </ItemGroup>
@@ -108,8 +108,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\SE_PocketTeleporter.png" />
-    <EmbeddedResource Include="Assets\icon_waystone.png" />
+    <EmbeddedResource Include="Assets\SE_WaystoneTeleporter.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\icon_waystone.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="Libs\LocalizationManager.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

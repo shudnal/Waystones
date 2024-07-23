@@ -3,20 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static PocketTeleporter.PocketTeleporter;
+using static WaystoneTeleporter.WaystoneTeleporter;
 using static UnityEngine.ParticleSystem;
 
-namespace PocketTeleporter
+namespace WaystoneTeleporter
 {
     internal class PieceWaystone
     {
         public static Sprite iconWaystone;
         internal static GameObject waystonePrefab;
-        internal const string waystoneName = "PocketTeleporter_WayStone";
+        internal const string waystoneName = "WaystoneTeleporter";
         public static int waystoneHash = waystoneName.GetStableHashCode();
 
-        public const string waystonePieceName = "$pt_piece_waystone_name";
-        public const string waystonePieceDescription = "$pt_piece_waystone_description";
+        public const string waystonePieceName = "$wt_piece_waystone_name";
+        public const string waystonePieceDescription = "$wt_piece_waystone_description";
 
         public static void RegisterPiece()
         {
@@ -102,7 +102,7 @@ namespace PocketTeleporter
 
                 PT_WayStone.initial = true;
 
-                PT_WayStone pt_waystone = waystonePrefab.AddComponent<PT_WayStone>();
+                PT_WayStone wt_waystone = waystonePrefab.AddComponent<PT_WayStone>();
 
                 PT_WayStone.initial = false;
 
@@ -114,10 +114,10 @@ namespace PocketTeleporter
 
                 GuidePoint guidePoint = CustomPrefabs.AddComponent(point, typeof(GuidePoint)) as GuidePoint;
                 guidePoint.m_text.m_alwaysSpawn = false;
-                guidePoint.m_text.m_key = "pt_waystone";
-                guidePoint.m_text.m_topic = "$pt_tutorial_waystone_topic";
-                guidePoint.m_text.m_label = "$pt_tutorial_waystone_label";
-                guidePoint.m_text.m_text = "$pt_tutorial_waystone_text";
+                guidePoint.m_text.m_key = "wt_waystone";
+                guidePoint.m_text.m_topic = "$wt_tutorial_waystone_topic";
+                guidePoint.m_text.m_label = "$wt_tutorial_waystone_label";
+                guidePoint.m_text.m_text = "$wt_tutorial_waystone_text";
 
                 LogInfo("Waystone prefab added");
             }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PocketTeleporter", "PocketTeleporter.csproj", "{1AF3A9E7-99BE-490A-A211-741AAFF1AEF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaystoneTeleporter", "WaystoneTeleporter.csproj", "{1AF3A9E7-99BE-490A-A211-741AAFF1AEF2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

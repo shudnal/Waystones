@@ -5,9 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using static PocketTeleporter.PocketTeleporter;
+using static WaystoneTeleporter.WaystoneTeleporter;
 
-namespace PocketTeleporter
+namespace WaystoneTeleporter
 {
     public static class DirectionSearch
     {
@@ -30,8 +30,8 @@ namespace PocketTeleporter
             {
                 _sb.Clear();
                 _sb.Append(name);
-                _sb.Append($"\n[<color=yellow><b>$KEY_Use</b></color>] $pt_tooltip_teleport_to");
-                _sb.Append($"\n\n$pt_tooltip_cooldown_after_teleport <color=#add8e6>{WorldData.TimerString(cooldown)}</color>");
+                _sb.Append($"\n[<color=yellow><b>$KEY_Use</b></color>] $wt_tooltip_teleport_to");
+                _sb.Append($"\n\n$wt_tooltip_cooldown_after_teleport <color=#add8e6>{WorldData.TimerString(cooldown)}</color>");
                 return Localization.instance.Localize(_sb.ToString());
             }
         }
@@ -39,7 +39,7 @@ namespace PocketTeleporter
         private static List<Direction> directions = new List<Direction>();
         private static Direction current;
         private static bool activated;
-        private static readonly Direction placeOfMystery = new Direction("$pt_location_random_point", Vector2.zero);
+        private static readonly Direction placeOfMystery = new Direction("$wt_location_random_point", Vector2.zero);
         private static float currentAngle;
 
         private static float defaultFoV;
@@ -102,13 +102,13 @@ namespace PocketTeleporter
         {
             directions.Clear();
 
-            directions.Add(new Direction("$pt_location_spawn_point", GetSpawnPoint()));
+            directions.Add(new Direction("$wt_location_spawn_point", GetSpawnPoint()));
 
             ZoneSystem.instance.GetLocationIcons(ZoneSystem.instance.tempIconList);
             foreach (KeyValuePair<Vector3, string> loc in ZoneSystem.instance.tempIconList)
             {
                 if (loc.Value == "StartTemple")
-                    directions.Add(new Direction("$pt_location_start_temple", loc.Key));
+                    directions.Add(new Direction("$wt_location_start_temple", loc.Key));
                 else if (loc.Value == "Vendor_BlackForest")
                     directions.Add(new Direction("$npc_haldor", loc.Key));
                 else if (loc.Value == "Hildir_camp")
@@ -117,7 +117,7 @@ namespace PocketTeleporter
 
             PlayerProfile profile = Game.instance.GetPlayerProfile();
             if (profile.HaveDeathPoint())
-                directions.Add(new Direction("$pt_location_last_tombstone", profile.GetDeathPoint()));
+                directions.Add(new Direction("$wt_location_last_tombstone", profile.GetDeathPoint()));
 
             directions.AddRange(WorldData.GetSavedDirections());
 
@@ -265,7 +265,7 @@ namespace PocketTeleporter
             private static void Postfix(Hud __instance)
             {
                 GameObject blocker = UnityEngine.Object.Instantiate(__instance.m_loadingScreen.gameObject, __instance.m_loadingScreen.transform.parent);
-                blocker.name = "PocketTeleporter_DirectionSearchBlack";
+                blocker.name = "WaystoneTeleporter_DirectionSearchBlack";
                 blocker.transform.SetSiblingIndex(0);
 
                 blocker.transform.Find("Loading/TopFade").SetParent(blocker.transform);

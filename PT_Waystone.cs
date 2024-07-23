@@ -1,8 +1,8 @@
-﻿using PocketTeleporter;
+﻿using WaystoneTeleporter;
 using System.Text;
 using UnityEngine;
-using static PocketTeleporter.DirectionSearch;
-using static PocketTeleporter.PocketTeleporter;
+using static WaystoneTeleporter.DirectionSearch;
+using static WaystoneTeleporter.WaystoneTeleporter;
 
 public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
 {
@@ -78,22 +78,22 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
             return GetHoverName();
 
         if (!IsActivated())
-            return Localization.instance.Localize("$pt_piece_waystone_name\n[<color=yellow><b>$KEY_Use</b></color>] $pt_piece_waystone_activate");
+            return Localization.instance.Localize("$wt_piece_waystone_name\n[<color=yellow><b>$KEY_Use</b></color>] $wt_piece_waystone_activate");
 
         sb.Clear();
-        sb.Append("$pt_piece_waystone_activated");
-        sb.Append("\n[<color=yellow><b>$KEY_Use</b></color>] $pt_tooltip_start_search");
+        sb.Append("$wt_piece_waystone_activated");
+        sb.Append("\n[<color=yellow><b>$KEY_Use</b></color>] $wt_tooltip_start_search");
 
         Vector3 markedPosition = WorldData.GetMarkedPositionTooltip();
 
         if (markedPosition == Vector3.one || Utils.DistanceXZ(Player.m_localPlayer.transform.position, markedPosition) > 10f)
         {
             string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
-            sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $pt_piece_waystone_mark");
+            sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $wt_piece_waystone_mark");
         }
         else
         {
-            sb.Append($"\n\n<color=#add8e6>$pt_location_marked_location</color>");
+            sb.Append($"\n\n<color=#add8e6>$wt_location_marked_location</color>");
         }
 
         return Localization.instance.Localize(sb.ToString());
@@ -101,7 +101,7 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
 
     public string GetHoverName()
     {
-        return "$pt_piece_waystone_name";
+        return "$wt_piece_waystone_name";
     }
 
     public bool Interact(Humanoid character, bool hold, bool alt)
@@ -120,7 +120,7 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
             MarkCurrentLocation(character);
         else if (IsSearchAllowed(character as Player))
         {
-            character.Message(MessageHud.MessageType.Center, "$pt_piece_waystone_activation");
+            character.Message(MessageHud.MessageType.Center, "$wt_piece_waystone_activation");
             Enter();
         }
 
@@ -186,7 +186,7 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
         }
         else if (!allowNonSitting.Value && !player.IsSitting())
         {
-            player.Message(MessageHud.MessageType.Center, "$pt_piece_waystone_sit");
+            player.Message(MessageHud.MessageType.Center, "$wt_piece_waystone_sit");
             return false;
         }
 

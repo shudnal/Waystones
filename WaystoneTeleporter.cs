@@ -9,20 +9,20 @@ using System.Reflection;
 using UnityEngine.Rendering;
 using LocalizationManager;
 
-namespace PocketTeleporter
+namespace WaystoneTeleporter
 {
     [BepInPlugin(pluginID, pluginName, pluginVersion)]
-    public class PocketTeleporter : BaseUnityPlugin
+    public class WaystoneTeleporter : BaseUnityPlugin
     {
-        const string pluginID = "shudnal.PocketTeleporter";
-        const string pluginName = "Pocket Teleporter";
+        const string pluginID = "shudnal.WaystoneTeleporter";
+        const string pluginName = "Waystone Teleporter";
         const string pluginVersion = "1.0.0";
 
         private readonly Harmony harmony = new Harmony(pluginID);
 
         internal static readonly ConfigSync configSync = new ConfigSync(pluginID) { DisplayName = pluginName, CurrentVersion = pluginVersion, MinimumRequiredVersion = pluginVersion };
 
-        internal static PocketTeleporter instance;
+        internal static WaystoneTeleporter instance;
 
         internal static ConfigEntry<bool> configLocked;
         internal static ConfigEntry<bool> loggingEnabled;
@@ -67,7 +67,7 @@ namespace PocketTeleporter
 
         public static string configDirectory;
 
-        public const string customDataKey = "PocketTeleporter";
+        public const string customDataKey = "WaystoneTeleporter";
 
         public enum CooldownTime
         {
@@ -160,14 +160,14 @@ namespace PocketTeleporter
             if (Player.m_localPlayer == null)
                 return;
 
-            if ((Chat.instance == null || !Chat.instance.HasFocus()) && !Console.IsVisible() && !Menu.IsVisible() && (bool)TextViewer.instance && !TextViewer.instance.IsVisible() && !Player.m_localPlayer.InCutscene() && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash))
+            if ((Chat.instance == null || !Chat.instance.HasFocus()) && !Console.IsVisible() && !Menu.IsVisible() && (bool)TextViewer.instance && !TextViewer.instance.IsVisible() && !Player.m_localPlayer.InCutscene() && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash))
             {
                 if (ZInput.GetButtonDown("Block") || ZInput.GetButtonDown("JoyBlock") || ZInput.GetButtonDown("JoyButtonB"))
                 {
                     ZInput.ResetButtonStatus("Block");
                     ZInput.ResetButtonStatus("JoyBlock");
                     ZInput.ResetButtonStatus("JoyButtonB");
-                    Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash);
+                    Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash);
                 }
             }
 
@@ -176,7 +176,7 @@ namespace PocketTeleporter
 
         public static void InitCommands()
         {
-            new Terminal.ConsoleCommand("setteleportercooldown", "seconds", delegate (Terminal.ConsoleEventArgs args)
+            new Terminal.ConsoleCommand("setwaystonecooldown", "seconds", delegate (Terminal.ConsoleEventArgs args)
             {
                 WorldData.SetCooldown(args.TryParameterInt(1, 0));
             }, isCheat: true);
@@ -188,18 +188,18 @@ namespace PocketTeleporter
                 return;
 
             if (!location.IsNullOrWhiteSpace())
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"$pt_tooltip_teleport_to {location}");
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"$wt_tooltip_teleport_to {location}");
 
             SEMan seman = Player.m_localPlayer.GetSEMan();
-            if (seman.HaveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash))
+            if (seman.HaveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash))
             {
-                Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash);
+                Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash);
             }
             else
             {
                 if (PT_WayStone.IsSearchAllowed(Player.m_localPlayer))
                 {
-                    SE_PocketTeleporter se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash) as SE_PocketTeleporter;
+                    SE_WaystoneTeleporter se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash) as SE_WaystoneTeleporter;
                     if (se != null)
                     {
                         se.targetPoint = targetPoint;
@@ -213,7 +213,7 @@ namespace PocketTeleporter
 
                         if (!location.IsNullOrWhiteSpace())
                         {
-                            MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, $"$pt_message_teleporting_to {location}");
+                            MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, $"$wt_message_travelling_to {location}");
                             se.m_name = location;
                             LogInfo($"Teleport initiated to {location} pos {targetPoint} cooldown {WorldData.TimerString(cooldown)}");
                         }
@@ -253,7 +253,7 @@ namespace PocketTeleporter
 
         private void LoadIcons()
         {
-            LoadIcon("SE_PocketTeleporter.png", ref SE_PocketTeleporter.iconPocketTeleporter);
+            LoadIcon("SE_WaystoneTeleporter.png", ref SE_WaystoneTeleporter.iconWaystoneTeleporter);
             LoadIcon("icon_waystone.png", ref PieceWaystone.iconWaystone);
         }
 
@@ -289,7 +289,7 @@ namespace PocketTeleporter
 
         private static bool PreventPlayerInput()
         {
-            return Player.m_localPlayer != null && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash);
+            return Player.m_localPlayer != null && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash);
         }
 
         [HarmonyPatch(typeof(ZInput), nameof(ZInput.GetMouseDelta))]
@@ -319,7 +319,7 @@ namespace PocketTeleporter
             [HarmonyPriority(Priority.First)]
             public static void Prefix(Player __instance, ref Vector2 mouseLook)
             {
-                if (__instance.GetSEMan().HaveStatusEffect(SE_PocketTeleporter.statusEffectPocketTeleporterHash))
+                if (__instance.GetSEMan().HaveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash))
                     mouseLook = Vector2.zero;
             }
         }

@@ -4,26 +4,26 @@ using System.Linq;
 using UnityEngine;
 using static UnityEngine.ParticleSystem;
 
-namespace PocketTeleporter
+namespace WaystoneTeleporter
 {
-    public class SE_PocketTeleporter : SE_Stats
+    public class SE_WaystoneTeleporter : SE_Stats
     {
-        public const string statusEffectPocketTeleporterName = "PocketTeleporter";
-        public static readonly int statusEffectPocketTeleporterHash = statusEffectPocketTeleporterName.GetStableHashCode();
+        public const string statusEffectWaystoneTeleporterName = "WaystoneTeleporter";
+        public static readonly int statusEffectWaystoneTeleporterHash = statusEffectWaystoneTeleporterName.GetStableHashCode();
 
-        public const string vfx_PocketTeleporterName = "vfx_PocketTeleporter";
-        public static readonly int vfx_PocketTeleporterHash = vfx_PocketTeleporterName.GetStableHashCode();
-        public const string vfx_PocketTeleporterParticles = "Sparcs";
-        public const string vfx_PocketTeleporterSfx = "Sfx";
-        public const string vfx_PocketTeleporterLight = "Light";
+        public const string vfx_WaystoneTeleporterName = "vfx_WaystoneTeleporter";
+        public static readonly int vfx_WaystoneTeleporterHash = vfx_WaystoneTeleporterName.GetStableHashCode();
+        public const string vfx_WaystoneTeleporterParticles = "Sparcs";
+        public const string vfx_WaystoneTeleporterSfx = "Sfx";
+        public const string vfx_WaystoneTeleporterLight = "Light";
 
-        public const string statusEffectName = "$se_pocketteleporter_name";
-        public const string statusEffectTooltip = "$se_pocketteleporter_tooltip";
+        public const string statusEffectName = "$se_waystoneteleporter_name";
+        public const string statusEffectTooltip = "$se_waystoneteleporter_tooltip";
 
         public static readonly int s_gpower = ZSyncAnimation.GetHash("gpower");
 
-        public static Sprite iconPocketTeleporter;
-        public static GameObject vfx_PocketTeleporter;
+        public static Sprite iconWaystoneTeleporter;
+        public static GameObject vfx_WaystoneTeleporter;
 
         [NonSerialized]
         private float volume;
@@ -104,12 +104,12 @@ namespace PocketTeleporter
 
             GameObject effect = m_startEffectInstances[0];
 
-            sfx = effect.transform.Find(vfx_PocketTeleporterSfx).GetComponent<AudioSource>();
+            sfx = effect.transform.Find(vfx_WaystoneTeleporterSfx).GetComponent<AudioSource>();
             volume = sfx.volume;
 
-            main = effect.transform.Find(vfx_PocketTeleporterParticles).GetComponent<ParticleSystem>().main;
+            main = effect.transform.Find(vfx_WaystoneTeleporterParticles).GetComponent<ParticleSystem>().main;
 
-            light = effect.transform.Find(vfx_PocketTeleporterLight).GetComponent<Light>();
+            light = effect.transform.Find(vfx_WaystoneTeleporterLight).GetComponent<Light>();
 
             character.StopEmote();
         }
@@ -124,7 +124,7 @@ namespace PocketTeleporter
                 m_character.m_lookTransitionTime = 0f;
 
                 if (m_character == Player.m_localPlayer)
-                    WorldData.SetCooldown(teleportTriggered ? targetCooldown : PocketTeleporter.cooldownShort.Value);
+                    WorldData.SetCooldown(teleportTriggered ? targetCooldown : WaystoneTeleporter.cooldownShort.Value);
             }
         }
 
@@ -145,24 +145,24 @@ namespace PocketTeleporter
             if (!ZNetScene.instance)
                 return;
 
-            if (!(bool)vfx_PocketTeleporter)
+            if (!(bool)vfx_WaystoneTeleporter)
             {
                 WayStone waystone = Resources.FindObjectsOfTypeAll<WayStone>().FirstOrDefault();
                 if (waystone == null)
                     return;
 
-                vfx_PocketTeleporter = CustomPrefabs.InitPrefabClone(ObjectDB.instance.GetStatusEffect(SEMan.s_statusEffectCold).m_startEffects.m_effectPrefabs[0].m_prefab, vfx_PocketTeleporterName);
-                for (int i = vfx_PocketTeleporter.transform.childCount - 1; i >= 0; i--)
+                vfx_WaystoneTeleporter = CustomPrefabs.InitPrefabClone(ObjectDB.instance.GetStatusEffect(SEMan.s_statusEffectCold).m_startEffects.m_effectPrefabs[0].m_prefab, vfx_WaystoneTeleporterName);
+                for (int i = vfx_WaystoneTeleporter.transform.childCount - 1; i >= 0; i--)
                 {
-                    Transform child = vfx_PocketTeleporter.transform.GetChild(i);
+                    Transform child = vfx_WaystoneTeleporter.transform.GetChild(i);
                     child.parent = null;
                     UnityEngine.Object.Destroy(child.gameObject);
                 }
 
-                Instantiate(waystone.transform.Find("WayEffect/sfx"), vfx_PocketTeleporter.transform).name = vfx_PocketTeleporterSfx;
+                Instantiate(waystone.transform.Find("WayEffect/sfx"), vfx_WaystoneTeleporter.transform).name = vfx_WaystoneTeleporterSfx;
 
-                GameObject pointLight = Instantiate(waystone.transform.Find("WayEffect/Point light"), vfx_PocketTeleporter.transform).gameObject;
-                pointLight.name = vfx_PocketTeleporterLight;
+                GameObject pointLight = Instantiate(waystone.transform.Find("WayEffect/Point light"), vfx_WaystoneTeleporter.transform).gameObject;
+                pointLight.name = vfx_WaystoneTeleporterLight;
                 pointLight.transform.localPosition = new Vector3(0f, 0f, -0.2f);
 
                 Light light = pointLight.GetComponent<Light>();
@@ -170,14 +170,14 @@ namespace PocketTeleporter
                 light.shadows = LightShadows.None;
                 light.intensity = 0f;
 
-                GameObject sparcs = Instantiate(waystone.transform.Find("WayEffect/Particle System sparcs"), vfx_PocketTeleporter.transform).gameObject;
-                sparcs.name = vfx_PocketTeleporterParticles;
+                GameObject sparcs = Instantiate(waystone.transform.Find("WayEffect/Particle System sparcs"), vfx_WaystoneTeleporter.transform).gameObject;
+                sparcs.name = vfx_WaystoneTeleporterParticles;
                 sparcs.transform.localPosition = new Vector3(0f, 0f, -0.1f);
 
                 ParticleSystem ps = sparcs.GetComponent<ParticleSystem>();
 
                 MainModule main = ps.main;
-                main.maxParticles = PocketTeleporter.particlesMaxAmount.Value;
+                main.maxParticles = WaystoneTeleporter.particlesMaxAmount.Value;
                 main.duration = 20f;
                 main.simulationSpace = ParticleSystemSimulationSpace.World;
 
@@ -189,11 +189,11 @@ namespace PocketTeleporter
 
                 MinMaxCurve rot = emission.rateOverTime;
                 rot.mode = ParticleSystemCurveMode.Curve;
-                rot.curve = AnimationCurve.Linear(0, PocketTeleporter.particlesMinRateOverTime.Value, 1, PocketTeleporter.particlesMaxRateOverTime.Value);
+                rot.curve = AnimationCurve.Linear(0, WaystoneTeleporter.particlesMinRateOverTime.Value, 1, WaystoneTeleporter.particlesMaxRateOverTime.Value);
 
                 emission.rateOverTime = rot;
 
-                if (PocketTeleporter.particlesCollision.Value)
+                if (WaystoneTeleporter.particlesCollision.Value)
                 {
                     CollisionModule collision = ps.collision;
                     collision.enabled = true;
@@ -205,16 +205,16 @@ namespace PocketTeleporter
 
                 MinMaxCurve forceZ = force.z;
                 forceZ.mode = ParticleSystemCurveMode.Curve;
-                forceZ.curve = AnimationCurve.Linear(0, PocketTeleporter.particlesMinForceOverTime.Value, 1, PocketTeleporter.particlesMaxForceOverTime.Value);
+                forceZ.curve = AnimationCurve.Linear(0, WaystoneTeleporter.particlesMinForceOverTime.Value, 1, WaystoneTeleporter.particlesMaxForceOverTime.Value);
 
                 force.z = forceZ;
                 force.zMultiplier = 3;
             }
 
-            if ((bool)vfx_PocketTeleporter && !ZNetScene.instance.m_namedPrefabs.ContainsKey(vfx_PocketTeleporterHash))
+            if ((bool)vfx_WaystoneTeleporter && !ZNetScene.instance.m_namedPrefabs.ContainsKey(vfx_WaystoneTeleporterHash))
             {
-                ZNetScene.instance.m_prefabs.Add(vfx_PocketTeleporter);
-                ZNetScene.instance.m_namedPrefabs[vfx_PocketTeleporterHash] = vfx_PocketTeleporter;
+                ZNetScene.instance.m_prefabs.Add(vfx_WaystoneTeleporter);
+                ZNetScene.instance.m_namedPrefabs[vfx_WaystoneTeleporterHash] = vfx_WaystoneTeleporter;
             }
         }
 
@@ -227,12 +227,12 @@ namespace PocketTeleporter
 
                 if (odb.m_StatusEffects.Count > 0)
                 {
-                    if (!odb.m_StatusEffects.Any(se => se.name == statusEffectPocketTeleporterName))
+                    if (!odb.m_StatusEffects.Any(se => se.name == statusEffectWaystoneTeleporterName))
                     {
-                        SE_PocketTeleporter statusEffect = ScriptableObject.CreateInstance<SE_PocketTeleporter>();
-                        statusEffect.name = statusEffectPocketTeleporterName;
-                        statusEffect.m_nameHash = statusEffectPocketTeleporterHash;
-                        statusEffect.m_icon = iconPocketTeleporter;
+                        SE_WaystoneTeleporter statusEffect = ScriptableObject.CreateInstance<SE_WaystoneTeleporter>();
+                        statusEffect.name = statusEffectWaystoneTeleporterName;
+                        statusEffect.m_nameHash = statusEffectWaystoneTeleporterHash;
+                        statusEffect.m_icon = iconWaystoneTeleporter;
                         statusEffect.m_noiseModifier = 1;
                         statusEffect.m_stealthModifier = -1;
                         statusEffect.m_staminaDrainPerSec = 10f;
@@ -243,7 +243,7 @@ namespace PocketTeleporter
                         statusEffect.m_startEffects.m_effectPrefabs = new[] {
                             new EffectList.EffectData()
                                 {
-                                    m_prefab = vfx_PocketTeleporter,
+                                    m_prefab = vfx_WaystoneTeleporter,
                                     m_enabled = true,
                                     m_inheritParentScale = true,
                                     m_attach = true,

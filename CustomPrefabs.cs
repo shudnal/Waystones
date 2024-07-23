@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 
-namespace PocketTeleporter
+namespace WaystoneTeleporter
 {
     internal class CustomPrefabs
     {

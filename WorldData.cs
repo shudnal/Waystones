@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using static PocketTeleporter.PocketTeleporter;
+using static WaystoneTeleporter.WaystoneTeleporter;
 using HarmonyLib;
 using UnityEngine;
 using System.Text;
 
-namespace PocketTeleporter
+namespace WaystoneTeleporter
 {
     [Serializable]
     public class WorldData
@@ -29,13 +29,13 @@ namespace PocketTeleporter
                 return result;
 
             if (data.lastShip != null && data.lastShip != Vector3.zero)
-                result.Add(new DirectionSearch.Direction("$pt_location_last_ship", data.lastShip));
+                result.Add(new DirectionSearch.Direction("$wt_location_last_ship", data.lastShip));
 
             if (data.lastPosition != null && data.lastPosition != Vector3.zero)
-                result.Add(new DirectionSearch.Direction("$pt_location_last_location", data.lastPosition));
+                result.Add(new DirectionSearch.Direction("$wt_location_last_location", data.lastPosition));
 
             if (data.markedPosition != null && data.markedPosition != Vector3.zero)
-                result.Add(new DirectionSearch.Direction("$pt_location_marked_location", data.markedPosition));
+                result.Add(new DirectionSearch.Direction("$wt_location_marked_location", data.markedPosition));
 
             return result;
         }
