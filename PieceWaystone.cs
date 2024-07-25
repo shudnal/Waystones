@@ -10,7 +10,7 @@ namespace WaystoneTeleporter
 {
     internal class PieceWaystone
     {
-        public static Sprite iconWaystone;
+        public static Sprite itemWaystone;
         internal static GameObject waystonePrefab;
         internal const string waystoneName = "WaystoneTeleporter";
         public static int waystoneHash = waystoneName.GetStableHashCode();
@@ -63,7 +63,7 @@ namespace WaystoneTeleporter
                 netview.m_type = ZDO.ObjectType.Solid;
 
                 Piece piece = CustomPrefabs.AddComponent(waystonePrefab, typeof(Piece)) as Piece;
-                piece.m_icon = iconWaystone;
+                piece.m_icon = itemWaystone;
                 piece.m_name = waystonePieceName;
                 piece.m_description = waystonePieceDescription;
                 piece.m_clipGround = true;

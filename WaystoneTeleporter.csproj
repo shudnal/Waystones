@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DirectionSearch.cs" />
+    <Compile Include="WaystoneList.cs" />
     <Compile Include="PieceWaystone.cs" />
     <Compile Include="PT_Waystone.cs" />
     <Compile Include="WorldData.cs" />
@@ -109,6 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\SE_WaystoneTeleporter.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Assets\item_waystone.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\icon_waystone.png">

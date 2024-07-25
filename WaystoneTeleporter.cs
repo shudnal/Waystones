@@ -28,6 +28,7 @@ namespace WaystoneTeleporter
         internal static ConfigEntry<bool> loggingEnabled;
         internal static ConfigEntry<KeyboardShortcut> shortcut;
         internal static ConfigEntry<string> pieceRecipe;
+        internal static ConfigEntry<bool> showOnMap;
 
         internal static ConfigEntry<bool> useShortcutToEnter;
         internal static ConfigEntry<bool> allowEncumbered;
@@ -67,8 +68,6 @@ namespace WaystoneTeleporter
 
         public static string configDirectory;
 
-        public const string customDataKey = "WaystoneTeleporter";
-
         public enum CooldownTime
         {
             WorldTime,
@@ -100,6 +99,7 @@ namespace WaystoneTeleporter
             configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
             loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
             pieceRecipe = config("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
+            showOnMap = config("General", "Show on map", defaultValue: true, "Show waystone map pins");
 
             pieceRecipe.SettingChanged += (sender, args) => PieceWaystone.SetPieceRequirements();
 
@@ -254,7 +254,8 @@ namespace WaystoneTeleporter
         private void LoadIcons()
         {
             LoadIcon("SE_WaystoneTeleporter.png", ref SE_WaystoneTeleporter.iconWaystoneTeleporter);
-            LoadIcon("icon_waystone.png", ref PieceWaystone.iconWaystone);
+            LoadIcon("item_waystone.png", ref PieceWaystone.itemWaystone);
+            LoadIcon("icon_waystone.png", ref WaystoneList.iconWaystone);
         }
 
         internal static void LoadIcon(string filename, ref Sprite icon)

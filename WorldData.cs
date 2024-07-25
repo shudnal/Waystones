@@ -18,6 +18,8 @@ namespace WaystoneTeleporter
         public Vector3 lastPosition = Vector3.zero;
         public Vector3 markedPosition = Vector3.zero;
 
+        public const string customDataKey = "WaystoneTeleporter";
+
         private static Vector3 _markedPosition;
 
         public static List<DirectionSearch.Direction> GetSavedDirections()
