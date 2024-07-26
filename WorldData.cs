@@ -16,11 +16,8 @@ namespace WaystoneTeleporter
         public double worldTime;
         public Vector3 lastShip = Vector3.zero;
         public Vector3 lastPosition = Vector3.zero;
-        public Vector3 markedPosition = Vector3.zero;
 
         public const string customDataKey = "WaystoneTeleporter";
-
-        private static Vector3 _markedPosition;
 
         public static List<DirectionSearch.Direction> GetSavedDirections()
         {
@@ -36,34 +33,9 @@ namespace WaystoneTeleporter
             if (data.lastPosition != null && data.lastPosition != Vector3.zero)
                 result.Add(new DirectionSearch.Direction("$wt_location_last_location", data.lastPosition));
 
-            if (data.markedPosition != null && data.markedPosition != Vector3.zero)
-                result.Add(new DirectionSearch.Direction("$wt_location_marked_location", data.markedPosition));
+            MarkedWaystone.GetCurrentWorldList().Do(waystone => result.Add(new DirectionSearch.Direction(waystone.name, waystone.position)));
 
             return result;
-        }
-
-        public static Vector3 GetMarkedPositionTooltip()
-        {
-            if (_markedPosition != Vector3.zero)
-                return _markedPosition;
-
-            WorldData worldData = GetWorldData(GetState());
-            
-            _markedPosition = worldData == null ? Vector3.one : worldData.markedPosition;
-            return _markedPosition;
-        }
-
-        public static void SaveMarkedPosition(Vector3 position)
-        {
-            List<WorldData> state = GetState();
-
-            GetWorldData(state, createIfEmpty: true).markedPosition = position;
-
-            Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
-
-            _markedPosition = position;
-
-            LogInfo("Marked location saved: " + position);
         }
 
         public static void SaveLastPosition(Vector3 position)

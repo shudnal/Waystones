@@ -17,7 +17,7 @@
     "wt_piece_waystone_activation": "Вы касаетесь холодной каменной поверхности и думаете о доме.",
     "wt_piece_waystone_activated": "Активный путевой камень",
     "wt_piece_waystone_activate": "Активировать",
-    "wt_piece_waystone_mark": "Отметить текущее место",
+    "wt_piece_waystone_deactivate": "Деактивировать",
     "wt_piece_waystone_sit": "Сядьте, чтобы взаимодействовать",
     "wt_tutorial_waystone_label": "Хугин: Путевой камень",
     "wt_tutorial_waystone_text": "Путевой камень позволяет вам <color=yellow>быстро перемещаться</color> в отдаленные места.\n\nСядьте перед <color=yellow>активированным</color> путевым камнем и начните поиск.\nНайдите взглядом отдаленное место, чтобы переместиться туда.",

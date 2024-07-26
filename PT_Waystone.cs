@@ -77,24 +77,12 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
         if (Player.m_localPlayer.InInterior())
             return GetHoverName();
 
-        if (!IsActivated())
-            return Localization.instance.Localize("$wt_piece_waystone_name\n[<color=yellow><b>$KEY_Use</b></color>] $wt_piece_waystone_activate");
-
         sb.Clear();
-        sb.Append("$wt_piece_waystone_activated");
+        sb.Append(IsActivated() ? "$wt_piece_waystone_activated" : GetHoverName());
         sb.Append("\n[<color=yellow><b>$KEY_Use</b></color>] $wt_tooltip_start_search");
-
-        Vector3 markedPosition = WorldData.GetMarkedPositionTooltip();
-
-        if (markedPosition == Vector3.one || Utils.DistanceXZ(Player.m_localPlayer.transform.position, markedPosition) > 10f)
-        {
-            string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
-            sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $wt_piece_waystone_mark");
-        }
-        else
-        {
-            sb.Append($"\n\n<color=#add8e6>$wt_location_marked_location</color>");
-        }
+        
+        string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
+        sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] {(IsActivated() ? "$wt_piece_waystone_deactivate" : "$wt_piece_waystone_activate")}");
 
         return Localization.instance.Localize(sb.ToString());
     }
@@ -106,7 +94,7 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
 
     public bool Interact(Humanoid character, bool hold, bool alt)
     {
-        if (hold)
+        /*if (hold)
             return false;
 
         if (!IsActivated())
@@ -122,7 +110,7 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
         {
             character.Message(MessageHud.MessageType.Center, "$wt_piece_waystone_activation");
             Enter();
-        }
+        }*/
 
         return true;
     }
@@ -135,15 +123,6 @@ public class PT_WayStone : MonoBehaviour, Hoverable, Interactable
     public bool IsActivated()
     {
         return m_activeObject.activeSelf;
-    }
-
-    private void MarkCurrentLocation(Humanoid character)
-    {
-        if (character != null && character != Player.m_localPlayer)
-            return;
-
-        m_markEffect.Create(base.transform.position, base.transform.rotation);
-        WorldData.SaveMarkedPosition(character.transform.position);
     }
 
     internal static bool IsSearchAllowed(Player player)

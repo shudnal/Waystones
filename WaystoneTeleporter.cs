@@ -255,7 +255,7 @@ namespace WaystoneTeleporter
         {
             LoadIcon("SE_WaystoneTeleporter.png", ref SE_WaystoneTeleporter.iconWaystoneTeleporter);
             LoadIcon("item_waystone.png", ref PieceWaystone.itemWaystone);
-            LoadIcon("icon_waystone.png", ref WaystoneList.iconWaystone);
+            LoadIcon("icon_waystone.png", ref MarkedWaystone.iconWaystone);
         }
 
         internal static void LoadIcon(string filename, ref Sprite icon)
