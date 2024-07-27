@@ -1,25 +1,19 @@
 ﻿using HarmonyLib;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
-using static WaystoneTeleporter.WaystoneTeleporter;
+using static Waystones.Waystones;
 
-namespace WaystoneTeleporter
+namespace Waystones
 {
-    [Serializable]
-    internal class MarkedWaystone
+    internal static class WaystoneList
     {
-        public long worldUID;
-        public string name;
-        public Vector3 position;
-        public ushort zdoUserKey;
-        public uint zdoID;
-
         public static Sprite iconWaystone;
         public static readonly List<Minimap.PinData> waystonePins = new List<Minimap.PinData>();
+        public static readonly List<Tuple<string, Vector3, Quaternion>> activatedWaystones = new List<Tuple<string, Vector3, Quaternion>>();
+
+        // Server
+        public static readonly HashSet<ZDO> waystoneObjects = new HashSet<ZDO>();
 
         public const string customDataKey = "WaystoneList";
 
@@ -29,113 +23,9 @@ namespace WaystoneTeleporter
                 Minimap.instance.RemovePin(pin);
 
             waystonePins.Clear();
-            if (showOnMap.Value)
-                foreach (MarkedWaystone waystone in GetCurrentWorldList())
-                    waystonePins.Add(Minimap.instance.AddPin(waystone.position, (Minimap.PinType)WaystoneIconType.pinType, waystone.name, save: false, isChecked: false, Player.m_localPlayer.GetPlayerID()));   
-        }
-
-        public static IEnumerable<MarkedWaystone> GetCurrentWorldList()
-        {
-            return GetWorldList(GetMarkedWaystones());
-        }
-
-        public static bool IsEnabled(ZDO zdo)
-        {
-            if (zdo == null || !zdo.IsValid())
-                return false;
-
-            List<MarkedWaystone> state = GetMarkedWaystones();
-
-            return GetWorldList(state).Any(d => zdo.m_uid.UserKey == d.zdoUserKey && zdo.m_uid.ID == d.zdoID);
-        }
-
-        private static IEnumerator UpdatePinsOnMapReady()
-        {
-            yield return new WaitUntil(() => Minimap.instance);
-
-            UpdatePins();
-        }
-
-        public static void EnableWaystone(ZDO zdo)
-        {
-            if (zdo == null || !zdo.IsValid())
-                return;
-
-            List<MarkedWaystone> state = GetMarkedWaystones();
-
-            if (GetWorldList(state).Any(d => zdo.m_uid.UserKey == d.zdoUserKey && zdo.m_uid.ID == d.zdoID))
-                return;
-
-            MarkedWaystone waystone = new MarkedWaystone()
-            {
-                worldUID = ZNet.instance.GetWorldUID(),
-                name = zdo.GetString(ZDOVars.s_tag),
-                position = zdo.GetPosition(),
-                zdoUserKey = zdo.m_uid.UserKey,
-                zdoID = zdo.m_uid.ID
-            };
-
-            state.Add(waystone);
-
-            Player.m_localPlayer.m_customData[customDataKey] = SaveWaystoneList(state);
-
-            LogInfo($"Waystone enabled: {waystone.name} {waystone.position}");
-        }
-
-        public static void DisableWaystone(ZDO zdo)
-        {
-            if (zdo == null || !zdo.IsValid())
-                return;
-
-            List<MarkedWaystone> state = GetMarkedWaystones();
-
-            if (state.RemoveAll(d => d.worldUID == ZNet.instance.GetWorldUID() && zdo.m_uid.UserKey == d.zdoUserKey && zdo.m_uid.ID == d.zdoID) == 0)
-                return;
-
-            Player.m_localPlayer.m_customData[customDataKey] = SaveWaystoneList(state);
-
-            LogInfo($"Waystone disabled: {zdo.GetString(ZDOVars.s_tag)} {zdo.GetPosition()}");
-        }
-
-        private static IEnumerable<MarkedWaystone> GetWorldList(List<MarkedWaystone> state)
-        {
-            return state.Where(d => d.worldUID == ZNet.instance.GetWorldUID());
-        }
-
-        private static List<MarkedWaystone> GetMarkedWaystones()
-        {
-            return Player.m_localPlayer.m_customData.TryGetValue(customDataKey, out string value) ? GetWaystoneList(value) : new List<MarkedWaystone>();
-        }
-
-        private static List<MarkedWaystone> GetWaystoneList(string value)
-        {
-            List<MarkedWaystone> data = new List<MarkedWaystone>();
-            SplitToLines(value).Do(line => data.Add(JsonUtility.FromJson<MarkedWaystone>(line)));
-            return data;
-        }
-
-        private static string SaveWaystoneList(List<MarkedWaystone> list)
-        {
-            StringBuilder sb = new StringBuilder();
-            list.Do(data => sb.AppendLine(JsonUtility.ToJson(data)));
-            return sb.ToString();
-        }
-
-        private static IEnumerable<string> SplitToLines(string input)
-        {
-            if (input == null)
-            {
-                yield break;
-            }
-
-            using (System.IO.StringReader reader = new System.IO.StringReader(input))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    yield return line;
-                }
-            }
+            if (showOnMap.Value && DirectionSearch.IsActivated)
+                foreach (Tuple<string, Vector3, Quaternion> waystone in activatedWaystones)
+                    waystonePins.Add(Minimap.instance.AddPin(waystone.Item2, (Minimap.PinType)WaystoneIconType.pinType, waystone.Item1, save: false, isChecked: false, Player.m_localPlayer.GetPlayerID()));
         }
 
         [HarmonyPatch(typeof(Minimap), nameof(Minimap.Start))]
@@ -159,13 +49,151 @@ namespace WaystoneTeleporter
             }
         }
         
-        [HarmonyPatch(typeof(Player), nameof(Player.SetLocalPlayer))]
-        public static class Player_SetLocalPlayer_AddWaystonePins
+        [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start))]
+        public static class ZoneSystem_Start_WaystoneList
         {
-            private static void Postfix(Player __instance)
+            private static void Postfix()
             {
-                if (__instance != Player.m_localPlayer)
-                    instance.StartCoroutine(UpdatePinsOnMapReady());
+                RegisterRPCs();
+            }
+        }
+
+        [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.OnDestroy))]
+        public static class ZoneSystem_OnDestroy_WaystoneList
+        {
+            private static void Postfix()
+            {
+                waystoneObjects.Clear();
+            }
+        }
+
+        internal static void RegisterRPCs()
+        {
+            if (ZNet.instance.IsServer())
+            {
+                ZRoutedRpc.instance.Register<long>("MarkedLocationRequest", RPC_MarkedLocationRequest);
+            }
+            else
+            {
+                ZRoutedRpc.instance.Register<ZPackage>("MarkedLocationResponse", RPC_MarkedLocationResponse);
+            }
+        }
+
+        public static void EnterSearchMode()
+        {
+            if (!ZNet.instance.IsServer())
+            {
+                MarkedLocationRequest();
+                return;
+            }
+
+            if (!Player.m_localPlayer)
+                return;
+
+            GetActivatedWaystones(Player.m_localPlayer.GetPlayerID());
+            DirectionSearch.Enter();
+        }
+
+        public static void MarkedLocationRequest()
+        {
+            LogInfo($"Marked location request");
+
+            ZRoutedRpc.instance.InvokeRoutedRPC("MarkedLocationRequest", Player.m_localPlayer.GetPlayerID());
+        }
+
+        public static List<Tuple<string, Vector3, Quaternion>> GetActivatedWaystones(long playerID)
+        {
+            activatedWaystones.Clear();
+            foreach (ZDO zdo in waystoneObjects)
+                if (WayStoneSmall.IsWaystoneActivated(zdo, playerID))
+                {
+                    string tag = zdo.GetString(ZDOVars.s_tag);
+                    if (string.IsNullOrWhiteSpace(tag))
+                        continue;
+
+                    Vector3 position = zdo.GetPosition();
+                    Quaternion rotation = zdo.GetRotation();
+                    Vector3 vector = rotation * Vector3.forward;
+                    Vector3 pos = position + vector * 1 + Vector3.up;
+
+                    activatedWaystones.Add(Tuple.Create(tag, pos, rotation * Quaternion.Euler(0, 180f, 0)));
+                }
+
+            return activatedWaystones;
+        }
+
+        public static void RPC_MarkedLocationRequest(long sender, long playerID)
+        {
+            // Server
+            GetActivatedWaystones(playerID);
+
+            ZPackage zPackage = new ZPackage();
+            zPackage.Write(activatedWaystones.Count);
+
+            foreach (Tuple<string, Vector3, Quaternion> waystone in activatedWaystones)
+            {
+                zPackage.Write(waystone.Item1);
+                zPackage.Write(waystone.Item2);
+                zPackage.Write(waystone.Item3);
+            }
+
+            ZRoutedRpc.instance.InvokeRoutedRPC(sender, "MarkedLocationResponse", zPackage);
+        }
+
+        public static void RPC_MarkedLocationResponse(long sender, ZPackage pkg)
+        {
+            LogInfo($"Server responded with activated location list");
+
+            activatedWaystones.Clear();
+            int num = pkg.ReadInt();
+            for (int i = 0; i < num; i++)
+                activatedWaystones.Add(Tuple.Create(pkg.ReadString(), pkg.ReadVector3(), pkg.ReadQuaternion()));
+
+            DirectionSearch.Enter();
+        }
+
+        [HarmonyPatch(typeof(ZDOMan), nameof(ZDOMan.Load))]
+        public static class ZDOMan_Load_WaystoneListInit
+        {
+            private static void Postfix(ZDOMan __instance)
+            {
+                foreach (KeyValuePair<ZDOID, ZDO> item in __instance.m_objectsByID)
+                    if (item.Value.GetPrefab() == PieceWaystone.waystoneHash)
+                        waystoneObjects.Add(item.Value);
+            }
+        }
+
+        [HarmonyPatch(typeof(ZDOMan), nameof(ZDOMan.CreateNewZDO), new Type[3] { typeof(ZDOID), typeof(Vector3), typeof(int) })]
+        public static class ZDOMan_CreateNewZDO_WaystoneListAddNew
+        {
+            private static void Postfix(int prefabHashIn, ZDO __result)
+            {
+                if (((prefabHashIn != 0) ? prefabHashIn : __result.GetPrefab()) == PieceWaystone.waystoneHash)
+                    waystoneObjects.Add(__result);
+            }
+        }
+
+        [HarmonyPatch(typeof(ZDOMan), nameof(ZDOMan.HandleDestroyedZDO))]
+        public static class ZDOMan_HandleDestroyedZDO_WaystoneListRemove
+        {
+            private static void Prefix(ZDOMan __instance, ZDOID uid)
+            {
+                ZDO zDO = __instance.GetZDO(uid);
+                if (zDO == null)
+                    return;
+
+                if (zDO.GetPrefab() == PieceWaystone.waystoneHash)
+                    waystoneObjects.Remove(zDO);
+            }
+        }
+
+        [HarmonyPatch(typeof(ZDO), nameof(ZDO.Deserialize))]
+        public static class ZDO_Deserialize_WaystoneListAdd
+        {
+            private static void Postfix(ZDO __instance)
+            {
+                if (__instance.GetPrefab() == PieceWaystone.waystoneHash)
+                    waystoneObjects.Add(__instance);
             }
         }
     }

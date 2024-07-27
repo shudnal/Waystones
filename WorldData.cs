@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using static WaystoneTeleporter.WaystoneTeleporter;
+using static Waystones.Waystones;
 using HarmonyLib;
 using UnityEngine;
 using System.Text;
 
-namespace WaystoneTeleporter
+namespace Waystones
 {
     [Serializable]
     public class WorldData
@@ -17,7 +17,9 @@ namespace WaystoneTeleporter
         public Vector3 lastShip = Vector3.zero;
         public Vector3 lastPosition = Vector3.zero;
 
-        public const string customDataKey = "WaystoneTeleporter";
+        public const string customDataKey = "Waystones";
+        
+        public static bool saveNextGroundPositionAsShipLocation;
 
         public static List<DirectionSearch.Direction> GetSavedDirections()
         {
@@ -28,12 +30,12 @@ namespace WaystoneTeleporter
                 return result;
 
             if (data.lastShip != null && data.lastShip != Vector3.zero)
-                result.Add(new DirectionSearch.Direction("$wt_location_last_ship", data.lastShip));
+                result.Add(new DirectionSearch.Direction("$ws_location_last_ship", data.lastShip));
 
             if (data.lastPosition != null && data.lastPosition != Vector3.zero)
-                result.Add(new DirectionSearch.Direction("$wt_location_last_location", data.lastPosition));
+                result.Add(new DirectionSearch.Direction("$ws_location_last_location", data.lastPosition));
 
-            MarkedWaystone.GetCurrentWorldList().Do(waystone => result.Add(new DirectionSearch.Direction(waystone.name, waystone.position)));
+            WaystoneList.activatedWaystones.Do(waystone => result.Add(new DirectionSearch.Direction($"$ws_piece_waystone_name \"{waystone.Item1}\"", waystone.Item2, waystone.Item3)));
 
             return result;
         }
@@ -190,6 +192,32 @@ namespace WaystoneTeleporter
                 while ((line = reader.ReadLine()) != null)
                 {
                     yield return line;
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(Ship), nameof(Ship.OnTriggerExit))]
+        public static class Ship_OnTriggerExit_LastShipPosition
+        {
+            private static void Prefix(Ship __instance, Collider collider)
+            {
+                if (Player.m_localPlayer && Player.m_localPlayer == collider.GetComponent<Player>() && Ship.s_currentShips.Contains(__instance))
+                    saveNextGroundPositionAsShipLocation = true;
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.FixedUpdate))]
+        public static class Player_FixedUpdate_SaveLastShipPosition
+        {
+            private static void Postfix(Player __instance)
+            {
+                if (__instance != Player.m_localPlayer)
+                    return;
+
+                if (saveNextGroundPositionAsShipLocation && __instance.IsOnGround() && !__instance.InWater() && __instance.GetStandingOnShip() == null)
+                {
+                    saveNextGroundPositionAsShipLocation = false;
+                    SaveLastShip(Player.m_localPlayer.transform.position);
                 }
             }
         }

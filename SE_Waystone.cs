@@ -4,26 +4,26 @@ using System.Linq;
 using UnityEngine;
 using static UnityEngine.ParticleSystem;
 
-namespace WaystoneTeleporter
+namespace Waystones
 {
-    public class SE_WaystoneTeleporter : SE_Stats
+    public class SE_Waystone : SE_Stats
     {
-        public const string statusEffectWaystoneTeleporterName = "WaystoneTeleporter";
-        public static readonly int statusEffectWaystoneTeleporterHash = statusEffectWaystoneTeleporterName.GetStableHashCode();
+        public const string statusEffectWaystonesName = "WaystoneFastTravel";
+        public static readonly int statusEffectWaystonesHash = statusEffectWaystonesName.GetStableHashCode();
 
-        public const string vfx_WaystoneTeleporterName = "vfx_WaystoneTeleporter";
-        public static readonly int vfx_WaystoneTeleporterHash = vfx_WaystoneTeleporterName.GetStableHashCode();
-        public const string vfx_WaystoneTeleporterParticles = "Sparcs";
-        public const string vfx_WaystoneTeleporterSfx = "Sfx";
-        public const string vfx_WaystoneTeleporterLight = "Light";
+        public const string vfx_WaystonesName = "vfx_Waystones";
+        public static readonly int vfx_WaystonesHash = vfx_WaystonesName.GetStableHashCode();
+        public const string vfx_WaystonesParticles = "Sparcs";
+        public const string vfx_WaystonesSfx = "Sfx";
+        public const string vfx_WaystonesLight = "Light";
 
-        public const string statusEffectName = "$se_waystoneteleporter_name";
-        public const string statusEffectTooltip = "$se_waystoneteleporter_tooltip";
+        public const string statusEffectName = "$se_waystone_name";
+        public const string statusEffectTooltip = "$se_waystone_tooltip";
 
         public static readonly int s_gpower = ZSyncAnimation.GetHash("gpower");
 
-        public static Sprite iconWaystoneTeleporter;
-        public static GameObject vfx_WaystoneTeleporter;
+        public static Sprite iconWaystones;
+        public static GameObject vfx_Waystones;
 
         [NonSerialized]
         private float volume;
@@ -36,6 +36,8 @@ namespace WaystoneTeleporter
 
         [NonSerialized]
         public Vector3 targetPoint = Vector3.zero;
+        [NonSerialized]
+        public Quaternion targetRotation = Quaternion.identity;
         [NonSerialized]
         public double targetCooldown = 0;
         [NonSerialized]
@@ -79,7 +81,7 @@ namespace WaystoneTeleporter
 
                 if (!teleportTriggered && GetRemaningTime() < 0.75f && targetPoint != Vector3.zero)
                 {
-                    localPlayer.TeleportTo(targetPoint, localPlayer.transform.rotation, distantTeleport: true);
+                    localPlayer.TeleportTo(targetPoint, targetRotation == Quaternion.identity ? localPlayer.transform.rotation : targetRotation, distantTeleport: true);
                     WorldData.SaveLastPosition(localPlayer.transform.position);
                     teleportTriggered = true;
                 }
@@ -104,12 +106,12 @@ namespace WaystoneTeleporter
 
             GameObject effect = m_startEffectInstances[0];
 
-            sfx = effect.transform.Find(vfx_WaystoneTeleporterSfx).GetComponent<AudioSource>();
+            sfx = effect.transform.Find(vfx_WaystonesSfx).GetComponent<AudioSource>();
             volume = sfx.volume;
 
-            main = effect.transform.Find(vfx_WaystoneTeleporterParticles).GetComponent<ParticleSystem>().main;
+            main = effect.transform.Find(vfx_WaystonesParticles).GetComponent<ParticleSystem>().main;
 
-            light = effect.transform.Find(vfx_WaystoneTeleporterLight).GetComponent<Light>();
+            light = effect.transform.Find(vfx_WaystonesLight).GetComponent<Light>();
 
             character.StopEmote();
         }
@@ -124,7 +126,7 @@ namespace WaystoneTeleporter
                 m_character.m_lookTransitionTime = 0f;
 
                 if (m_character == Player.m_localPlayer)
-                    WorldData.SetCooldown(teleportTriggered ? targetCooldown : WaystoneTeleporter.cooldownShort.Value);
+                    WorldData.SetCooldown(teleportTriggered ? targetCooldown : Waystones.cooldownShort.Value);
             }
         }
 
@@ -145,24 +147,24 @@ namespace WaystoneTeleporter
             if (!ZNetScene.instance)
                 return;
 
-            if (!(bool)vfx_WaystoneTeleporter)
+            if (!(bool)vfx_Waystones)
             {
                 WayStone waystone = Resources.FindObjectsOfTypeAll<WayStone>().FirstOrDefault();
                 if (waystone == null)
                     return;
 
-                vfx_WaystoneTeleporter = CustomPrefabs.InitPrefabClone(ObjectDB.instance.GetStatusEffect(SEMan.s_statusEffectCold).m_startEffects.m_effectPrefabs[0].m_prefab, vfx_WaystoneTeleporterName);
-                for (int i = vfx_WaystoneTeleporter.transform.childCount - 1; i >= 0; i--)
+                vfx_Waystones = CustomPrefabs.InitPrefabClone(ObjectDB.instance.GetStatusEffect(SEMan.s_statusEffectCold).m_startEffects.m_effectPrefabs[0].m_prefab, vfx_WaystonesName);
+                for (int i = vfx_Waystones.transform.childCount - 1; i >= 0; i--)
                 {
-                    Transform child = vfx_WaystoneTeleporter.transform.GetChild(i);
+                    Transform child = vfx_Waystones.transform.GetChild(i);
                     child.parent = null;
                     UnityEngine.Object.Destroy(child.gameObject);
                 }
 
-                Instantiate(waystone.transform.Find("WayEffect/sfx"), vfx_WaystoneTeleporter.transform).name = vfx_WaystoneTeleporterSfx;
+                Instantiate(waystone.transform.Find("WayEffect/sfx"), vfx_Waystones.transform).name = vfx_WaystonesSfx;
 
-                GameObject pointLight = Instantiate(waystone.transform.Find("WayEffect/Point light"), vfx_WaystoneTeleporter.transform).gameObject;
-                pointLight.name = vfx_WaystoneTeleporterLight;
+                GameObject pointLight = Instantiate(waystone.transform.Find("WayEffect/Point light"), vfx_Waystones.transform).gameObject;
+                pointLight.name = vfx_WaystonesLight;
                 pointLight.transform.localPosition = new Vector3(0f, 0f, -0.2f);
 
                 Light light = pointLight.GetComponent<Light>();
@@ -170,14 +172,14 @@ namespace WaystoneTeleporter
                 light.shadows = LightShadows.None;
                 light.intensity = 0f;
 
-                GameObject sparcs = Instantiate(waystone.transform.Find("WayEffect/Particle System sparcs"), vfx_WaystoneTeleporter.transform).gameObject;
-                sparcs.name = vfx_WaystoneTeleporterParticles;
+                GameObject sparcs = Instantiate(waystone.transform.Find("WayEffect/Particle System sparcs"), vfx_Waystones.transform).gameObject;
+                sparcs.name = vfx_WaystonesParticles;
                 sparcs.transform.localPosition = new Vector3(0f, 0f, -0.1f);
 
                 ParticleSystem ps = sparcs.GetComponent<ParticleSystem>();
 
                 MainModule main = ps.main;
-                main.maxParticles = WaystoneTeleporter.particlesMaxAmount.Value;
+                main.maxParticles = Waystones.particlesMaxAmount.Value;
                 main.duration = 20f;
                 main.simulationSpace = ParticleSystemSimulationSpace.World;
 
@@ -189,11 +191,11 @@ namespace WaystoneTeleporter
 
                 MinMaxCurve rot = emission.rateOverTime;
                 rot.mode = ParticleSystemCurveMode.Curve;
-                rot.curve = AnimationCurve.Linear(0, WaystoneTeleporter.particlesMinRateOverTime.Value, 1, WaystoneTeleporter.particlesMaxRateOverTime.Value);
+                rot.curve = AnimationCurve.Linear(0, Waystones.particlesMinRateOverTime.Value, 1, Waystones.particlesMaxRateOverTime.Value);
 
                 emission.rateOverTime = rot;
 
-                if (WaystoneTeleporter.particlesCollision.Value)
+                if (Waystones.particlesCollision.Value)
                 {
                     CollisionModule collision = ps.collision;
                     collision.enabled = true;
@@ -205,16 +207,16 @@ namespace WaystoneTeleporter
 
                 MinMaxCurve forceZ = force.z;
                 forceZ.mode = ParticleSystemCurveMode.Curve;
-                forceZ.curve = AnimationCurve.Linear(0, WaystoneTeleporter.particlesMinForceOverTime.Value, 1, WaystoneTeleporter.particlesMaxForceOverTime.Value);
+                forceZ.curve = AnimationCurve.Linear(0, Waystones.particlesMinForceOverTime.Value, 1, Waystones.particlesMaxForceOverTime.Value);
 
                 force.z = forceZ;
                 force.zMultiplier = 3;
             }
 
-            if ((bool)vfx_WaystoneTeleporter && !ZNetScene.instance.m_namedPrefabs.ContainsKey(vfx_WaystoneTeleporterHash))
+            if ((bool)vfx_Waystones && !ZNetScene.instance.m_namedPrefabs.ContainsKey(vfx_WaystonesHash))
             {
-                ZNetScene.instance.m_prefabs.Add(vfx_WaystoneTeleporter);
-                ZNetScene.instance.m_namedPrefabs[vfx_WaystoneTeleporterHash] = vfx_WaystoneTeleporter;
+                ZNetScene.instance.m_prefabs.Add(vfx_Waystones);
+                ZNetScene.instance.m_namedPrefabs[vfx_WaystonesHash] = vfx_Waystones;
             }
         }
 
@@ -227,12 +229,12 @@ namespace WaystoneTeleporter
 
                 if (odb.m_StatusEffects.Count > 0)
                 {
-                    if (!odb.m_StatusEffects.Any(se => se.name == statusEffectWaystoneTeleporterName))
+                    if (!odb.m_StatusEffects.Any(se => se.name == statusEffectWaystonesName))
                     {
-                        SE_WaystoneTeleporter statusEffect = ScriptableObject.CreateInstance<SE_WaystoneTeleporter>();
-                        statusEffect.name = statusEffectWaystoneTeleporterName;
-                        statusEffect.m_nameHash = statusEffectWaystoneTeleporterHash;
-                        statusEffect.m_icon = iconWaystoneTeleporter;
+                        SE_Waystone statusEffect = ScriptableObject.CreateInstance<SE_Waystone>();
+                        statusEffect.name = statusEffectWaystonesName;
+                        statusEffect.m_nameHash = statusEffectWaystonesHash;
+                        statusEffect.m_icon = iconWaystones;
                         statusEffect.m_noiseModifier = 1;
                         statusEffect.m_stealthModifier = -1;
                         statusEffect.m_staminaDrainPerSec = 10f;
@@ -243,7 +245,7 @@ namespace WaystoneTeleporter
                         statusEffect.m_startEffects.m_effectPrefabs = new[] {
                             new EffectList.EffectData()
                                 {
-                                    m_prefab = vfx_WaystoneTeleporter,
+                                    m_prefab = vfx_Waystones,
                                     m_enabled = true,
                                     m_inheritParentScale = true,
                                     m_attach = true,

@@ -9,20 +9,20 @@ using System.Reflection;
 using UnityEngine.Rendering;
 using LocalizationManager;
 
-namespace WaystoneTeleporter
+namespace Waystones
 {
     [BepInPlugin(pluginID, pluginName, pluginVersion)]
-    public class WaystoneTeleporter : BaseUnityPlugin
+    public class Waystones : BaseUnityPlugin
     {
-        const string pluginID = "shudnal.WaystoneTeleporter";
-        const string pluginName = "Waystone Teleporter";
+        const string pluginID = "shudnal.Waystones";
+        const string pluginName = "Waystones";
         const string pluginVersion = "1.0.0";
 
         private readonly Harmony harmony = new Harmony(pluginID);
 
         internal static readonly ConfigSync configSync = new ConfigSync(pluginID) { DisplayName = pluginName, CurrentVersion = pluginVersion, MinimumRequiredVersion = pluginVersion };
 
-        internal static WaystoneTeleporter instance;
+        internal static Waystones instance;
 
         internal static ConfigEntry<bool> configLocked;
         internal static ConfigEntry<bool> loggingEnabled;
@@ -37,6 +37,7 @@ namespace WaystoneTeleporter
         internal static ConfigEntry<bool> allowWet;
         internal static ConfigEntry<bool> allowSensed;
         internal static ConfigEntry<bool> allowNonSitting;
+        internal static ConfigEntry<int> tagCharactersLimit;
 
         internal static ConfigEntry<float> directionSensitivity;
         internal static ConfigEntry<float> directionSensitivityThreshold;
@@ -103,7 +104,7 @@ namespace WaystoneTeleporter
 
             pieceRecipe.SettingChanged += (sender, args) => PieceWaystone.SetPieceRequirements();
 
-            emitNoiseOnTeleportation = config("Restrictions", "Emit noise on teleportation", defaultValue: true, "If enabled then you will attract attention of nearby enemies on teleportation start.");
+            emitNoiseOnTeleportation = config("Restrictions", "Emit noise on fast travelling", defaultValue: true, "If enabled then you will attract attention of nearby enemies on fast travelling start.");
             allowEncumbered = config("Restrictions", "Ignore encumbered to start search", defaultValue: false, "If enabled then encumbrance check before search start will be omitted.");
             allowNonTeleportableItems = config("Restrictions", "Ignore nonteleportable items to start search", defaultValue: false, "If enabled then inventory check before search start will be omitted.");
             allowWet = config("Restrictions", "Ignore wet status to start search", defaultValue: false, "If enabled then Wet status check before search start will be omitted.");
@@ -111,6 +112,7 @@ namespace WaystoneTeleporter
             allowNonSitting = config("Restrictions", "Ignore sitting to start search", defaultValue: false, "If enabled then sitting position check before search start will be omitted.");
             useShortcutToEnter = config("Restrictions", "Use shortcut to toggle search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut. If not set - you have to sit in front of the waystone to start search mode.");
             shortcut = config("Restrictions", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y), "Enter/Exit direction search mode [Not Synced with Server]", false);
+            tagCharactersLimit = config("Restrictions", "Tag characters limit", defaultValue: 15, "Max length of waystone tag. Values less than 10 will be ignored.");
 
             directionSensitivity = config("Search mode", "Target sensitivity threshold", defaultValue: 2f, "Angle between look direction and target direction for location to appear in search mode");
             directionSensitivityThreshold = config("Search mode", "Screen sensitivity threshold", defaultValue: 6f, "Angle between look direction and target direction for location to start appearing in search mode");
@@ -125,22 +127,22 @@ namespace WaystoneTeleporter
             slowFactorLook = config("Search mode", "Slow factor mouse", defaultValue: 0.08f, "Multiplier of mouse/gamepad camera sensitivity [Not Synced with Server]", false);
             fovDelta = config("Search mode", "FoV delta", defaultValue: 40f, "How much camera FoV can be changed both sides using zoom");
 
-            cooldownTime = config("Teleport cooldown", "Time", defaultValue: CooldownTime.WorldTime, "Time type to calculate cooldown." +
+            cooldownTime = config("Travel cooldown", "Time", defaultValue: CooldownTime.WorldTime, "Time type to calculate cooldown." +
                                                                                                      "\nWorld time - calculate from time passed in game world" +
                                                                                                      "\nGlobal time - calculate from real world time");
-            cooldownDistanceMaximum = config("Teleport cooldown", "Teleportation distance maximum", defaultValue: 5000, "If teleportation distance is larger then that cooldown will be set to maximum. World radius is 10000.");
-            cooldownDistanceMinimum = config("Teleport cooldown", "Teleportation distance minimum", defaultValue: 500, "If teleportation distance is smaller then that cooldown will be set to minimum. World radius is 10000.");
-            cooldownMaximum = config("Teleport cooldown", "Teleportation cooldown maximum", defaultValue: 7200, "Maximal cooldown to be set after successfull teleportation");
-            cooldownMinimum = config("Teleport cooldown", "Teleportation cooldown minimum", defaultValue: 600, "Minimal cooldown to be set after successfull teleportation");
-            cooldownShort = config("Teleport cooldown", "Teleportation interrupted cooldown", defaultValue: 120, "Cooldown to be set if teleportation was interrupted");
-            cooldownSearchMode = config("Teleport cooldown", "Search mode cooldown", defaultValue: 120, "Cooldown to be set on search mode exit");
+            cooldownDistanceMaximum = config("Travel cooldown", "Fast travelling distance maximum", defaultValue: 5000, "If fast travelling distance is larger then that cooldown will be set to maximum. World radius is 10000.");
+            cooldownDistanceMinimum = config("Travel cooldown", "Fast travelling distance minimum", defaultValue: 500, "If fast travelling distance is smaller then that cooldown will be set to minimum. World radius is 10000.");
+            cooldownMaximum = config("Travel cooldown", "Fast travelling cooldown maximum", defaultValue: 7200, "Maximal cooldown to be set after successfull fast travelling");
+            cooldownMinimum = config("Travel cooldown", "Fast travelling cooldown minimum", defaultValue: 600, "Minimal cooldown to be set after successfull fast travelling");
+            cooldownShort = config("Travel cooldown", "Fast travelling interrupted cooldown", defaultValue: 120, "Cooldown to be set if fast travelling was interrupted");
+            cooldownSearchMode = config("Travel cooldown", "Search mode cooldown", defaultValue: 120, "Cooldown to be set on search mode exit");
 
-            particlesCollision = config("Teleportation effect", "Particles physics collision", defaultValue: false, "Make particles emitted while teleporting collide with objects. Restart required.");
-            particlesMaxAmount = config("Teleportation effect", "Particles amount maximum", defaultValue: 8000, "Maximum amount of particles emitted. Restart required.");
-            particlesMaxRateOverTime = config("Teleportation effect", "Particles rate over time maximum", defaultValue: 4000, "Maximum amount of particles emitted per second at the curve end. Restart required.");
-            particlesMinRateOverTime = config("Teleportation effect", "Particles rate over time minimum", defaultValue: 50, "Minimum amount of particles emitted per second at the curve start. Restart required.");
-            particlesMaxForceOverTime = config("Teleportation effect", "Particles force over time maximum", defaultValue: 10, "Maximum emission force of particles emitted at the curve end. Restart required.");
-            particlesMinForceOverTime = config("Teleportation effect", "Particles force over time minimum", defaultValue: 5, "Minimum emission force of particles emitted at the curve start. Restart required.");
+            particlesCollision = config("Fast travelling effect", "Particles physics collision", defaultValue: false, "Make particles emitted while fast travelling collide with objects. Restart required.");
+            particlesMaxAmount = config("Fast travelling effect", "Particles amount maximum", defaultValue: 8000, "Maximum amount of particles emitted. Restart required.");
+            particlesMaxRateOverTime = config("Fast travelling effect", "Particles rate over time maximum", defaultValue: 4000, "Maximum amount of particles emitted per second at the curve end. Restart required.");
+            particlesMinRateOverTime = config("Fast travelling effect", "Particles rate over time minimum", defaultValue: 50, "Minimum amount of particles emitted per second at the curve start. Restart required.");
+            particlesMaxForceOverTime = config("Fast travelling effect", "Particles force over time maximum", defaultValue: 10, "Maximum emission force of particles emitted at the curve end. Restart required.");
+            particlesMinForceOverTime = config("Fast travelling effect", "Particles force over time minimum", defaultValue: 5, "Minimum emission force of particles emitted at the curve start. Restart required.");
 
             InitCommands();
         }
@@ -160,14 +162,14 @@ namespace WaystoneTeleporter
             if (Player.m_localPlayer == null)
                 return;
 
-            if ((Chat.instance == null || !Chat.instance.HasFocus()) && !Console.IsVisible() && !Menu.IsVisible() && (bool)TextViewer.instance && !TextViewer.instance.IsVisible() && !Player.m_localPlayer.InCutscene() && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash))
+            if ((Chat.instance == null || !Chat.instance.HasFocus()) && !Console.IsVisible() && !Menu.IsVisible() && (bool)TextViewer.instance && !TextViewer.instance.IsVisible() && !Player.m_localPlayer.InCutscene() && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_Waystone.statusEffectWaystonesHash))
             {
                 if (ZInput.GetButtonDown("Block") || ZInput.GetButtonDown("JoyBlock") || ZInput.GetButtonDown("JoyButtonB"))
                 {
                     ZInput.ResetButtonStatus("Block");
                     ZInput.ResetButtonStatus("JoyBlock");
                     ZInput.ResetButtonStatus("JoyButtonB");
-                    Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash);
+                    Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_Waystone.statusEffectWaystonesHash);
                 }
             }
 
@@ -182,29 +184,30 @@ namespace WaystoneTeleporter
             }, isCheat: true);
         }
 
-        public static void TeleportAttempt(Vector3 targetPoint, double cooldown, string location)
+        public static void TeleportAttempt(Vector3 targetPoint, Quaternion targetRotation, double cooldown, string location)
         {
             if (!CanCast())
                 return;
 
             if (!location.IsNullOrWhiteSpace())
-                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"$wt_tooltip_teleport_to {location}");
+                MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, $"$ws_tooltip_moving_to {location}");
 
             SEMan seman = Player.m_localPlayer.GetSEMan();
-            if (seman.HaveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash))
+            if (seman.HaveStatusEffect(SE_Waystone.statusEffectWaystonesHash))
             {
-                Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash);
+                Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_Waystone.statusEffectWaystonesHash);
             }
             else
             {
-                if (PT_WayStone.IsSearchAllowed(Player.m_localPlayer))
+                if (WayStoneSmall.IsSearchAllowed(Player.m_localPlayer))
                 {
-                    SE_WaystoneTeleporter se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash) as SE_WaystoneTeleporter;
+                    SE_Waystone se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_Waystone.statusEffectWaystonesHash) as SE_Waystone;
                     if (se != null)
                     {
                         se.targetPoint = targetPoint;
                         se.targetCooldown = cooldown;
-                        
+                        se.targetRotation = targetRotation;
+
                         if (emitNoiseOnTeleportation.Value)
                         {
                             Player.m_localPlayer.AddNoise(50f);
@@ -213,7 +216,7 @@ namespace WaystoneTeleporter
 
                         if (!location.IsNullOrWhiteSpace())
                         {
-                            MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, $"$wt_message_travelling_to {location}");
+                            MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, $"$ws_message_travelling_to {location}");
                             se.m_name = location;
                             LogInfo($"Teleport initiated to {location} pos {targetPoint} cooldown {WorldData.TimerString(cooldown)}");
                         }
@@ -230,7 +233,7 @@ namespace WaystoneTeleporter
                     (Chat.instance == null || !Chat.instance.HasFocus()) &&
                     !Console.IsVisible() && !Menu.IsVisible() && TextViewer.instance != null &&
                     !TextViewer.instance.IsVisible() && !TextInput.IsVisible() &&
-                    !Minimap.IsOpen() && !GameCamera.InFreeFly() && !StoreGui.IsVisible() && !InventoryGui.IsVisible();
+                    /*!Minimap.IsOpen() &&*/ !GameCamera.InFreeFly() && !StoreGui.IsVisible() && !InventoryGui.IsVisible();
         }
 
         public static void LogInfo(object data)
@@ -253,9 +256,9 @@ namespace WaystoneTeleporter
 
         private void LoadIcons()
         {
-            LoadIcon("SE_WaystoneTeleporter.png", ref SE_WaystoneTeleporter.iconWaystoneTeleporter);
+            LoadIcon("SE_Waystone.png", ref SE_Waystone.iconWaystones);
             LoadIcon("item_waystone.png", ref PieceWaystone.itemWaystone);
-            LoadIcon("icon_waystone.png", ref MarkedWaystone.iconWaystone);
+            LoadIcon("icon_waystone.png", ref WaystoneList.iconWaystone);
         }
 
         internal static void LoadIcon(string filename, ref Sprite icon)
@@ -290,7 +293,7 @@ namespace WaystoneTeleporter
 
         private static bool PreventPlayerInput()
         {
-            return Player.m_localPlayer != null && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash);
+            return Player.m_localPlayer != null && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_Waystone.statusEffectWaystonesHash);
         }
 
         [HarmonyPatch(typeof(ZInput), nameof(ZInput.GetMouseDelta))]
@@ -320,10 +323,9 @@ namespace WaystoneTeleporter
             [HarmonyPriority(Priority.First)]
             public static void Prefix(Player __instance, ref Vector2 mouseLook)
             {
-                if (__instance.GetSEMan().HaveStatusEffect(SE_WaystoneTeleporter.statusEffectWaystoneTeleporterHash))
+                if (__instance.GetSEMan().HaveStatusEffect(SE_Waystone.statusEffectWaystonesHash))
                     mouseLook = Vector2.zero;
             }
         }
-
     }
 }

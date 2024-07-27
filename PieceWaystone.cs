@@ -3,20 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static WaystoneTeleporter.WaystoneTeleporter;
+using static Waystones.Waystones;
 using static UnityEngine.ParticleSystem;
 
-namespace WaystoneTeleporter
+namespace Waystones
 {
     internal class PieceWaystone
     {
         public static Sprite itemWaystone;
         internal static GameObject waystonePrefab;
-        internal const string waystoneName = "WaystoneTeleporter";
+        internal const string waystoneName = "Waystones";
         public static int waystoneHash = waystoneName.GetStableHashCode();
 
-        public const string waystonePieceName = "$wt_piece_waystone_name";
-        public const string waystonePieceDescription = "$wt_piece_waystone_description";
+        public const string waystonePieceName = "$ws_piece_waystone_name";
+        public const string waystonePieceDescription = "$ws_piece_waystone_description";
 
         public static void RegisterPiece()
         {
@@ -69,7 +69,7 @@ namespace WaystoneTeleporter
                 piece.m_clipGround = true;
                 piece.m_clipEverything = true;
                 piece.m_notOnTiltingSurface = true;
-                piece.m_noClipping = true;
+                piece.m_noClipping = false;
                 piece.m_randomTarget = false;
 
                 WearNTear wnt = CustomPrefabs.AddComponent(waystonePrefab, typeof(WearNTear)) as WearNTear;
@@ -100,11 +100,11 @@ namespace WaystoneTeleporter
 
                 WayStone original = waystonePrefab.GetComponent<WayStone>();
 
-                PT_WayStone.initial = true;
+                WayStoneSmall.initial = true;
 
-                PT_WayStone wt_waystone = waystonePrefab.AddComponent<PT_WayStone>();
+                WayStoneSmall ws_waystone = waystonePrefab.AddComponent<WayStoneSmall>();
 
-                PT_WayStone.initial = false;
+                WayStoneSmall.initial = false;
 
                 UnityEngine.Object.Destroy(original);
 
@@ -114,10 +114,10 @@ namespace WaystoneTeleporter
 
                 GuidePoint guidePoint = CustomPrefabs.AddComponent(point, typeof(GuidePoint)) as GuidePoint;
                 guidePoint.m_text.m_alwaysSpawn = false;
-                guidePoint.m_text.m_key = "wt_waystone";
-                guidePoint.m_text.m_topic = "$wt_tutorial_waystone_topic";
-                guidePoint.m_text.m_label = "$wt_tutorial_waystone_label";
-                guidePoint.m_text.m_text = "$wt_tutorial_waystone_text";
+                guidePoint.m_text.m_key = "ws_waystone";
+                guidePoint.m_text.m_topic = "$ws_tutorial_waystone_topic";
+                guidePoint.m_text.m_label = "$ws_tutorial_waystone_label";
+                guidePoint.m_text.m_text = "$ws_tutorial_waystone_text";
 
                 LogInfo("Waystone prefab added");
             }
@@ -132,13 +132,15 @@ namespace WaystoneTeleporter
                     waystonePrefab.GetComponent<WearNTear>().m_hitEffect.m_effectPrefabs = stone_pile.GetComponent<WearNTear>().m_hitEffect.m_effectPrefabs.ToArray();
                 }
 
+                WayStoneSmall componentWayStone = waystonePrefab.GetComponent<WayStoneSmall>();
+
                 WayStone waystone = Resources.FindObjectsOfTypeAll<WayStone>().FirstOrDefault(obj => obj.name == "Waystone");
                 if (waystone != null)
-                    waystonePrefab.GetComponent<PT_WayStone>().m_activateEffect.m_effectPrefabs = waystone.m_activeEffect.m_effectPrefabs.ToArray();
+                    componentWayStone.m_activateEffect.m_effectPrefabs = waystone.m_activeEffect.m_effectPrefabs.ToArray();
 
                 PrivateArea privateArea = ZNetScene.instance.GetPrefab("guard_stone")?.GetComponent<PrivateArea>();
                 if (privateArea != null)
-                    waystonePrefab.GetComponent<PT_WayStone>().m_markEffect.m_effectPrefabs = privateArea.m_addPermittedEffect.m_effectPrefabs.ToArray();
+                    componentWayStone.m_deactivateEffect.m_effectPrefabs = privateArea.m_removedPermittedEffect.m_effectPrefabs.ToArray();
 
                 GuidePoint guidePoint = ZNetScene.instance.GetPrefab("piece_workbench")?.GetComponentInChildren<GuidePoint>();
                 if (guidePoint != null)

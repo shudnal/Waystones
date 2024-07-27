@@ -5,9 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using static WaystoneTeleporter.WaystoneTeleporter;
+using static Waystones.Waystones;
 
-namespace WaystoneTeleporter
+namespace Waystones
 {
     public static class DirectionSearch
     {
@@ -15,12 +15,22 @@ namespace WaystoneTeleporter
         {
             public string name;
             public Vector3 position;
+            public Quaternion rotation;
             public double cooldown;
 
             public Direction(string name, Vector3 position)
             {
                 this.name = name; 
                 this.position = position;
+                rotation = Quaternion.identity;
+                cooldown = WorldData.GetCooldownTimeToTarget(position);
+            }
+
+            public Direction(string name, Vector3 position, Quaternion rotation)
+            {
+                this.name = name;
+                this.position = position;
+                this.rotation = rotation;
                 cooldown = WorldData.GetCooldownTimeToTarget(position);
             }
 
@@ -30,8 +40,8 @@ namespace WaystoneTeleporter
             {
                 _sb.Clear();
                 _sb.Append(name);
-                _sb.Append($"\n[<color=yellow><b>$KEY_Use</b></color>] $wt_tooltip_teleport_to");
-                _sb.Append($"\n\n$wt_tooltip_cooldown_after_teleport <color=#add8e6>{WorldData.TimerString(cooldown)}</color>");
+                _sb.Append($"\n[<color=yellow><b>$KEY_Use</b></color>] $ws_tooltip_moving_to");
+                _sb.Append($"\n\n$ws_tooltip_cooldown_after <color=#add8e6>{WorldData.TimerString(cooldown)}</color>");
                 return Localization.instance.Localize(_sb.ToString());
             }
         }
@@ -39,7 +49,7 @@ namespace WaystoneTeleporter
         private static List<Direction> directions = new List<Direction>();
         private static Direction current;
         private static bool activated;
-        private static readonly Direction placeOfMystery = new Direction("$wt_location_random_point", Vector2.zero);
+        private static readonly Direction placeOfMystery = new Direction("$ws_location_random_point", Vector2.zero);
         private static float currentAngle;
 
         private static float defaultFoV;
@@ -48,13 +58,13 @@ namespace WaystoneTeleporter
         public static CanvasGroup screenBlackener;
         public static AudioSource screenBlackenerSfx;
 
-        public static bool saveNextGroundPositionAsShipLocation;
+        public static bool IsActivated { get { return activated; } }
 
         internal static void Toggle()
         {
             if (activated)
                 Exit();
-            else if (useShortcutToEnter.Value && PT_WayStone.IsSearchAllowed(Player.m_localPlayer))
+            else if (useShortcutToEnter.Value && WayStoneSmall.IsSearchAllowed(Player.m_localPlayer))
                 Enter();
         }
 
@@ -73,6 +83,8 @@ namespace WaystoneTeleporter
 
             FillDirections();
             activated = true;
+            
+            WaystoneList.UpdatePins();
         }
 
         internal static void Exit(bool force = false)
@@ -96,19 +108,21 @@ namespace WaystoneTeleporter
             activated = false;
             current = null;
             currentAngle = 0f;
+
+            WaystoneList.UpdatePins();
         }
 
         internal static void FillDirections()
         {
             directions.Clear();
 
-            directions.Add(new Direction("$wt_location_spawn_point", GetSpawnPoint()));
+            directions.Add(new Direction("$ws_location_spawn_point", GetSpawnPoint()));
 
             ZoneSystem.instance.GetLocationIcons(ZoneSystem.instance.tempIconList);
             foreach (KeyValuePair<Vector3, string> loc in ZoneSystem.instance.tempIconList)
             {
                 if (loc.Value == "StartTemple")
-                    directions.Add(new Direction("$wt_location_start_temple", loc.Key));
+                    directions.Add(new Direction("$ws_location_start_temple", loc.Key));
                 else if (loc.Value == "Vendor_BlackForest")
                     directions.Add(new Direction("$npc_haldor", loc.Key));
                 else if (loc.Value == "Hildir_camp")
@@ -117,11 +131,13 @@ namespace WaystoneTeleporter
 
             PlayerProfile profile = Game.instance.GetPlayerProfile();
             if (profile.HaveDeathPoint())
-                directions.Add(new Direction("$wt_location_last_tombstone", profile.GetDeathPoint()));
+                directions.Add(new Direction("$ws_location_last_tombstone", profile.GetDeathPoint()));
 
             directions.AddRange(WorldData.GetSavedDirections());
 
-            directions.Do(d => LogInfo($"{Localization.instance.Localize(d.name)} {d.position} {WorldData.TimerString(d.cooldown)}"));
+            directions.Do(d => LogInfo($"{Localization.instance.Localize(d.name)} {d.position} {WorldData.TimerString(d.cooldown)} {(Utils.DistanceXZ(Player.m_localPlayer.transform.position, d.position) < 10f ? "(filtered)" : "")}"));
+
+            directions.RemoveAll(d => Utils.DistanceXZ(Player.m_localPlayer.transform.position, d.position) < 10f);
         }
 
         internal static Vector3 GetSpawnPoint()
@@ -152,7 +168,7 @@ namespace WaystoneTeleporter
                 if (current == placeOfMystery)
                     current.position = GetRandomPoint();
 
-                TeleportAttempt(current.position, current.cooldown, current.name);
+                TeleportAttempt(current.position, current.rotation, current.cooldown, current.name);
                 Exit();
             }
 
@@ -265,7 +281,7 @@ namespace WaystoneTeleporter
             private static void Postfix(Hud __instance)
             {
                 GameObject blocker = UnityEngine.Object.Instantiate(__instance.m_loadingScreen.gameObject, __instance.m_loadingScreen.transform.parent);
-                blocker.name = "WaystoneTeleporter_DirectionSearchBlack";
+                blocker.name = "Waystones_DirectionSearchBlack";
                 blocker.transform.SetSiblingIndex(0);
 
                 blocker.transform.Find("Loading/TopFade").SetParent(blocker.transform);
@@ -443,31 +459,18 @@ namespace WaystoneTeleporter
             }
         }
 
-        [HarmonyPatch(typeof(Ship), nameof(Ship.OnTriggerExit))]
-        public static class Ship_OnTriggerExit_LastShipPosition
+        [HarmonyPatch(typeof(Minimap), nameof(Minimap.OnMapLeftDown))]
+        public static class Minimap_ShowPinNameInput_BlockPinDialogInSearchMode
         {
-            private static void Postfix(Collider collider)
+            private static bool Prefix(Minimap __instance)
             {
-                if (Player.m_localPlayer != collider.GetComponent<Player>())
-                    return;
+                if (!IsActivated)
+                    return true;
 
-                saveNextGroundPositionAsShipLocation = true;
-            }
-        }
+                __instance.m_leftClickTime = Time.time;
+                __instance.m_leftDownTime = Time.time;
 
-        [HarmonyPatch(typeof(Player), nameof(Player.FixedUpdate))]
-        public static class Player_FixedUpdate_SaveLastShipPosition
-        {
-            private static void Postfix(Player __instance)
-            {
-                if (__instance != Player.m_localPlayer)
-                    return;
-                 
-                if (saveNextGroundPositionAsShipLocation && __instance.IsOnGround() && !__instance.InWater() && __instance.GetStandingOnShip() == null)
-                {
-                    saveNextGroundPositionAsShipLocation = false;
-                    WorldData.SaveLastShip(Player.m_localPlayer.transform.position);
-                }
+                return false;
             }
         }
     }

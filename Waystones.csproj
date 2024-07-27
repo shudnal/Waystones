@@ -7,8 +7,8 @@
     <ProjectGuid>{1AF3A9E7-99BE-490A-A211-741AAFF1AEF2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WaystoneTeleporter</RootNamespace>
-    <AssemblyName>WaystoneTeleporter</AssemblyName>
+    <RootNamespace>Waystones</RootNamespace>
+    <AssemblyName>Waystones</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -35,12 +35,12 @@
     <Compile Include="DirectionSearch.cs" />
     <Compile Include="WaystoneList.cs" />
     <Compile Include="PieceWaystone.cs" />
-    <Compile Include="PT_Waystone.cs" />
+    <Compile Include="WayStoneSmall.cs" />
     <Compile Include="WorldData.cs" />
     <Compile Include="CustomPrefabs.cs" />
-    <Compile Include="WaystoneTeleporter.cs" />
+    <Compile Include="Waystones.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SE_PocketTeleporter.cs" />
+    <Compile Include="SE_Waystone.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -60,6 +60,10 @@
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>F:\Steam\steamapps\common\Valheim\BepInEx\core\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="gui_framework, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Assemblies\stable\gui_framework.dll</HintPath>
     </Reference>
     <Reference Include="LocalizationManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -109,7 +113,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Assets\SE_WaystoneTeleporter.png">
+    <EmbeddedResource Include="Assets\SE_Waystone.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Assets\item_waystone.png">
@@ -137,7 +141,9 @@
     <EmbeddedResource Include="translations\English.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="translations\Russian.json" />
+    <EmbeddedResource Include="translations\Russian.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
