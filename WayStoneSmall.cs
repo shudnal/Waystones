@@ -124,8 +124,11 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (Player.m_localPlayer.InInterior())
             return GetHoverName();
 
+        if (!PrivateArea.CheckAccess(base.transform.position, 0f, flash: false))
+            return Localization.instance.Localize(GetHoverName() + "\n$piece_noaccess");
+
         sb.Clear();
-        sb.Append(IsActive() ? "$ws_piece_waystone_activated" : GetHoverName());
+        sb.Append(GetHoverName());
         
         string text = GetText().RemoveRichTextTags();
         if (text.Length > 0)
@@ -141,11 +144,14 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
     public string GetHoverName()
     {
-        return "$ws_piece_waystone_name";
+        return IsActive() ? "$ws_piece_waystone_activated" : "$ws_piece_waystone_name";
     }
 
     public bool Interact(Humanoid human, bool hold, bool alt)
     {
+        if (Player.m_localPlayer == null || Player.m_localPlayer.InInterior() || !PrivateArea.CheckAccess(base.transform.position))
+            return true;
+
         if (hold)
         {
             if (ZInput.GetButtonPressedTimer("Use") + ZInput.GetButtonPressedTimer("JoyUse") > waystoneHoldSetTagDelay && !TextInput.IsVisible())
