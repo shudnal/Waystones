@@ -64,7 +64,7 @@ namespace Waystones
         {
             if (activated)
                 Exit();
-            else if (useShortcutToEnter.Value && WayStoneSmall.IsSearchAllowed(Player.m_localPlayer))
+            else if (useShortcutToEnter.Value && WaystoneSmall.IsSearchAllowed(Player.m_localPlayer))
                 Enter();
         }
 
@@ -118,6 +118,7 @@ namespace Waystones
 
             directions.Add(new Direction("$ws_location_spawn_point", GetSpawnPoint()));
 
+            ZoneSystem.instance.tempIconList.Clear();
             ZoneSystem.instance.GetLocationIcons(ZoneSystem.instance.tempIconList);
             foreach (KeyValuePair<Vector3, string> loc in ZoneSystem.instance.tempIconList)
             {

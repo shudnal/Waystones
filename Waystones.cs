@@ -199,7 +199,7 @@ namespace Waystones
             }
             else
             {
-                if (WayStoneSmall.IsSearchAllowed(Player.m_localPlayer))
+                if (WaystoneSmall.IsSearchAllowed(Player.m_localPlayer))
                 {
                     SE_Waystone se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_Waystone.statusEffectWaystonesHash) as SE_Waystone;
                     if (se != null)

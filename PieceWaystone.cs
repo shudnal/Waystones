@@ -12,7 +12,7 @@ namespace Waystones
     {
         public static Sprite itemWaystone;
         internal static GameObject waystonePrefab;
-        internal const string waystoneName = "Waystones";
+        internal const string waystoneName = "Waystone_small";
         public static int waystoneHash = waystoneName.GetStableHashCode();
 
         public const string waystonePieceName = "$ws_piece_waystone_name";
@@ -100,11 +100,11 @@ namespace Waystones
 
                 WayStone original = waystonePrefab.GetComponent<WayStone>();
 
-                WayStoneSmall.initial = true;
+                WaystoneSmall.initial = true;
 
-                WayStoneSmall ws_waystone = waystonePrefab.AddComponent<WayStoneSmall>();
+                WaystoneSmall ws_waystone = waystonePrefab.AddComponent<WaystoneSmall>();
 
-                WayStoneSmall.initial = false;
+                WaystoneSmall.initial = false;
 
                 UnityEngine.Object.Destroy(original);
 
@@ -132,7 +132,7 @@ namespace Waystones
                     waystonePrefab.GetComponent<WearNTear>().m_hitEffect.m_effectPrefabs = stone_pile.GetComponent<WearNTear>().m_hitEffect.m_effectPrefabs.ToArray();
                 }
 
-                WayStoneSmall componentWayStone = waystonePrefab.GetComponent<WayStoneSmall>();
+                WaystoneSmall componentWayStone = waystonePrefab.GetComponent<WaystoneSmall>();
 
                 WayStone waystone = Resources.FindObjectsOfTypeAll<WayStone>().FirstOrDefault(obj => obj.name == "Waystone");
                 if (waystone != null)

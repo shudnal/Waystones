@@ -105,7 +105,7 @@ namespace Waystones
         {
             activatedWaystones.Clear();
             foreach (ZDO zdo in waystoneObjects)
-                if (WayStoneSmall.IsWaystoneActivated(zdo, playerID))
+                if (WaystoneSmall.IsWaystoneActivated(zdo, playerID))
                 {
                     string tag = zdo.GetString(ZDOVars.s_tag);
                     if (string.IsNullOrWhiteSpace(tag))

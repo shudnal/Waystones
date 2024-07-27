@@ -35,7 +35,7 @@
     <Compile Include="DirectionSearch.cs" />
     <Compile Include="WaystoneList.cs" />
     <Compile Include="PieceWaystone.cs" />
-    <Compile Include="WayStoneSmall.cs" />
+    <Compile Include="WaystoneSmall.cs" />
     <Compile Include="WorldData.cs" />
     <Compile Include="CustomPrefabs.cs" />
     <Compile Include="Waystones.cs" />

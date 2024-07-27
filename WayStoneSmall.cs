@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Collections;
 using HarmonyLib;
 
-public class WayStoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactable
+public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactable
 {
     public GameObject m_activeObject;
 
@@ -315,7 +315,7 @@ public class WayStoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         private static void Postfix(TextInput __instance)
         {
             __instance.m_inputField.readOnly = false;
-            if (__instance.m_queuedSign is WayStoneSmall && TextInput.IsVisible() && blockInputUntil > Time.time && ZInput.GetButton("Use") || ZInput.GetButton("JoyUse"))
+            if (__instance.m_queuedSign is WaystoneSmall && TextInput.IsVisible() && blockInputUntil > Time.time && ZInput.GetButton("Use") || ZInput.GetButton("JoyUse"))
                 __instance.m_inputField.readOnly = true;
         }
     }
