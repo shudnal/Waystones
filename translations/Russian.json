@@ -15,12 +15,12 @@
     "ws_piece_waystone_description": "Помогает найти путь в отдаленные места",
     "ws_piece_waystone_activation": "Вы касаетесь холодной каменной поверхности и думаете о доме.",
     "ws_piece_waystone_activated": "Активный путевой камень",
-    "ws_piece_waystone_activate": "Активировать",
-    "ws_piece_waystone_deactivate": "Деактивировать",
+    "ws_piece_waystone_activate": "Зажечь",
+    "ws_piece_waystone_deactivate": "Погасить",
     "ws_piece_waystone_sit": "Сядьте, чтобы взаимодействовать",
     "ws_tutorial_waystone_label": "Хугин: Путевые камни",
     "ws_tutorial_waystone_text": "Путевые камни позволяют вам <color=yellow>быстро перемещаться</color> в отдаленные места и другим путевым камням.\n\nСядьте перед путевым камнем и начните поиск.\nНайдите взглядом отдаленное место, чтобы переместиться туда.\n\n<color=yellow>Активируйте и оставьте метку</color> на путевом камне, чтобы иметь возможность вернуться к нему.",
     "ws_tutorial_waystone_topic": "Вы построили путевой камень",
-    "ws_piece_waystone_settag": "(Удерживайте, чтобы поставить метку)",
+    "ws_piece_waystone_settag": "(Удерживать для пометки)",
     "ws_piece_waystone_tag": "Метка"
 }

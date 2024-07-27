@@ -135,7 +135,7 @@ namespace Waystones
 
             directions.AddRange(WorldData.GetSavedDirections());
 
-            directions.Do(d => LogInfo($"{Localization.instance.Localize(d.name)} {d.position} {WorldData.TimerString(d.cooldown)} {(Utils.DistanceXZ(Player.m_localPlayer.transform.position, d.position) < 10f ? "(filtered)" : "")}"));
+            directions.Do(d => LogInfo($"{Localization.instance.Localize(d.name)} {d.position} {WorldData.TimerString(d.cooldown)} {(Utils.DistanceXZ(Player.m_localPlayer.transform.position, d.position) < 10f ? "(filtered, too close)" : "")}"));
 
             directions.RemoveAll(d => Utils.DistanceXZ(Player.m_localPlayer.transform.position, d.position) < 10f);
         }

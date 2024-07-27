@@ -137,12 +137,12 @@ namespace Waystones
             cooldownShort = config("Travel cooldown", "Fast travelling interrupted cooldown", defaultValue: 120, "Cooldown to be set if fast travelling was interrupted");
             cooldownSearchMode = config("Travel cooldown", "Search mode cooldown", defaultValue: 120, "Cooldown to be set on search mode exit");
 
-            particlesCollision = config("Fast travelling effect", "Particles physics collision", defaultValue: false, "Make particles emitted while fast travelling collide with objects. Restart required.");
-            particlesMaxAmount = config("Fast travelling effect", "Particles amount maximum", defaultValue: 8000, "Maximum amount of particles emitted. Restart required.");
-            particlesMaxRateOverTime = config("Fast travelling effect", "Particles rate over time maximum", defaultValue: 4000, "Maximum amount of particles emitted per second at the curve end. Restart required.");
-            particlesMinRateOverTime = config("Fast travelling effect", "Particles rate over time minimum", defaultValue: 50, "Minimum amount of particles emitted per second at the curve start. Restart required.");
-            particlesMaxForceOverTime = config("Fast travelling effect", "Particles force over time maximum", defaultValue: 10, "Maximum emission force of particles emitted at the curve end. Restart required.");
-            particlesMinForceOverTime = config("Fast travelling effect", "Particles force over time minimum", defaultValue: 5, "Minimum emission force of particles emitted at the curve start. Restart required.");
+            particlesCollision = config("Travelling effect", "Particles physics collision", defaultValue: false, "Make particles emitted while fast travelling collide with objects. Restart required.");
+            particlesMaxAmount = config("Travelling effect", "Particles amount maximum", defaultValue: 8000, "Maximum amount of particles emitted. Restart required.");
+            particlesMaxRateOverTime = config("Travelling effect", "Particles rate over time maximum", defaultValue: 4000, "Maximum amount of particles emitted per second at the curve end. Restart required.");
+            particlesMinRateOverTime = config("Travelling effect", "Particles rate over time minimum", defaultValue: 50, "Minimum amount of particles emitted per second at the curve start. Restart required.");
+            particlesMaxForceOverTime = config("Travelling effect", "Particles force over time maximum", defaultValue: 10, "Maximum emission force of particles emitted at the curve end. Restart required.");
+            particlesMinForceOverTime = config("Travelling effect", "Particles force over time minimum", defaultValue: 5, "Minimum emission force of particles emitted at the curve start. Restart required.");
 
             InitCommands();
         }
