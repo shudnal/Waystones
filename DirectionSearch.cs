@@ -64,8 +64,8 @@ namespace Waystones
         {
             if (activated)
                 Exit();
-            else if (useShortcutToEnter.Value && WaystoneSmall.IsSearchAllowed(Player.m_localPlayer))
-                Enter();
+            else if (useShortcutToEnter.Value && CanCast() && WaystoneSmall.IsSearchAllowed(Player.m_localPlayer))
+                WaystoneList.EnterSearchMode();
         }
 
         internal static void Enter()

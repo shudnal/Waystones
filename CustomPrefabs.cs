@@ -35,6 +35,9 @@ internal class CustomPrefabs
     {
         InitRootObject();
 
+        if (rootPrefabs.transform.Find(prefabName) != null)
+            return rootPrefabs.transform.Find(prefabName).gameObject;
+
         prefabInit = true;
         GameObject clonedPrefab = UnityEngine.Object.Instantiate(prefabToClone, rootPrefabs.transform, false);
         prefabInit = false;

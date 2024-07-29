@@ -36,6 +36,7 @@
     <Compile Include="WaystoneList.cs" />
     <Compile Include="PieceWaystone.cs" />
     <Compile Include="WaystoneSmall.cs" />
+    <Compile Include="WaystoneTravelEffect.cs" />
     <Compile Include="WorldData.cs" />
     <Compile Include="CustomPrefabs.cs" />
     <Compile Include="Waystones.cs" />

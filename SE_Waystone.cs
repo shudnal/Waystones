@@ -26,15 +26,6 @@ namespace Waystones
         public static GameObject vfx_Waystones;
 
         [NonSerialized]
-        private float volume;
-        [NonSerialized]
-        private AudioSource sfx;
-        [NonSerialized]
-        private MainModule main;
-        [NonSerialized]
-        private Light light;
-
-        [NonSerialized]
         public Vector3 targetPoint = Vector3.zero;
         [NonSerialized]
         public Quaternion targetRotation = Quaternion.identity;
@@ -44,6 +35,8 @@ namespace Waystones
         private bool lookDirTriggered;
         [NonSerialized]
         private bool teleportTriggered;
+        [NonSerialized]
+        private ZNetView effectNetView;
 
         public override void UpdateStatusEffect(float dt)
         {
@@ -52,14 +45,10 @@ namespace Waystones
             if (m_startEffectInstances == null)
                 return;
 
-            main.startLifetime = 0.5f + 5.5f * (m_time / m_ttl);
-            main.startSpeed = 4f - 3.5f * (m_time / m_ttl);
-            main.simulationSpeed = 1f + (m_time / m_ttl);
+            if (effectNetView == null)
+                effectNetView = m_startEffectInstances[0].GetComponent<ZNetView>();
 
-            light.intensity = 1f + 2f * (m_time / m_ttl);
-            light.range = 5f + 15f * (m_time / m_ttl);
-
-            sfx.volume = volume * (m_time / m_ttl);
+            WaystoneTravelEffect.SetProgress(effectNetView, m_time / m_ttl);
 
             if (ControlLocalPlayer())
             {
@@ -92,7 +81,6 @@ namespace Waystones
                 Vector3 dir = targetPoint - m_character.transform.position;
                 dir.Normalize();
                 m_startEffectInstances[0].transform.rotation = Quaternion.LookRotation(dir);
-
                 m_startEffectInstances[0].transform.localPosition = Vector3.MoveTowards(m_startEffectInstances[0].transform.localPosition, new Vector3(0, 1.5f, -0.3f), dt / 10f);
             }
         }
@@ -100,18 +88,6 @@ namespace Waystones
         public override void Setup(Character character)
         {
             base.Setup(character);
-
-            if (m_startEffectInstances.Length == 0)
-                return;
-
-            GameObject effect = m_startEffectInstances[0];
-
-            sfx = effect.transform.Find(vfx_WaystonesSfx).GetComponent<AudioSource>();
-            volume = sfx.volume;
-
-            main = effect.transform.Find(vfx_WaystonesParticles).GetComponent<ParticleSystem>().main;
-
-            light = effect.transform.Find(vfx_WaystonesLight).GetComponent<Light>();
 
             character.StopEmote();
         }
@@ -160,6 +136,15 @@ namespace Waystones
                     child.parent = null;
                     UnityEngine.Object.Destroy(child.gameObject);
                 }
+
+                WaystoneTravelEffect.initial = true;
+                vfx_Waystones.AddComponent<WaystoneTravelEffect>();
+                WaystoneTravelEffect.initial = false;
+
+                ZSyncTransform zst = vfx_Waystones.GetComponent<ZSyncTransform>();
+                zst.m_syncRotation = true;
+                zst.m_useGravity = false;
+                zst.m_syncScale = false;
 
                 Instantiate(waystone.transform.Find("WayEffect/sfx"), vfx_Waystones.transform).name = vfx_WaystonesSfx;
 

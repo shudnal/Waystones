@@ -30,8 +30,12 @@ namespace Waystones
                 waystonePrefab.transform.localScale *= 0.15f;
 
                 LODGroup lodGroup = waystonePrefab.GetComponent<LODGroup>();
+
                 LOD[] lods = lodGroup.GetLODs();
-                lods[0].renderers = lods[0].renderers.Where(r => r.name != "Particle System").ToArray();
+
+                List<Renderer> renderers = lods[0].renderers.Where(r => r.name == "model").ToList();
+                renderers.Add(waystonePrefab.transform.Find("WayEffect/Particle System sparcs").GetComponent<ParticleSystemRenderer>());
+                lods[0].renderers = renderers.ToArray();
                 lodGroup.SetLODs(lods);
 
                 UnityEngine.Object.Destroy(waystonePrefab.transform.Find("WayEffect/Particle System").gameObject);
@@ -55,11 +59,13 @@ namespace Waystones
 
                 Light light = waystonePrefab.transform.Find("Point light (1)").GetComponent<Light>();
                 light.intensity = 1.1f;
+                light.gameObject.AddComponent<LightLod>().m_lightDistance = 50f;
 
                 waystonePrefab.GetComponentInChildren<EffectArea>().m_type = EffectArea.Type.Fire;
                 
                 ZNetView netview = CustomPrefabs.AddComponent(waystonePrefab, typeof(ZNetView)) as ZNetView;
                 netview.m_persistent = true;
+                netview.m_distant = true;
                 netview.m_type = ZDO.ObjectType.Solid;
 
                 Piece piece = CustomPrefabs.AddComponent(waystonePrefab, typeof(Piece)) as Piece;
