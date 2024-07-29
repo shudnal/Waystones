@@ -134,8 +134,8 @@ namespace Waystones
             cooldownDistanceMinimum = config("Travel cooldown", "Fast travelling distance minimum", defaultValue: 500, "If fast travelling distance is smaller then that cooldown will be set to minimum. World radius is 10000.");
             cooldownMaximum = config("Travel cooldown", "Fast travelling cooldown maximum", defaultValue: 7200, "Maximal cooldown to be set after successfull fast travelling");
             cooldownMinimum = config("Travel cooldown", "Fast travelling cooldown minimum", defaultValue: 600, "Minimal cooldown to be set after successfull fast travelling");
-            cooldownShort = config("Travel cooldown", "Fast travelling interrupted cooldown", defaultValue: 120, "Cooldown to be set if fast travelling was interrupted");
-            cooldownSearchMode = config("Travel cooldown", "Search mode cooldown", defaultValue: 120, "Cooldown to be set on search mode exit");
+            cooldownShort = config("Travel cooldown", "Fast travelling interrupted cooldown", defaultValue: 60, "Cooldown to be set if fast travelling was interrupted");
+            cooldownSearchMode = config("Travel cooldown", "Search mode cooldown", defaultValue: 30, "Cooldown to be set on search mode exit");
 
             particlesCollision = config("Travelling effect", "Particles physics collision", defaultValue: false, "Make particles emitted while fast travelling collide with objects. Restart required.");
             particlesMaxAmount = config("Travelling effect", "Particles amount maximum", defaultValue: 8000, "Maximum amount of particles emitted. Restart required.");

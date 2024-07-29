@@ -147,4 +147,3 @@ Or [Official BepInEx Configuration Manager](https://thunderstore.io/c/valheim/p/
 
 ## Mirrors
 [Nexus](https://www.nexusmods.com/valheim/mods/2832)
-[Thunderstore](https://valheim.thunderstore.io/package/shudnal/Waystones/)
