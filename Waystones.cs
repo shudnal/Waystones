@@ -19,7 +19,7 @@ namespace Waystones
     {
         const string pluginID = "shudnal.Waystones";
         const string pluginName = "Waystones";
-        const string pluginVersion = "1.0.1";
+        const string pluginVersion = "1.0.2";
 
         private readonly Harmony harmony = new Harmony(pluginID);
 
@@ -58,7 +58,8 @@ namespace Waystones
         internal static ConfigEntry<float> fadeMax;
         internal static ConfigEntry<float> fadeMin;
         internal static ConfigEntry<float> slowFactorTime;
-        internal static ConfigEntry<float> slowFactorLook;
+        internal static ConfigEntry<float> slowFactorLookDeceleration;
+        internal static ConfigEntry<float> slowFactorLookMinimum;
         internal static ConfigEntry<float> fovDelta;
         internal static ConfigEntry<float> sfxSensitivityThreshold;
         internal static ConfigEntry<float> sfxMax;
@@ -153,7 +154,9 @@ namespace Waystones
             sfxPitchMax = config("Search mode", "Sound effect max pitch", defaultValue: 1.0f, "Pitch of sound effect played in direction mode when looking at a target");
             sfxPitchMin = config("Search mode", "Sound effect min pitch", defaultValue: 0.8f, "Pitch of sound effect played in direction mode when sensitivity threshold is not met.");
             slowFactorTime = config("Search mode", "Slow factor time", defaultValue: 0.25f, "Multiplier of speed ​​of time (singleplayer)");
-            slowFactorLook = config("Search mode", "Slow factor mouse", defaultValue: 0.08f, "Multiplier of mouse/gamepad camera sensitivity [Not Synced with Server]", false);
+            slowFactorLookDeceleration = config("Search mode", "Slow factor mouse deceleration", defaultValue: 60f, "Mouse camera sensitivity acceleration factor. [Not Synced with Server]" +
+                                                                                                                    "\nIncrease to make mouse acceleration proportionally lower, decrease to make mouse movement faster ", false);
+            slowFactorLookMinimum = config("Search mode", "Slow factor mouse minimum", defaultValue: 0.08f, "Minimum mouse camera sensitivity factor in search mode. [Not Synced with Server]", false);
             fovDelta = config("Search mode", "FoV delta", defaultValue: 40f, "How much camera FoV can be changed both sides using zoom");
 
             cooldownTime = config("Travel cooldown", "Time", defaultValue: CooldownTime.WorldTime, "Time type to calculate cooldown." +
@@ -193,10 +196,9 @@ namespace Waystones
 
             if ((Chat.instance == null || !Chat.instance.HasFocus()) && !Console.IsVisible() && !Menu.IsVisible() && (bool)TextViewer.instance && !TextViewer.instance.IsVisible() && !Player.m_localPlayer.InCutscene() && Player.m_localPlayer.GetSEMan().HaveStatusEffect(SE_Waystone.statusEffectWaystonesHash))
             {
-                if (ZInput.GetButtonDown("Block") || ZInput.GetButtonDown("JoyBlock") || ZInput.GetButtonDown("JoyButtonB"))
+                if (ZInput.GetButtonDown("Block") || ZInput.GetButtonDown("JoyButtonB"))
                 {
                     ZInput.ResetButtonStatus("Block");
-                    ZInput.ResetButtonStatus("JoyBlock");
                     ZInput.ResetButtonStatus("JoyButtonB");
                     Player.m_localPlayer.GetSEMan().RemoveStatusEffect(SE_Waystone.statusEffectWaystonesHash);
                 }

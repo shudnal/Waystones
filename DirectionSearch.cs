@@ -159,7 +159,6 @@ namespace Waystones
                 Toggle();
             else if (activated
                 && (ZInput.GetButtonDown("Block") ||
-                    ZInput.GetButtonDown("JoyBlock") ||
                     ZInput.GetButtonDown("JoyButtonB")))
             {
                 Exit();
@@ -349,7 +348,10 @@ namespace Waystones
                 if (!activated)
                     return;
 
-                __result *= Mathf.Max(slowFactorLook.Value, 0.01f);
+                if (!Game.CanPause())
+                    __result /= 2f;
+                else if (Game.m_timeScale != 0)
+                    __result *= Mathf.Clamp(1 / Game.m_timeScale, 1f, 2f);
             }
         }
 
@@ -361,7 +363,7 @@ namespace Waystones
                 if (!activated)
                     return;
 
-                __result *= Mathf.Max(slowFactorLook.Value, 0.01f);
+                __result *= Mathf.Clamp(__result.magnitude / slowFactorLookDeceleration.Value, slowFactorLookMinimum.Value, 1f);
             }
         }
 

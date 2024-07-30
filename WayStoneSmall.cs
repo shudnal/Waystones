@@ -134,10 +134,10 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (text.Length > 0)
             sb.AppendFormat(" \"{0}\"", text);
 
-        sb.AppendFormat("\n[<color=yellow><b>$KEY_Use</b></color>] {0} $ws_piece_waystone_settag", IsActive() ? "$ws_piece_waystone_deactivate" : "$ws_piece_waystone_activate");
-        
+        sb.Append("\n[<color=yellow><b>$KEY_Use</b></color>] $ws_tooltip_start_search $ws_piece_waystone_settag");
+
         string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
-        sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] $ws_tooltip_start_search");
+        sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] {(IsActive() ? "$ws_piece_waystone_deactivate" : "$ws_piece_waystone_activate")}");
 
         return Localization.instance.Localize(sb.ToString());
     }
@@ -167,11 +167,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         Player player = human as Player;
         if (alt)
         {
-            if (IsSearchAllowed(player) && CanCast())
-            {
-                player.Message(MessageHud.MessageType.Center, "$ws_piece_waystone_activation");
-                WaystoneList.EnterSearchMode();
-            }
+            m_nview.InvokeRPC("ToggleActivated", player.GetPlayerID(), player.GetPlayerName());
             return true;
         }
 
@@ -183,8 +179,14 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
     {
         yield return new WaitWhile(() => ZInput.GetButton("Use") || ZInput.GetButton("JoyUse"));
 
-        if (!TextInput.IsVisible())
-            m_nview.InvokeRPC("ToggleActivated", player.GetPlayerID(), player.GetPlayerName());
+        if (TextInput.IsVisible())
+            yield break;
+
+        if (IsSearchAllowed(player) && CanCast())
+        {
+            player.Message(MessageHud.MessageType.Center, "$ws_piece_waystone_activation");
+            WaystoneList.EnterSearchMode();
+        }
     }
 
     public bool UseItem(Humanoid user, ItemDrop.ItemData item)
