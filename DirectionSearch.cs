@@ -116,22 +116,23 @@ namespace Waystones
         {
             directions.Clear();
 
-            directions.Add(new Direction("$ws_location_spawn_point", GetSpawnPoint()));
+            if (locationShowCurrentSpawn.Value)
+                directions.Add(new Direction("$ws_location_spawn_point", GetSpawnPoint()));
 
             ZoneSystem.instance.tempIconList.Clear();
             ZoneSystem.instance.GetLocationIcons(ZoneSystem.instance.tempIconList);
             foreach (KeyValuePair<Vector3, string> loc in ZoneSystem.instance.tempIconList)
             {
-                if (loc.Value == "StartTemple")
+                if (loc.Value == "StartTemple" && locationShowStartTemple.Value)
                     directions.Add(new Direction("$ws_location_start_temple", loc.Key));
-                else if (loc.Value == "Vendor_BlackForest")
+                else if (loc.Value == "Vendor_BlackForest" && locationShowHaldor.Value)
                     directions.Add(new Direction("$npc_haldor", loc.Key));
-                else if (loc.Value == "Hildir_camp")
+                else if (loc.Value == "Hildir_camp" & locationShowHildir.Value)
                     directions.Add(new Direction("$npc_hildir", loc.Key));
             }
 
             PlayerProfile profile = Game.instance.GetPlayerProfile();
-            if (profile.HaveDeathPoint())
+            if (profile.HaveDeathPoint() && locationShowLastTombstone.Value)
                 directions.Add(new Direction("$ws_location_last_tombstone", profile.GetDeathPoint()));
 
             directions.AddRange(WorldData.GetSavedDirections());
@@ -200,7 +201,7 @@ namespace Waystones
 
             Vector3 look = Player.m_localPlayer.GetLookDir();
             currentAngle = Vector3.Angle(look, Vector3.down);
-            if (currentAngle < GetCurrentSensivity())
+            if (currentAngle < GetCurrentSensivity() && locationShowRandomPoint.Value)
             {
                 current = placeOfMystery;
                 return;

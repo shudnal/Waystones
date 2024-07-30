@@ -31,8 +31,13 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CustomSyncedValuesSynchronizer.cs" />
     <Compile Include="DirectionSearch.cs" />
+    <Compile Include="LocalizationManager.cs" />
     <Compile Include="WaystoneList.cs" />
     <Compile Include="PieceWaystone.cs" />
     <Compile Include="WaystoneSmall.cs" />
@@ -66,13 +71,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Assemblies\stable\gui_framework.dll</HintPath>
     </Reference>
-    <Reference Include="LocalizationManager, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libs\LocalizationManager.dll</HintPath>
-    </Reference>
     <Reference Include="ServerSync, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Libs\ServerSync.dll</HintPath>
+    </Reference>
+    <Reference Include="System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Assemblies\beta\System.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -112,6 +117,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Assemblies\stable\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Assemblies\beta\mscorlib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\SE_Waystone.png">
@@ -123,9 +132,9 @@
     <EmbeddedResource Include="Assets\icon_waystone.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="Libs\LocalizationManager.dll">
+    <None Include="Libs\LocalizationManager.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
     <Content Include="Libs\ServerSync.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -135,6 +144,9 @@
       <Version>2.0.34</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="YamlDotNet">
+      <Version>16.0.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

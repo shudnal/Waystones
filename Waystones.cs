@@ -8,6 +8,9 @@ using System.IO;
 using System.Reflection;
 using UnityEngine.Rendering;
 using LocalizationManager;
+using System.Collections.Generic;
+using System;
+using YamlDotNet.Serialization;
 
 namespace Waystones
 {
@@ -16,7 +19,7 @@ namespace Waystones
     {
         const string pluginID = "shudnal.Waystones";
         const string pluginName = "Waystones";
-        const string pluginVersion = "1.0.0";
+        const string pluginVersion = "1.0.1";
 
         private readonly Harmony harmony = new Harmony(pluginID);
 
@@ -28,7 +31,18 @@ namespace Waystones
         internal static ConfigEntry<bool> loggingEnabled;
         internal static ConfigEntry<KeyboardShortcut> shortcut;
         internal static ConfigEntry<string> pieceRecipe;
-        internal static ConfigEntry<bool> showOnMap;
+        internal static ConfigEntry<bool> itemSacrifitionReduceCooldown;
+
+        internal static ConfigEntry<bool> locationWaystonesShowOnMap;
+        internal static ConfigEntry<bool> locationShowCurrentSpawn;
+        internal static ConfigEntry<bool> locationShowLastPoint;
+        internal static ConfigEntry<bool> locationShowLastShip;
+        internal static ConfigEntry<bool> locationShowLastTombstone;
+        internal static ConfigEntry<bool> locationShowStartTemple;
+        internal static ConfigEntry<bool> locationShowHaldor;
+        internal static ConfigEntry<bool> locationShowHildir;
+        internal static ConfigEntry<bool> locationShowWaystones;
+        internal static ConfigEntry<bool> locationShowRandomPoint;
 
         internal static ConfigEntry<bool> useShortcutToEnter;
         internal static ConfigEntry<bool> allowEncumbered;
@@ -67,7 +81,11 @@ namespace Waystones
         internal static ConfigEntry<int> particlesMinForceOverTime;
         internal static ConfigEntry<int> particlesMaxForceOverTime;
 
+        public static readonly CustomSyncedValue<Dictionary<string, int>> itemsToReduceCooldown = new CustomSyncedValue<Dictionary<string, int>>(configSync, "Items to reduce cooldowns", new Dictionary<string, int>());
+
         public static string configDirectory;
+        internal static FileSystemWatcher configWatcher;
+        private const string itemsToReduceCooldownFilter = $"{pluginID}.reduce_cooldowns.*";
 
         public enum CooldownTime
         {
@@ -100,9 +118,20 @@ namespace Waystones
             configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
             loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
             pieceRecipe = config("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
-            showOnMap = config("General", "Show on map", defaultValue: true, "Show waystone map pins");
+            itemSacrifitionReduceCooldown = config("Item sacrifition", "Sacrifice item from list to reduce cooldown", defaultValue: true, "Enable sacrifition of item from list to reduce waystone cooldown");
 
             pieceRecipe.SettingChanged += (sender, args) => PieceWaystone.SetPieceRequirements();
+
+            locationWaystonesShowOnMap = config("Locations", "Show waystones on map", defaultValue: true, "Show waystone map pins");
+            locationShowCurrentSpawn = config("Locations", "Show current spawn", defaultValue: true, "Show current spawn point in search mode");
+            locationShowLastPoint = config("Locations", "Show last location", defaultValue: true, "Show last location from where you used fast travel last time in search mode");
+            locationShowLastShip = config("Locations", "Show last ship", defaultValue: true, "Show last ship position in search mode");
+            locationShowLastTombstone = config("Locations", "Show last tombstone", defaultValue: true, "Show last death position in search mode");
+            locationShowStartTemple = config("Locations", "Show sacrificial stones", defaultValue: true, "Show sacrificial stones positioin in search mode");
+            locationShowHaldor = config("Locations", "Show Haldor", defaultValue: true, "Show Haldor location in search mode");
+            locationShowHildir = config("Locations", "Show Hildir", defaultValue: true, "Show Hildir location in search mode");
+            locationShowWaystones = config("Locations", "Show waystones", defaultValue: true, "Show waystones network in search mode");
+            locationShowRandomPoint = config("Locations", "Show random point", defaultValue: true, "Show random point position in search mode");
 
             emitNoiseOnTeleportation = config("Restrictions", "Emit noise on fast travelling", defaultValue: true, "If enabled then you will attract attention of nearby enemies on fast travelling start.");
             allowEncumbered = config("Restrictions", "Ignore encumbered to start search", defaultValue: false, "If enabled then encumbrance check before search start will be omitted.");
@@ -307,6 +336,22 @@ namespace Waystones
             }
         }
 
+        [HarmonyPatch]
+        public static class JoyRightStick_SlowFactor
+        {
+            private static IEnumerable<MethodBase> TargetMethods()
+            {
+                yield return AccessTools.Method(typeof(ZInput), nameof(ZInput.GetJoyRightStickX));
+                yield return AccessTools.Method(typeof(ZInput), nameof(ZInput.GetJoyRightStickY));
+            }
+
+            private static void Postfix(ref float __result)
+            {
+                if (PreventPlayerInput())
+                    __result = 0f;
+            }
+        }
+
         [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.TakeInput))]
         public static class PlayerController_TakeInput_PreventPlayerMovements
         {
@@ -326,6 +371,82 @@ namespace Waystones
                 if (__instance.GetSEMan().HaveStatusEffect(SE_Waystone.statusEffectWaystonesHash))
                     mouseLook = Vector2.zero;
             }
+        }
+
+        [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start))]
+        public static class ZoneSystem_Start_InitSeasonStateAndConfigWatcher
+        {
+            private static void Postfix()
+            {
+                SetupConfigWatcher(enabled: true);
+            }
+        }
+
+        [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.OnDestroy))]
+        public static class ZoneSystem_OnDestroy_DisableConfigWatcher
+        {
+            private static void Postfix()
+            {
+                SetupConfigWatcher(enabled: false);
+            }
+        }
+
+        public static void SetupConfigWatcher(bool enabled)
+        {
+            if (!Directory.Exists(Paths.ConfigPath))
+                return;
+
+            if (enabled)
+                ReadInitialConfigs();
+
+            if (configWatcher == null)
+            {
+                configWatcher = new FileSystemWatcher(Paths.ConfigPath, itemsToReduceCooldownFilter);
+                configWatcher.Changed += new FileSystemEventHandler(ReadConfigs);
+                configWatcher.Created += new FileSystemEventHandler(ReadConfigs);
+                configWatcher.Renamed += new RenamedEventHandler(ReadConfigs);
+                configWatcher.Deleted += new FileSystemEventHandler(ReadConfigs);
+                configWatcher.IncludeSubdirectories = false;
+                configWatcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
+            }
+
+            configWatcher.EnableRaisingEvents = enabled;
+        }
+
+        private static void ReadInitialConfigs()
+        {
+            foreach (FileInfo file in new DirectoryInfo(Paths.ConfigPath).GetFiles(itemsToReduceCooldownFilter, SearchOption.AllDirectories))
+                ReadConfigFile(file.Name, file.FullName);
+        }
+
+        private static void ReadConfigs(object sender, FileSystemEventArgs eargs)
+        {
+            if (eargs is RenamedEventArgs)
+                ReadInitialConfigs();
+            else
+                ReadConfigFile(eargs.Name, eargs.FullPath);
+        }
+
+        private static void ReadConfigFile(string filename, string fullname)
+        {
+            Dictionary<string, int> newValue = new Dictionary<string, int>();
+            try
+            {
+                string content = File.ReadAllText(fullname);
+#nullable enable
+                if (content is not null)
+                    foreach (KeyValuePair<string, int> kv in new DeserializerBuilder().IgnoreFields().Build().Deserialize<Dictionary<string, int>?>(content) ?? new Dictionary<string, int>())
+                        newValue[kv.Key] = kv.Value;
+#nullable disable
+            }
+            catch (Exception e)
+            {
+                LogInfo($"Error reading file ({fullname})! Error: {e.Message}");
+            }
+
+            itemsToReduceCooldown.AssignValueSafe(newValue);
+
+            LogInfo($"Loaded {newValue.Count} items from file {filename}");
         }
     }
 }

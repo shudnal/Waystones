@@ -29,13 +29,14 @@ namespace Waystones
             if (data == null)
                 return result;
 
-            if (data.lastShip != null && data.lastShip != Vector3.zero)
+            if (data.lastShip != null && data.lastShip != Vector3.zero && locationShowLastShip.Value)
                 result.Add(new DirectionSearch.Direction("$ws_location_last_ship", data.lastShip));
 
-            if (data.lastPosition != null && data.lastPosition != Vector3.zero)
+            if (data.lastPosition != null && data.lastPosition != Vector3.zero && locationShowLastPoint.Value)
                 result.Add(new DirectionSearch.Direction("$ws_location_last_location", data.lastPosition));
 
-            WaystoneList.activatedWaystones.Do(waystone => result.Add(new DirectionSearch.Direction($"$ws_piece_waystone_name \"{waystone.Item1}\"", waystone.Item2, waystone.Item3)));
+            if (locationShowWaystones.Value)
+                WaystoneList.activatedWaystones.Do(waystone => result.Add(new DirectionSearch.Direction($"$ws_piece_waystone_name \"{waystone.Item1}\"", waystone.Item2, waystone.Item3)));
 
             return result;
         }
@@ -132,6 +133,25 @@ namespace Waystones
             Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
 
             LogInfo($"Cooldown set {TimerString(cooldown)}");
+        }
+
+        public static bool TryReduceCooldown(int seconds)
+        {
+            if (!ZNet.instance)
+                return false;
+
+            List<WorldData> state = GetState();
+
+            WorldData data = GetWorldData(state);
+            if (data == null)
+                return false;
+
+            data.SetCooldownTime(Math.Max(data.GetCooldownTime() - seconds, 0));
+
+            Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
+
+            LogInfo($"Cooldown set {TimerString(data.GetCooldownTime())}");
+            return true;
         }
 
         internal static bool IsOnCooldown()

@@ -189,6 +189,31 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
     public bool UseItem(Humanoid user, ItemDrop.ItemData item)
     {
+        int cooldown = 0;
+        if (itemSacrifitionReduceCooldown.Value && TryReduceCooldownOnItemSacrifice(item.m_dropPrefab?.name, ref cooldown) || TryReduceCooldownOnItemSacrifice(item.m_shared.m_name, ref cooldown))
+        {
+            user.GetInventory().RemoveOneItem(item);
+            user.Message(MessageHud.MessageType.Center, Localization.instance.Localize("$ws_piece_waystone_cooldown_reduced", cooldown.ToString()));
+            if (WorldData.IsOnCooldown())
+                user.Message(MessageHud.MessageType.TopLeft, $"$hud_powernotready: {WorldData.GetCooldownString()}");
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool TryReduceCooldownOnItemSacrifice(string itemName, ref int cooldown)
+    {
+        if (itemName == null)
+            return false;
+
+        if (itemsToReduceCooldown.Value.TryGetValue(itemName, out int reduceCooldown) && WorldData.TryReduceCooldown(reduceCooldown))
+        {
+            cooldown = reduceCooldown;
+            return true;
+        }
+
         return false;
     }
 

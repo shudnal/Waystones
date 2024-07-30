@@ -23,7 +23,7 @@ namespace Waystones
                 Minimap.instance.RemovePin(pin);
 
             waystonePins.Clear();
-            if (showOnMap.Value && DirectionSearch.IsActivated)
+            if (locationWaystonesShowOnMap.Value && DirectionSearch.IsActivated)
                 foreach (Tuple<string, Vector3, Quaternion> waystone in activatedWaystones)
                     waystonePins.Add(Minimap.instance.AddPin(waystone.Item2, (Minimap.PinType)WaystoneIconType.pinType, waystone.Item1, save: false, isChecked: false, Player.m_localPlayer.GetPlayerID()));
         }

@@ -22,5 +22,6 @@
     "ws_tutorial_waystone_text": "Waystones allow you to <color=yellow>fast travel</color> to distant locations and other waystones.\n\nSit in front of a waystone and begin your search.\nLocate a distant place with your gaze to fast travel there.\n\n<color=yellow>Activate and mark</color> a waystone to be able to return to it later.",
     "ws_tutorial_waystone_topic": "You have built a waystone",
     "ws_piece_waystone_settag": "(Hold to set tag)",
-    "ws_piece_waystone_tag": "Tag"
+    "ws_piece_waystone_tag": "Tag",
+    "ws_piece_waystone_cooldown_reduced": "Cooldown reduced: $1 seconds"
 }
