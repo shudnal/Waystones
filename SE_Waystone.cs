@@ -251,7 +251,7 @@ namespace Waystones
         }
 
         [HarmonyPatch(typeof(ObjectDB), nameof(ObjectDB.CopyOtherDB))]
-        public static class ObjectDB_CopyOtherDB_SE_Season
+        public static class ObjectDB_CopyOtherDB_AddStatusEffects
         {
             private static void Postfix(ObjectDB __instance)
             {
