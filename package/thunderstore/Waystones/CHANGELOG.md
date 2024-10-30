@@ -1,3 +1,6 @@
+# 1.0.3
+* bog witch
+
 # 1.0.2
 * mouse acceleration in direction search mode
 * gamepad sticks acceleration rebalanced in direction search mode

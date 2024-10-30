@@ -19,7 +19,7 @@ namespace Waystones
     {
         const string pluginID = "shudnal.Waystones";
         const string pluginName = "Waystones";
-        const string pluginVersion = "1.0.2";
+        const string pluginVersion = "1.0.3";
 
         private readonly Harmony harmony = new Harmony(pluginID);
 
@@ -372,6 +372,15 @@ namespace Waystones
             {
                 if (__instance.GetSEMan().HaveStatusEffect(SE_Waystone.statusEffectWaystonesHash))
                     mouseLook = Vector2.zero;
+            }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.ActivateGuardianPower))]
+        public static class Player_ActivateGuardianPower_PreventGPowerUseWhenTeleporting
+        {
+            private static bool Prefix(Player __instance)
+            {
+                return !__instance.GetSEMan().HaveStatusEffect(SE_Waystone.statusEffectWaystonesHash);
             }
         }
 

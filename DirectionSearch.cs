@@ -288,9 +288,21 @@ namespace Waystones
                 blocker.transform.Find("Loading/TopFade").SetParent(blocker.transform);
                 blocker.transform.Find("Loading/BottomFade").SetParent(blocker.transform);
 
-                UnityEngine.Object.Destroy(blocker.transform.Find("Loading").gameObject);
-                UnityEngine.Object.Destroy(blocker.transform.Find("Sleeping").gameObject);
-                UnityEngine.Object.Destroy(blocker.transform.Find("Teleporting").gameObject);
+                for (int i = blocker.transform.childCount - 1; i >= 0; i--)
+                {
+                    Transform child = blocker.transform.GetChild(i);
+                    switch (child.name)
+                    {
+                        case "Loading":
+                        case "Sleeping":
+                        case "Teleporting":
+                        case "Image":
+                        case "Tip":
+                        case "panel_separator":
+                            UnityEngine.Object.Destroy(child.gameObject);
+                            break;
+                    }
+                }
 
                 // sfx Magic_CollectorLoop
                 GameObject prefab = ZNetScene.instance.GetPrefab("guard_stone");

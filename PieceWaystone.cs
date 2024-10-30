@@ -91,9 +91,10 @@ namespace Waystones
                 wnt.m_broken = m_new;
 
                 wnt.m_noRoofWear = false;
-                wnt.m_noSupportWear = false;
+                wnt.m_noSupportWear = true;
                 wnt.m_burnable = false;
                 wnt.m_supports = false;
+                wnt.m_ashDamageResist = true;
                 wnt.m_materialType = WearNTear.MaterialType.Stone;
                 wnt.m_health = 1000;
                 wnt.m_damages.m_pierce = HitData.DamageModifier.Resistant;
