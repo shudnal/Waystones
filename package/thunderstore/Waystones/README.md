@@ -119,7 +119,7 @@ You can send me a file with your localization at [GitHub](https://github.com/shu
 
 [Language list](https://valheim-modding.github.io/Jotunn/data/localization/language-list.html).
 
-English localization example is located in `English.json` file next to plugin dll.
+English localization example is located in `Waystones.English.json` file next to plugin dll.
 
 ## Installation (manual)
 copy Waystones.dll to your BepInEx\Plugins\ folder.

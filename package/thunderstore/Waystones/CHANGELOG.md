@@ -1,3 +1,7 @@
+# 1.0.4
+* readme and description updated
+* more built-in translations
+
 # 1.0.3
 * bog witch
 
