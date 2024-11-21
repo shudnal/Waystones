@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using HarmonyLib;
+using System.Linq;
 
 public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactable
 {
@@ -192,9 +193,8 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
     public bool UseItem(Humanoid user, ItemDrop.ItemData item)
     {
         int cooldown = 0;
-        if (itemSacrifitionReduceCooldown.Value && TryReduceCooldownOnItemSacrifice(item.m_dropPrefab?.name, ref cooldown) || TryReduceCooldownOnItemSacrifice(item.m_shared.m_name, ref cooldown))
+        if (itemSacrifitionReduceCooldown.Value && (TryReduceCooldownOnItemSacrifice(user, item, item.m_dropPrefab?.name, ref cooldown) || TryReduceCooldownOnItemSacrifice(user, item, item.m_shared.m_name, ref cooldown)))
         {
-            user.GetInventory().RemoveOneItem(item);
             user.Message(MessageHud.MessageType.Center, Localization.instance.Localize("$ws_piece_waystone_cooldown_reduced", cooldown.ToString()));
             if (WorldData.IsOnCooldown())
                 user.Message(MessageHud.MessageType.TopLeft, $"$hud_powernotready: {WorldData.GetCooldownString()}");
@@ -205,18 +205,26 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         return false;
     }
 
-    private bool TryReduceCooldownOnItemSacrifice(string itemName, ref int cooldown)
+    private bool TryReduceCooldownOnItemSacrifice(Humanoid user, ItemDrop.ItemData item, string itemName, ref int cooldown)
     {
         if (itemName == null)
             return false;
 
-        if (itemsToReduceCooldown.Value.TryGetValue(itemName, out int reduceCooldown) && WorldData.TryReduceCooldown(reduceCooldown))
+        if (itemsToReduceCooldown.Value.TryGetValue(itemName, out int reduceCooldown) && (cooldown = reduceCooldown) > 0)
+            return user.GetInventory().RemoveOneItem(item) && WorldData.TryReduceCooldown(reduceCooldown);
+
+        if (itemsToReduceCooldown.Value.Keys.FirstOrDefault(key => key.StartsWith(itemName)) is string itemKey && itemsToReduceCooldown.Value.TryGetValue(itemKey, out int reduce) && (cooldown = reduce) > 0)
         {
-            cooldown = reduceCooldown;
-            return true;
+            string[] pair = itemKey.Split(':');
+            return pair.Length > 1 && pair[0] == itemName && int.TryParse(pair[1], out int amount) && CountItems(user.GetInventory(), itemName) >= amount && user.GetInventory().RemoveItem(item, amount) && WorldData.TryReduceCooldown(reduce);
         }
 
         return false;
+    }
+
+    private int CountItems(Inventory inventory, string itemName)
+    {
+        return inventory.m_inventory.Where(item => item.m_shared.m_name == itemName || item.m_dropPrefab?.name == itemName).Sum(item => item.m_stack);
     }
 
     public bool IsActive()

@@ -19,7 +19,7 @@ namespace Waystones
     {
         const string pluginID = "shudnal.Waystones";
         const string pluginName = "Waystones";
-        const string pluginVersion = "1.0.4";
+        const string pluginVersion = "1.0.5";
 
         private readonly Harmony harmony = new Harmony(pluginID);
 

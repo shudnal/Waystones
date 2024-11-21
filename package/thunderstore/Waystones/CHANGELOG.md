@@ -1,3 +1,6 @@
+# 1.0.5
+* option to set stack of item to reduce cooldown
+
 # 1.0.4
 * readme and description updated
 * more built-in translations
