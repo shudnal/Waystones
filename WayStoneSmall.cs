@@ -157,7 +157,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         {
             if (ZInput.GetButtonPressedTimer("Use") + ZInput.GetButtonPressedTimer("JoyUse") > waystoneHoldSetTagDelay && !TextInput.IsVisible())
             {
-                blockInputUntil = Time.time + waystoneHoldSetTagDelay * 2;
+                blockInputUntil = Time.time + 1f;
                 ZInput.ResetButtonStatus("Use");
                 ZInput.ResetButtonStatus("JoyUse");
                 TextInput.instance.RequestText(this, "$ws_piece_waystone_tag", Math.Max(tagCharactersLimit.Value, 10));
@@ -356,7 +356,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         private static void Postfix(TextInput __instance)
         {
             __instance.m_inputField.readOnly = false;
-            if (__instance.m_queuedSign is WaystoneSmall && TextInput.IsVisible() && blockInputUntil > Time.time && ZInput.GetButton("Use") || ZInput.GetButton("JoyUse"))
+            if (__instance.m_queuedSign is WaystoneSmall && TextInput.IsVisible() && blockInputUntil > Time.time)
                 __instance.m_inputField.readOnly = true;
         }
     }

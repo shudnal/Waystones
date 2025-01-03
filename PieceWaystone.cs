@@ -65,7 +65,7 @@ namespace Waystones
                 
                 ZNetView netview = CustomPrefabs.AddComponent(waystonePrefab, typeof(ZNetView)) as ZNetView;
                 netview.m_persistent = true;
-                netview.m_distant = true;
+                netview.m_distant = false;
                 netview.m_type = ZDO.ObjectType.Solid;
 
                 Piece piece = CustomPrefabs.AddComponent(waystonePrefab, typeof(Piece)) as Piece;

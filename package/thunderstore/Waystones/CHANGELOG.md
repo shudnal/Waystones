@@ -1,3 +1,7 @@
+# 1.0.6
+* fixed sometimes waystones would destroy itself in certain rare circumstances
+* Text input window for "hold to set tag" will be blocked for 1 second to prevent overwrite from holding "Use" key
+
 # 1.0.5
 * option to set stack of item to reduce cooldown
 

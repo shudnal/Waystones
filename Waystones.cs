@@ -17,9 +17,9 @@ namespace Waystones
     [BepInPlugin(pluginID, pluginName, pluginVersion)]
     public class Waystones : BaseUnityPlugin
     {
-        const string pluginID = "shudnal.Waystones";
-        const string pluginName = "Waystones";
-        const string pluginVersion = "1.0.5";
+        public const string pluginID = "shudnal.Waystones";
+        public const string pluginName = "Waystones";
+        public const string pluginVersion = "1.0.6";
 
         private readonly Harmony harmony = new Harmony(pluginID);
 
