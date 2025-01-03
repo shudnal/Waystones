@@ -198,10 +198,16 @@ namespace Waystones
                 force.zMultiplier = 3;
             }
 
-            if ((bool)vfx_Waystones && !ZNetScene.instance.m_namedPrefabs.ContainsKey(vfx_WaystonesHash))
+            if ((bool)vfx_Waystones)
             {
+                if (ZNetScene.instance.m_namedPrefabs.ContainsKey(vfx_WaystonesHash))
+                {
+                    ZNetScene.instance.m_prefabs.Remove(ZNetScene.instance.m_namedPrefabs[vfx_WaystonesHash]);
+                    ZNetScene.instance.m_namedPrefabs.Remove(vfx_WaystonesHash);
+                }
+
                 ZNetScene.instance.m_prefabs.Add(vfx_Waystones);
-                ZNetScene.instance.m_namedPrefabs[vfx_WaystonesHash] = vfx_Waystones;
+                ZNetScene.instance.m_namedPrefabs.Add(vfx_WaystonesHash, vfx_Waystones);
             }
         }
 

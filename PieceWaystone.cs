@@ -161,12 +161,17 @@ namespace Waystones
 
                 ZNetScene.instance.m_prefabs.Add(waystonePrefab);
                 ZNetScene.instance.m_namedPrefabs.Add(waystoneHash, waystonePrefab);
+            }
+        }
 
-                SetPieceRequirements();
+        private static void RegisterPieceTable()
+        {
+            SetPieceRequirements();
 
-                PieceTable hammer = Resources.FindObjectsOfTypeAll<PieceTable>().FirstOrDefault(ws => ws.name == "_HammerPieceTable");
-                if (hammer != null && !hammer.m_pieces.Contains(waystonePrefab))
-                    hammer.m_pieces.Add(waystonePrefab);
+            if (ObjectDB.instance.GetItemPrefab("Hammer")?.GetComponent<ItemDrop>()?.m_itemData.m_shared.m_buildPieces is PieceTable pieceTable)
+            {
+                pieceTable.m_pieces.RemoveAll(piece => piece.name == waystoneName);
+                pieceTable.m_pieces.Add(waystonePrefab);
             }
         }
 
@@ -206,10 +211,13 @@ namespace Waystones
         [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
         public static class ZNetScene_Awake_AddPiece
         {
-            private static void Postfix()
-            {
-                RegisterPiece();
-            }
+            private static void Postfix() => RegisterPiece();
+        }
+        
+        [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start))]
+        public static class ZoneSystem_Start_AddPieceTable
+        {
+            private static void Postfix() => RegisterPieceTable();
         }
     }
 }
