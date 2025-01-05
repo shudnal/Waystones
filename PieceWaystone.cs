@@ -65,7 +65,7 @@ namespace Waystones
                 
                 ZNetView netview = CustomPrefabs.AddComponent(waystonePrefab, typeof(ZNetView)) as ZNetView;
                 netview.m_persistent = true;
-                netview.m_distant = false;
+                netview.m_distant = true;
                 netview.m_type = ZDO.ObjectType.Solid;
 
                 Piece piece = CustomPrefabs.AddComponent(waystonePrefab, typeof(Piece)) as Piece;
@@ -91,10 +91,11 @@ namespace Waystones
                 wnt.m_broken = m_new;
 
                 wnt.m_noRoofWear = false;
-                wnt.m_noSupportWear = true;
+                wnt.m_noSupportWear = false;
                 wnt.m_burnable = false;
                 wnt.m_supports = false;
                 wnt.m_ashDamageResist = true;
+                wnt.m_staticPosition = true;
                 wnt.m_materialType = WearNTear.MaterialType.Stone;
                 wnt.m_health = 1000;
                 wnt.m_damages.m_pierce = HitData.DamageModifier.Resistant;
@@ -161,17 +162,14 @@ namespace Waystones
 
                 ZNetScene.instance.m_prefabs.Add(waystonePrefab);
                 ZNetScene.instance.m_namedPrefabs.Add(waystoneHash, waystonePrefab);
-            }
-        }
 
-        private static void RegisterPieceTable()
-        {
-            SetPieceRequirements();
+                SetPieceRequirements();
 
-            if (ObjectDB.instance.GetItemPrefab("Hammer")?.GetComponent<ItemDrop>()?.m_itemData.m_shared.m_buildPieces is PieceTable pieceTable)
-            {
-                pieceTable.m_pieces.RemoveAll(piece => piece.name == waystoneName);
-                pieceTable.m_pieces.Add(waystonePrefab);
+                if (ObjectDB.instance.GetItemPrefab("Hammer")?.GetComponent<ItemDrop>()?.m_itemData.m_shared.m_buildPieces is PieceTable pieceTable)
+                {
+                    pieceTable.m_pieces.RemoveAll(piece => piece.name == waystoneName);
+                    pieceTable.m_pieces.Add(waystonePrefab);
+                }
             }
         }
 
@@ -211,13 +209,8 @@ namespace Waystones
         [HarmonyPatch(typeof(ZNetScene), nameof(ZNetScene.Awake))]
         public static class ZNetScene_Awake_AddPiece
         {
+            [HarmonyPriority(Priority.First)]
             private static void Postfix() => RegisterPiece();
-        }
-        
-        [HarmonyPatch(typeof(ZoneSystem), nameof(ZoneSystem.Start))]
-        public static class ZoneSystem_Start_AddPieceTable
-        {
-            private static void Postfix() => RegisterPieceTable();
         }
     }
 }

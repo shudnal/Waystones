@@ -1,6 +1,6 @@
 {
   "name": "Waystones",
-  "version_number": "1.0.7",
+  "version_number": "1.0.8",
   "website_url": "https://github.com/shudnal/Waystones",
   "description": "Build a waystone network, sit in front of one, locate with your gaze a distant place or another waystone and fast travel there. Nomap/noportals immersive alternative for regular portals.",
   "dependencies": ["denikson-BepInExPack_Valheim-5.4.2202"]

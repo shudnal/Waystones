@@ -1,3 +1,7 @@
+# 1.0.8
+* another attempt to fix waystones would destroy itself in certain rare circumstances
+* another attempt to fix potential issue with Waystone not adding to Hammer menu
+
 # 1.0.7
 * initialization sequence was changed a bit to fix potential issue with Waystone not adding to Hammer menu
 
