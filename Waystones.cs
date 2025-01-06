@@ -264,7 +264,7 @@ namespace Waystones
                     (Chat.instance == null || !Chat.instance.HasFocus()) &&
                     !Console.IsVisible() && !Menu.IsVisible() && TextViewer.instance != null &&
                     !TextViewer.instance.IsVisible() && !TextInput.IsVisible() &&
-                    /*!Minimap.IsOpen() &&*/ !GameCamera.InFreeFly() && !StoreGui.IsVisible() && !InventoryGui.IsVisible();
+                    !GameCamera.InFreeFly() && !StoreGui.IsVisible() && !InventoryGui.IsVisible();
         }
 
         public static void LogInfo(object data)

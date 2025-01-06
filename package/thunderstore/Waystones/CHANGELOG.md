@@ -1,3 +1,7 @@
+# 1.0.9
+* prevent occasional usage of forsaken power while teleporting
+* getting hit while teleporting will no longer break teleporting but instead each hit will add 1 sec to teleport timer
+
 # 1.0.8
 * another attempt to fix waystones would destroy itself in certain rare circumstances
 * another attempt to fix potential issue with Waystone not adding to Hammer menu

@@ -80,9 +80,9 @@ Fast travelling to random point will set a shortest cooldown.
 ## Fast travelling
 After choosing a direction and pressing Use hotkey fast travelling will be started. 
 
-The moment you initiate fast travelling nearby monsters will be agitated by the sound and light emitted by you. Any damage taken while channeling will break the effect and set a short cooldown. 
+The moment you initiate fast travelling nearby monsters will be agitated by the sound and light emitted by you. Any damage taken while channeling will add 1 second to teleporting process.
 
-To break channeling manually press Block button.
+To break channeling manually you can press Block button.
 
 ## Restrictions
 There are several restrictions on fast travel and search mode usage.

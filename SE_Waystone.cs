@@ -20,10 +20,10 @@ namespace Waystones
         public const string statusEffectName = "$se_waystone_name";
         public const string statusEffectTooltip = "$se_waystone_tooltip";
 
-        public static readonly int s_gpower = ZSyncAnimation.GetHash("gpower");
-
         public static Sprite iconWaystones;
         public static GameObject vfx_Waystones;
+
+        public static float blockGPTime;
 
         [NonSerialized]
         public Vector3 targetPoint = Vector3.zero;
@@ -57,6 +57,7 @@ namespace Waystones
                 {
                     lookDirTriggered = true;
                     localPlayer.SetLookDir(targetPoint - localPlayer.transform.position, 5f);
+                    blockGPTime = Time.time + m_ttl + 1;
                     localPlayer.GetZAnim().SetTrigger("gpower");
                 }
 
@@ -109,14 +110,14 @@ namespace Waystones
         public override void OnDamaged(HitData hit, Character attacker)
         {
             base.OnDamaged(hit, attacker);
-            Stop();
-            m_time = m_ttl + 1;
+            if (attacker == null)
+                return;
+
+            m_time--;
+            blockGPTime++;
         }
 
-        private bool ControlLocalPlayer()
-        {
-            return m_character != null && m_character == Player.m_localPlayer;
-        }
+        private bool ControlLocalPlayer() => m_character != null && m_character == Player.m_localPlayer;
 
         public static void RegisterEffects()
         {
@@ -263,6 +264,12 @@ namespace Waystones
             {
                 ObjectDB_Awake_AddStatusEffects.AddCustomStatusEffects(__instance);
             }
+        }
+
+        [HarmonyPatch(typeof(Player), nameof(Player.ActivateGuardianPower))]
+        public static class Player_ActivateGuardianPower_PreventGuardianPower
+        {
+            private static bool Prefix(Player __instance) => !(__instance.GetSEMan().HaveStatusEffect(statusEffectWaystonesHash) || blockGPTime > Time.time);
         }
     }
 }
