@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections;
 using HarmonyLib;
 using System.Linq;
+using Splatform;
 
 public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactable
 {
@@ -236,11 +237,9 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
     {
         ZDO zDO = m_nview.GetZDO();
         if (zDO == null)
-        {
             return "";
-        }
 
-        return CensorShittyWords.FilterUGC(zDO.GetString(ZDOVars.s_tag), UGCType.Text, zDO.GetString(ZDOVars.s_tagauthor), 0L);
+        return CensorShittyWords.FilterUGC(zDO.GetString(ZDOVars.s_tag), UGCType.Text, new PlatformUserID(zDO.GetString(ZDOVars.s_tagauthor)), 0L);
     }
 
     public void GetTagSignature(out string tagRaw, out string authorId)
@@ -253,7 +252,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
     public void SetText(string text)
     {
         if (m_nview.IsValid())
-            m_nview.InvokeRPC("RPC_SetTag", text, PrivilegeManager.GetNetworkUserId());
+            m_nview.InvokeRPC("RPC_SetTag", text, PlatformManager.DistributionPlatform.LocalUser.PlatformUserID.ToString());
     }
 
     public void RPC_SetTag(long sender, string tag, string authorId)

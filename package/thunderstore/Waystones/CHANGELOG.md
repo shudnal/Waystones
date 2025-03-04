@@ -1,3 +1,6 @@
+# 1.0.10
+* patch 0.220.3
+
 # 1.0.9
 * prevent occasional usage of forsaken power while teleporting
 * getting hit while teleporting will no longer break teleporting but instead each hit will add 1 sec to teleport timer
