@@ -1,4 +1,4 @@
-# Waystones
+﻿# Waystones
 Build a waystone network, sit in front of one, locate with your gaze a distant place or another waystone and fast travel there
 
 ![](https://staticdelivery.nexusmods.com/mods/3667/images/headers/2832_1722236465.jpg)
@@ -35,6 +35,33 @@ There is console command `setwaystonecooldown [seconds]` to manually set cooldow
 
 Cooldown is based on a world time by default. It could be changed to use global real time instead.
 
+### Cooldown reduction
+
+You can sacrifice items to waystone to reduce cooldown.
+
+Create file shudnal.Waystones.reduce_cooldowns.json or shudnal.Waystones.reduce_cooldowns.yaml anywhere inside of the Bepinex config folder. 
+
+This file should consist of pairs `itemname: cooldown`. Item name could be set as prefab name (i.e. TrophyNeck) or item name (i.e. $item_trophy_neck)
+
+JSON example:
+```json
+{
+	"TrophyNeck": 10
+}
+```
+
+If you want several items to be sacrificed at once you can do it like this where 50 is amount of coins and 10 is amount of seconds.
+
+JSON
+```json
+{
+"Coins:50": 10
+}
+```
+
+YAML entry can be set like this
+﻿`'Coins:50': 10`
+
 ## Available directions
 
 ### Fixed locations
@@ -65,9 +92,9 @@ Fast travelling to random point will set a shortest cooldown.
 ## Fast travelling
 After choosing a direction and pressing Use hotkey fast travelling will be started. 
 
-The moment you initiate fast travelling nearby monsters will be agitated by the sound and light emitted by you. Any damage taken while channeling will break the effect and set a short cooldown. 
+The moment you initiate fast travelling nearby monsters will be agitated by the sound and light emitted by you. Any damage taken while channeling will add 1 second to teleporting process.
 
-To break channeling manually press Block button.
+To break channeling manually you can press Block button.
 
 ## Restrictions
 There are several restrictions on fast travel and search mode usage.
@@ -98,41 +125,13 @@ Notable configurable values:
 ## Localization
 To add your own localization create a file with the name Waystones.LanguageName.yml or Waystones.LanguageName.json anywhere inside of the Bepinex folder. For example, to add a French translation you could create a Waystones.French.yml file inside of the config folder and add French translations there.
 
-Localization file will be loaded on the next game launch.
+Localization file will be loaded on the next game launch or on the next language change.
 
 You can send me a file with your localization at [GitHub](https://github.com/shudnal/Waystones/issues) or [Nexus](https://www.nexusmods.com/valheim/mods/2832?tab=posts) so I can add it to mod's bundle.
 
 [Language list](https://valheim-modding.github.io/Jotunn/data/localization/language-list.html).
 
-English localization example.
-```json
-{
-    "ws_location_last_tombstone": "Last tombstone",
-    "ws_location_last_ship": "Last ship",
-    "ws_location_last_location": "Last departure point",
-    "ws_location_start_temple": "Sacrificial Stones",
-    "ws_location_spawn_point": "Current spawn point",
-    "ws_location_random_point": "Random location",
-    "ws_tooltip_start_search": "Start searching",
-    "ws_tooltip_moving_to": "Fast travel",
-    "ws_tooltip_cooldown_after": "Cooldown:",
-    "ws_message_travelling_to": "Moving:",
-    "se_waystone_name": "Fast travel",
-    "se_waystone_tooltip": "Safe journey to you.",
-    "ws_piece_waystone_name": "Waystone",
-    "ws_piece_waystone_description": "Helps you find a way to a distant places",
-    "ws_piece_waystone_activation": "You touch the cold stone surface and you think of home",
-    "ws_piece_waystone_activated": "Active waystone",
-    "ws_piece_waystone_activate": "Activate",
-    "ws_piece_waystone_deactivate": "Deactivate",
-    "ws_piece_waystone_sit": "Sit to interact",
-    "ws_tutorial_waystone_label": "Hugin: Waystones",
-    "ws_tutorial_waystone_text": "Waystones allow you to <color=yellow>fast travel</color> to distant locations and other waystones.\n\nSit in front of a waystone and begin your search.\nLocate a distant place with your gaze to fast travel there.\n\n<color=yellow>Activate and mark</color> a waystone to be able to return to it later.",
-    "ws_tutorial_waystone_topic": "You have built a waystone",
-    "ws_piece_waystone_settag": "(Hold to set tag)",
-    "ws_piece_waystone_tag": "Tag"
-}
-```
+English localization example is located in `Waystones.English.json` file next to plugin dll.
 
 ## Installation (manual)
 copy Waystones.dll to your BepInEx\Plugins\ folder.
@@ -148,3 +147,9 @@ Or [Official BepInEx Configuration Manager](https://thunderstore.io/c/valheim/p/
 ## Mirrors
 [Nexus](https://www.nexusmods.com/valheim/mods/2832)
 [Thunderstore](https://valheim.thunderstore.io/package/shudnal/Waystones/)
+
+## Donation
+[Buy Me a Coffee](https://buymeacoffee.com/shudnal)
+
+## Discord
+[Join server](https://discord.gg/e3UtQB8GFK)
