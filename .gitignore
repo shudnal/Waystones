@@ -364,3 +364,7 @@ FodyWeavers.xsd
 /package/thunderstore/Waystones/Waystones.dll
 /package/thunderstore/Waystones.zip
 /package/thunderstore/Waystones/English.json
+/package/nexus/Waystones/Waystones.dll
+/package/nexus/Waystones.zip
+/package/nexus/Waystones
+/Libs/ServerSync.dll
