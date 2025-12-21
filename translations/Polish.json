@@ -19,7 +19,7 @@
     "ws_piece_waystone_deactivate": "Dezaktywuj",
     "ws_piece_waystone_sit": "Usiądź, aby wejść w interakcję",
     "ws_tutorial_waystone_label": "Hugin: Waystones",
-    "ws_tutorial_waystone_text": "Waystones umożliwiają <color=yellow>szybką podróż</color> do odległych miejsc i innych waystones.\n\nUsiądź przed waystonem i rozpocznij poszukiwania.\nZlokalizuj odległe miejsce wzrokiem, aby szybko się tam udać.\n\n<color=yellow>Aktywuj i zaznacz</color> waystone, aby móc do niego później wrócić.",
+    "ws_tutorial_waystone_text": "Waystones umożliwiają <color=yellow>szybką podróż</color> do odległych miejsc i innych waystones.\n\nUsiądź przed waystonem i rozpocznij poszukiwania.\nWskaż wzrokiem odległe miejsce, aby szybko się tam udać.\n\n<color=yellow>Aktywuj i oznacz</color> waystone, aby móc wrócić później.",
     "ws_tutorial_waystone_topic": "Zbudowałeś waystone",
     "ws_piece_waystone_settag": "(Przytrzymaj, aby ustawić tag)",
     "ws_piece_waystone_tag": "Tag",

@@ -19,7 +19,7 @@
     "ws_piece_waystone_deactivate": "停用",
     "ws_piece_waystone_sit": "坐下來互動",
     "ws_tutorial_waystone_label": "胡金：路石",
-    "ws_tutorial_waystone_text": "路石可以让你<color=yellow>快速旅行</color>到遥远的地点和其他路石。\n\n坐在路石前开始搜索。\n用目光定位一个遥远的地方并快速前往。\n\n<color=yellow>启动并标记</color>路石以便稍后返回。",
+    "ws_tutorial_waystone_text": "路石可以讓你<color=yellow>快速旅行</color>到遙遠的地點和其他路石。\n\n坐在路石前開始搜尋。\n用目光定位一個遙遠的地方並快速前往。\n\n<color=yellow>啟動並標記</color>路石以便稍後返回。",
     "ws_tutorial_waystone_topic": "你已經建造了一塊路石",
     "ws_piece_waystone_settag": "(按住設定標籤)",
     "ws_piece_waystone_tag": "標籤",

@@ -19,9 +19,9 @@
     "ws_piece_waystone_deactivate": "비활성화",
     "ws_piece_waystone_sit": "앉아서 상호작용합니다",
     "ws_tutorial_waystone_label": "후긴: 웨이스톤",
-    "ws_tutorial_waystone_text": "웨이스톤을 사용하면 먼 곳과 다른 웨이스톤으로 <color=yellow>빠르게 이동</color>할 수 있습니다.\n\n웨이스톤 앞에 앉아 검색을 시작합니다.\n멀리 떨어진 곳을 찾습니다. 시선으로 그곳으로 빠르게 이동하세요.\n\n<color=yellow>활성화하고 나중에 돌아올 수 있도록 웨이스톤을 표시하세요</color>.",
+    "ws_tutorial_waystone_text": "웨이스톤을 사용하면 먼 곳과 다른 웨이스톤으로 <color=yellow>빠르게 이동</color>할 수 있습니다.\n\n웨이스톤 앞에 앉아 탐색을 시작하세요.\n시선으로 먼 위치를 찾아 빠르게 이동하세요.\n\n<color=yellow>웨이스톤을 활성화하고 표시</color>해 두면 나중에 돌아올 수 있습니다.",
     "ws_tutorial_waystone_topic": "웨이스톤을 건설했습니다",
     "ws_piece_waystone_settag": "(태그를 설정하려면 누르세요)",
     "ws_piece_waystone_tag": "태그",
     "ws_piece_waystone_cooldown_reduced": "쿨다운 감소: $1 초"
-    }
+}

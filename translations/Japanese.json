@@ -19,7 +19,7 @@
     "ws_piece_waystone_deactivate": "非アクティブにする",
     "ws_piece_waystone_sit": "座って対話する",
     "ws_tutorial_waystone_label": "フギン: ウェイストーン",
-    "ws_tutorial_waystone_text": "ウェイストーンを使用すると、遠くの場所や他のウェイストーンに <color=yellow>高速移動</color> できます。\n\nウェイストーンの前に座って検索を開始します。\n視線で遠くの場所を見つけて、そこに高速移動します。\n\nウェイストーンを <color=yellow>アクティブにしてマーク</color> すると、後でそこに戻ることができます。",
+    "ws_tutorial_waystone_text": "ウェイストーンを使うと、遠くの場所や他のウェイストーンへ<color=yellow>高速移動</color>できます。\n\nウェイストーンの前に座り、探索を始めましょう。\n視線で遠くの場所を見つけ、そこへ高速移動します。\n\n<color=yellow>ウェイストーンを起動してマーク</color>すると、後で戻ってくることができます。",
     "ws_tutorial_waystone_topic": "ウェイストーンを構築しました",
     "ws_piece_waystone_settag": "(タグを設定するには長押ししてください)",
     "ws_piece_waystone_tag": "タグ",

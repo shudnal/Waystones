@@ -19,8 +19,8 @@
     "ws_piece_waystone_deactivate": "Desactivar",
     "ws_piece_waystone_sit": "Siéntate para interactuar",
     "ws_tutorial_waystone_label": "Hugin: Piedras de camino",
-    "ws_tutorial_waystone_text": "Las piedras de camino te permiten <color=yellow>viajar rápido</color> a lugares distantes y otras piedras de camino.\n\nSiéntate frente a una piedra de camino y comienza tu búsqueda.\nUbica un lugar distante con tu mirada para viajar rápidamente allí.\n\n<color=yellow>Activa y marca</color> una piedra de camino para poder regresar a ella más tarde.",
-    "ws_tutorial_waystone_topic": "Has construido una piedra de referencia",
+    "ws_tutorial_waystone_text": "Las piedras de camino te permiten <color=yellow>viajar rápido</color> a lugares distantes y a otras piedras de camino.\n\nSiéntate frente a una piedra de camino y comienza tu búsqueda.\nUbica un lugar lejano con tu mirada para viajar rápidamente allí.\n\n<color=yellow>Activa y marca</color> una piedra de camino para poder regresar más tarde.",
+    "ws_tutorial_waystone_topic": "Has construido una piedra de camino",
     "ws_piece_waystone_settag": "(Mantén presionado para establecer la etiqueta)",
     "ws_piece_waystone_tag": "Etiqueta",
     "ws_piece_waystone_cooldown_reduced": "Enfriamiento reducido: $1 segundo"

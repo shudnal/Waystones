@@ -19,7 +19,7 @@
     "ws_piece_waystone_deactivate": "Désactiver",
     "ws_piece_waystone_sit": "Asseyez-vous pour interagir",
     "ws_tutorial_waystone_label": "Hugin : Pierres de chemin",
-    "ws_tutorial_waystone_text": "Les pierres de chemin vous permettent de <color=yellow>voyager rapidement</color> vers des endroits éloignés et d'autres pierres de chemin.\n\nAsseyez-vous devant une pierre de chemin et commencez votre recherche.\nLocalisez un endroit éloigné avec votre regard pour vous y rendre rapidement.\n\n<color=yellow>Activez et marquez</color> une pierre de chemin pour pouvoir y revenir plus tard.",
+    "ws_tutorial_waystone_text": "Les pierres de chemin vous permettent de <color=yellow>voyager rapidement</color> vers des endroits éloignés et d’autres pierres de chemin.\n\nAsseyez-vous devant une pierre de chemin et commencez votre recherche.\nRepérez un lieu éloigné avec votre regard pour vous y rendre rapidement.\n\n<color=yellow>Activez et marquez</color> une pierre de chemin pour pouvoir y revenir plus tard.",
     "ws_tutorial_waystone_topic": "Vous avez construit une pierre de chemin",
     "ws_piece_waystone_settag": "(Maintenez pour définir la balise)",
     "ws_piece_waystone_tag": "Balise",

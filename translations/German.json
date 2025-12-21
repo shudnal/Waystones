@@ -19,7 +19,7 @@
     "ws_piece_waystone_deactivate": "Deaktivieren",
     "ws_piece_waystone_sit": "Setzen Sie sich, um zu interagieren",
     "ws_tutorial_waystone_label": "Hugin: Wegsteine",
-    "ws_tutorial_waystone_text": "Wegsteine ​​ermöglichen Ihnen <color=yellow>schnelles Reisen</color> zu weit entfernten Orten und anderen Wegsteinen.\n\nSetzen Sie sich vor einen Wegstein und beginnen Sie Ihre Suche.\nLokalisieren Sie mit Ihrem Blick einen weit entfernten Ort, um schnell dorthin zu reisen.\n\n<color=yellow>Aktivieren und markieren Sie</color> Sie einen Wegstein, um dorthin zurückkehren zu können später.",
+    "ws_tutorial_waystone_text": "Wegsteine ermöglichen Ihnen <color=yellow>schnelles Reisen</color> zu weit entfernten Orten und anderen Wegsteinen.\n\nSetzen Sie sich vor einen Wegstein und beginnen Sie Ihre Suche.\nFinden Sie mit Ihrem Blick einen entfernten Ort, um schnell dorthin zu reisen.\n\n<color=yellow>Aktivieren und markieren</color> Sie einen Wegstein, um später zurückkehren zu können.",
     "ws_tutorial_waystone_topic": "Du hast einen Wegstein gebaut",
     "ws_piece_waystone_settag": "(Gedrückt halten, um Tag zu setzen)",
     "ws_piece_waystone_tag": "Tag",

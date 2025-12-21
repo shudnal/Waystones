@@ -19,7 +19,7 @@
     "ws_piece_waystone_deactivate": "Desativar",
     "ws_piece_waystone_sit": "Sente-se para interagir",
     "ws_tutorial_waystone_label": "Hugin: Waystones",
-    "ws_tutorial_waystone_text": "Waystones permitem que você faça <color=yellow>viagem rápida</color> para locais distantes e outros waystones.\n\nSente-se em frente a um waystone e comece sua busca.\nLocalize um lugar distante com seu olhar para uma viagem rápida lá.\n\n<color=yellow>Ative e marque</color> uma pedra do caminho para poder retornar a ela mais tarde.",
+    "ws_tutorial_waystone_text": "Waystones permitem que você faça <color=yellow>viagem rápida</color> para locais distantes e outros waystones.\n\nSente-se diante de um waystone e comece sua busca.\nEncontre um local distante com o olhar para viajar rapidamente até lá.\n\n<color=yellow>Ative e marque</color> um waystone para poder retornar depois.",
     "ws_tutorial_waystone_topic": "Você construiu uma pedra do caminho",
     "ws_piece_waystone_settag": "(Segure para definir a etiqueta)",
     "ws_piece_waystone_tag": "Etiqueta",

@@ -19,7 +19,7 @@
     "ws_piece_waystone_deactivate": "Devre dışı bırak",
     "ws_piece_waystone_sit": "Etkileşime geçmek için oturun",
     "ws_tutorial_waystone_label": "Hugin: Yol Taşları",
-    "ws_tutorial_waystone_text": "Yol taşları uzak yerlere ve diğer yol taşlarına <color=yellow>hızlı seyahat</color> etmenizi sağlar.\n\nBir yol taşının önüne oturun ve aramanıza başlayın.\nHızlı seyahat etmek için bakışlarınızla uzak bir yer bulun orada.\n\n<color=yellow>Daha sonra geri dönebilmek için bir yol taşını etkinleştirin ve işaretleyin</color>.",
+    "ws_tutorial_waystone_text": "Yol taşları uzak yerlere ve diğer yol taşlarına <color=yellow>hızlı seyahat</color> etmenizi sağlar.\n\nBir yol taşının önüne oturun ve aramaya başlayın.\nBakışlarınızla uzak bir yer bulun ve oraya hızlıca gidin.\n\n<color=yellow>Bir yol taşını etkinleştirip işaretleyin</color> ki daha sonra geri dönebilesiniz.",
     "ws_tutorial_waystone_topic": "Bir yol taşı inşa ettiniz",
     "ws_piece_waystone_settag": "(Etiket ayarlamak için basılı tutun)",
     "ws_piece_waystone_tag": "Etiket",
