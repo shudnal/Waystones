@@ -23,7 +23,7 @@ namespace Waystones
 
         public static List<DirectionSearch.Direction> GetSavedDirections()
         {
-            List<DirectionSearch.Direction> result = new List<DirectionSearch.Direction>();
+            List<DirectionSearch.Direction> result = new();
 
             WorldData data = GetWorldData(GetState());
             if (data == null)
@@ -187,14 +187,14 @@ namespace Waystones
 
         private static List<WorldData> GetWorldDataList(string value)
         {
-            List<WorldData> data = new List<WorldData>();
+            List<WorldData> data = new();
             SplitToLines(value).Do(line => data.Add(JsonUtility.FromJson<WorldData>(line)));
             return data;
         }
 
         private static string SaveWorldDataList(List<WorldData> list)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             list.Do(data => sb.AppendLine(JsonUtility.ToJson(data)));
             return sb.ToString();
         }
@@ -206,7 +206,7 @@ namespace Waystones
                 yield break;
             }
 
-            using (System.IO.StringReader reader = new System.IO.StringReader(input))
+            using (System.IO.StringReader reader = new(input))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)

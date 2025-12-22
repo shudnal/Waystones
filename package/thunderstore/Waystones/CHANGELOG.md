@@ -1,3 +1,7 @@
+# 1.0.12
+* new config option "Allow all players to use activated waystones" in Rectrictions section
+* more translations
+
 # 1.0.11
 * ServerSync updated
 

@@ -34,7 +34,7 @@ namespace Waystones
                 cooldown = WorldData.GetCooldownTimeToTarget(position);
             }
 
-            public static readonly StringBuilder _sb = new StringBuilder(3);
+            public static readonly StringBuilder _sb = new(3);
 
             public string GetHoverText()
             {
@@ -46,10 +46,10 @@ namespace Waystones
             }
         }
 
-        private static List<Direction> directions = new List<Direction>();
+        private static List<Direction> directions = new();
         private static Direction current;
         private static bool activated;
-        private static readonly Direction placeOfMystery = new Direction("$ws_location_random_point", Vector2.zero);
+        private static readonly Direction placeOfMystery = new("$ws_location_random_point", Vector2.zero);
         private static float currentAngle;
 
         private static float defaultFoV;

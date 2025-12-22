@@ -46,9 +46,21 @@ This file should consist of pairs `itemname: cooldown`. Item name could be set a
 JSON example:
 ```json
 {
-	"TrophyNeck": 10
+  "TrophyNeck": 10
 }
 ```
+
+If you want several items to be sacrificed at once you can do it like this where 50 is amount of coins and 10 is amount of seconds.
+
+JSON
+```json
+{
+  "Coins:50": 10
+}
+```
+
+YAML entry can be set like this
+﻿`'Coins:50': 10`
 
 ## Available directions
 
@@ -100,6 +112,8 @@ Tag character limit is 15 by default. If you plan to use waystones as signs you 
 
 Default waystone recipe is "SurtlingCore:1,GreydwarfEye:5,Stone:5" and is also configurable on the fly using configuration manager.
 
+By default you have to touch and activate a waystone yourself to be able to fast travel to it. There is config "Allow all players to use activated waystones" to disable this behaviour.
+
 ## Visual effects
 
 Almost everything related to direction search mode and particles visual effect of fast travelling are configurable in case you struggle with performance (which should not be a case but whatever).
@@ -137,3 +151,6 @@ Or [Official BepInEx Configuration Manager](https://thunderstore.io/c/valheim/p/
 
 ## Donation
 [Buy Me a Coffee](https://buymeacoffee.com/shudnal)
+
+## Discord
+[Join server](https://discord.gg/e3UtQB8GFK)

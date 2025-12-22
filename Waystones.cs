@@ -19,11 +19,11 @@ namespace Waystones
     {
         public const string pluginID = "shudnal.Waystones";
         public const string pluginName = "Waystones";
-        public const string pluginVersion = "1.0.11";
+        public const string pluginVersion = "1.0.12";
 
-        private readonly Harmony harmony = new Harmony(pluginID);
+        private readonly Harmony harmony = new(pluginID);
 
-        internal static readonly ConfigSync configSync = new ConfigSync(pluginID) { DisplayName = pluginName, CurrentVersion = pluginVersion, MinimumRequiredVersion = pluginVersion };
+        internal static readonly ConfigSync configSync = new(pluginID) { DisplayName = pluginName, CurrentVersion = pluginVersion, MinimumRequiredVersion = pluginVersion };
 
         internal static Waystones instance;
 
@@ -52,6 +52,7 @@ namespace Waystones
         internal static ConfigEntry<bool> allowSensed;
         internal static ConfigEntry<bool> allowNonSitting;
         internal static ConfigEntry<int> tagCharactersLimit;
+        internal static ConfigEntry<bool> allowForEveryone;
 
         internal static ConfigEntry<float> directionSensitivity;
         internal static ConfigEntry<float> directionSensitivityThreshold;
@@ -82,7 +83,7 @@ namespace Waystones
         internal static ConfigEntry<int> particlesMinForceOverTime;
         internal static ConfigEntry<int> particlesMaxForceOverTime;
 
-        public static readonly CustomSyncedValue<Dictionary<string, int>> itemsToReduceCooldown = new CustomSyncedValue<Dictionary<string, int>>(configSync, "Items to reduce cooldowns", new Dictionary<string, int>());
+        public static readonly CustomSyncedValue<Dictionary<string, int>> itemsToReduceCooldown = new(configSync, "Items to reduce cooldowns", new Dictionary<string, int>());
 
         public static string configDirectory;
         internal static FileSystemWatcher configWatcher;
@@ -143,6 +144,7 @@ namespace Waystones
             useShortcutToEnter = config("Restrictions", "Use shortcut to toggle search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut. If not set - you have to sit in front of the waystone to start search mode.");
             shortcut = config("Restrictions", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y), "Enter/Exit direction search mode [Not Synced with Server]", false);
             tagCharactersLimit = config("Restrictions", "Tag characters limit", defaultValue: 15, "Max length of waystone tag. Values less than 10 will be ignored.");
+            allowForEveryone = config("Restrictions", "Allow all players to use activated waystones", defaultValue: false, "If enabled, any player can use a waystone once it has been activated by someone.");
 
             directionSensitivity = config("Search mode", "Target sensitivity threshold", defaultValue: 2f, "Angle between look direction and target direction for location to appear in search mode");
             directionSensitivityThreshold = config("Search mode", "Screen sensitivity threshold", defaultValue: 6f, "Angle between look direction and target direction for location to start appearing in search mode");
@@ -294,7 +296,7 @@ namespace Waystones
 
         internal static void LoadIcon(string filename, ref Sprite icon)
         {
-            Texture2D tex = new Texture2D(2, 2);
+            Texture2D tex = new(2, 2);
             if (LoadTexture(filename, ref tex))
                 icon = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.zero);
         }
@@ -440,7 +442,7 @@ namespace Waystones
 
         private static void ReadConfigFile(string filename, string fullname)
         {
-            Dictionary<string, int> newValue = new Dictionary<string, int>();
+            Dictionary<string, int> newValue = new();
             try
             {
                 string content = File.ReadAllText(fullname);

@@ -8,8 +8,8 @@ namespace Waystones
 {
     internal static class CustomSyncedValuesSynchronizer
     {
-        private static readonly Queue<IEnumerator> coroutines = new Queue<IEnumerator>();
-        private static readonly WaitWhile waitForServerUpdate = new WaitWhile(() => ConfigSync.ProcessingServerUpdate);
+        private static readonly Queue<IEnumerator> coroutines = new();
+        private static readonly WaitWhile waitForServerUpdate = new(() => ConfigSync.ProcessingServerUpdate);
 
         public static void AssignValueSafe<T>(this CustomSyncedValue<T> syncedValue, T value)
         {

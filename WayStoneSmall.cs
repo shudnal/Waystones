@@ -13,11 +13,11 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 {
     public GameObject m_activeObject;
 
-    public EffectList m_activateEffect = new EffectList();
-    public EffectList m_deactivateEffect = new EffectList();
+    public EffectList m_activateEffect = new();
+    public EffectList m_deactivateEffect = new();
 
     public static bool initial = false;
-    public static StringBuilder sb = new StringBuilder();
+    public static StringBuilder sb = new();
 
     public ZNetView m_nview;
 
@@ -57,7 +57,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
     public void RemoveActivated(long playerID)
     {
         List<KeyValuePair<long, string>> permittedPlayers = GetActivatedPlayers();
-        if (permittedPlayers.RemoveAll((KeyValuePair<long, string> x) => x.Key == playerID) > 0)
+        if (permittedPlayers.RemoveAll(x => x.Key == playerID) > 0)
         {
             SetActivatedPlayers(permittedPlayers);
             m_deactivateEffect.Create(base.transform.position, base.transform.rotation);
@@ -271,7 +271,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
     public static List<KeyValuePair<long, string>> GetWaystoneActivatedPlayers(ZDO zdo)
     {
-        List<KeyValuePair<long, string>> list = new List<KeyValuePair<long, string>>();
+        List<KeyValuePair<long, string>> list = new();
         int @int = zdo.GetInt(ZDOVars.s_permitted);
         for (int i = 0; i < @int; i++)
         {
@@ -290,7 +290,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
             return false;
 
         foreach (KeyValuePair<long, string> permittedPlayer in GetWaystoneActivatedPlayers(zdo))
-            if (permittedPlayer.Key == playerID)
+            if (allowForEveryone.Value || permittedPlayer.Key == playerID)
                 return true;
 
         return false;

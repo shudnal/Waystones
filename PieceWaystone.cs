@@ -80,7 +80,7 @@ namespace Waystones
 
                 WearNTear wnt = CustomPrefabs.AddComponent(waystonePrefab, typeof(WearNTear)) as WearNTear;
 
-                GameObject m_new = new GameObject("new");
+                GameObject m_new = new("new");
                 m_new.transform.SetParent(waystonePrefab.transform);
                 m_new.transform.SetSiblingIndex(0);
 
@@ -116,7 +116,7 @@ namespace Waystones
 
                 UnityEngine.Object.Destroy(original);
 
-                GameObject point = new GameObject("GuidePoint");
+                GameObject point = new("GuidePoint");
                 point.transform.SetParent(waystonePrefab.transform);
                 point.transform.localPosition = new Vector3(-0.5f, 8.9f, -1.3f);
 
@@ -180,7 +180,7 @@ namespace Waystones
 
             Piece piece = waystonePrefab.GetComponent<Piece>();
 
-            List<Piece.Requirement> requirements = new List<Piece.Requirement>();
+            List<Piece.Requirement> requirements = new();
             foreach (string requirement in pieceRecipe.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 string[] req = requirement.Split(new[] { ':' }, StringSplitOptions.RemoveEmptyEntries);

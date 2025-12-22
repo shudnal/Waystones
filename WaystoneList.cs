@@ -9,11 +9,11 @@ namespace Waystones
     internal static class WaystoneList
     {
         public static Sprite iconWaystone;
-        public static readonly List<Minimap.PinData> waystonePins = new List<Minimap.PinData>();
-        public static readonly List<Tuple<string, Vector3, Quaternion>> activatedWaystones = new List<Tuple<string, Vector3, Quaternion>>();
+        public static readonly List<Minimap.PinData> waystonePins = new();
+        public static readonly List<Tuple<string, Vector3, Quaternion>> activatedWaystones = new();
 
         // Server
-        public static readonly HashSet<ZDO> waystoneObjects = new HashSet<ZDO>();
+        public static readonly HashSet<ZDO> waystoneObjects = new();
 
         public const string customDataKey = "WaystoneList";
 
@@ -127,7 +127,7 @@ namespace Waystones
             // Server
             GetActivatedWaystones(playerID);
 
-            ZPackage zPackage = new ZPackage();
+            ZPackage zPackage = new();
             zPackage.Write(activatedWaystones.Count);
 
             foreach (Tuple<string, Vector3, Quaternion> waystone in activatedWaystones)
