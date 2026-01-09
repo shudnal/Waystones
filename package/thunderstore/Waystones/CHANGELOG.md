@@ -1,3 +1,6 @@
+# 1.0.13
+* Bog Witch map marker
+
 # 1.0.12
 * new config option "Allow all players to use activated waystones" in Rectrictions section
 * more translations

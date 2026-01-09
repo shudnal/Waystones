@@ -127,8 +127,10 @@ namespace Waystones
                     directions.Add(new Direction("$ws_location_start_temple", loc.Key));
                 else if (loc.Value == "Vendor_BlackForest" && locationShowHaldor.Value)
                     directions.Add(new Direction("$npc_haldor", loc.Key));
-                else if (loc.Value == "Hildir_camp" & locationShowHildir.Value)
+                else if (loc.Value == "Hildir_camp" && locationShowHildir.Value)
                     directions.Add(new Direction("$npc_hildir", loc.Key));
+                else if (loc.Value == "BogWitch_Camp" && locationShowBogWitch.Value)
+                    directions.Add(new Direction("$npc_bogwitch", loc.Key));
             }
 
             PlayerProfile profile = Game.instance.GetPlayerProfile();

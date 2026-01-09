@@ -19,7 +19,7 @@ namespace Waystones
     {
         public const string pluginID = "shudnal.Waystones";
         public const string pluginName = "Waystones";
-        public const string pluginVersion = "1.0.12";
+        public const string pluginVersion = "1.0.13";
 
         private readonly Harmony harmony = new(pluginID);
 
@@ -41,6 +41,7 @@ namespace Waystones
         internal static ConfigEntry<bool> locationShowStartTemple;
         internal static ConfigEntry<bool> locationShowHaldor;
         internal static ConfigEntry<bool> locationShowHildir;
+        internal static ConfigEntry<bool> locationShowBogWitch;
         internal static ConfigEntry<bool> locationShowWaystones;
         internal static ConfigEntry<bool> locationShowRandomPoint;
 
@@ -132,6 +133,7 @@ namespace Waystones
             locationShowStartTemple = config("Locations", "Show sacrificial stones", defaultValue: true, "Show sacrificial stones positioin in search mode");
             locationShowHaldor = config("Locations", "Show Haldor", defaultValue: true, "Show Haldor location in search mode");
             locationShowHildir = config("Locations", "Show Hildir", defaultValue: true, "Show Hildir location in search mode");
+            locationShowBogWitch = config("Locations", "Show Bog Witch", defaultValue: true, "Show Bog Witch location in search mode");
             locationShowWaystones = config("Locations", "Show waystones", defaultValue: true, "Show waystones network in search mode");
             locationShowRandomPoint = config("Locations", "Show random point", defaultValue: true, "Show random point position in search mode");
 
