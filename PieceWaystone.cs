@@ -52,7 +52,15 @@ namespace Waystones
                 EmissionModule emission = particles.GetComponent<ParticleSystem>().emission;
                 emission.rateOverTime = 5f;
 
-                waystonePrefab.transform.Find("WayEffect/Particle System sparcs").localScale *= 0.4f;
+                Transform sparcs = waystonePrefab.transform.Find("WayEffect/Particle System sparcs");
+                sparcs.localScale *= 0.4f;
+                MainModule sparcsMain = sparcs.GetComponent<ParticleSystem>().main;
+                sparcsMain.startSpeed = 1f;
+                sparcsMain.maxParticles = 200;
+                EmissionModule sparcsEmission = sparcs.GetComponent<ParticleSystem>().emission;
+                sparcsEmission.rateOverTime = 20f;
+
+                sparcs.gameObject.SetActive(!disableWaystoneSparcs.Value);
 
                 Light innerLight = waystonePrefab.transform.Find("WayEffect/Point light").GetComponent<Light>();
                 innerLight.intensity = 1.1f;

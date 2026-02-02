@@ -19,7 +19,7 @@ namespace Waystones
     {
         public const string pluginID = "shudnal.Waystones";
         public const string pluginName = "Waystones";
-        public const string pluginVersion = "1.0.13";
+        public const string pluginVersion = "1.0.14";
 
         private readonly Harmony harmony = new(pluginID);
 
@@ -32,6 +32,7 @@ namespace Waystones
         internal static ConfigEntry<KeyboardShortcut> shortcut;
         internal static ConfigEntry<string> pieceRecipe;
         internal static ConfigEntry<bool> itemSacrifitionReduceCooldown;
+        internal static ConfigEntry<bool> disableWaystoneSparcs;
 
         internal static ConfigEntry<bool> locationWaystonesShowOnMap;
         internal static ConfigEntry<bool> locationShowCurrentSpawn;
@@ -111,7 +112,7 @@ namespace Waystones
             
             LoadIcons();
 
-            Localizer.Load();
+            StartCoroutine(Localizer.Load());
         }
 
         public void ConfigInit()
@@ -121,10 +122,12 @@ namespace Waystones
             configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
             loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
             pieceRecipe = config("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
-            itemSacrifitionReduceCooldown = config("Item sacrifition", "Sacrifice item from list to reduce cooldown", defaultValue: true, "Enable sacrifition of item from list to reduce waystone cooldown");
+            disableWaystoneSparcs = config("General", "Disable waystone sparcs", defaultValue: false, "Enable sacrifition of item from list to reduce waystone cooldown. Restart required. [Not Synced with Server]", false);
 
             pieceRecipe.SettingChanged += (sender, args) => PieceWaystone.SetPieceRequirements();
 
+            itemSacrifitionReduceCooldown = config("Item sacrifition", "Sacrifice item from list to reduce cooldown", defaultValue: true, "Enable sacrifition of item from list to reduce waystone cooldown");
+            
             locationWaystonesShowOnMap = config("Locations", "Show waystones on map", defaultValue: true, "Show waystone map pins");
             locationShowCurrentSpawn = config("Locations", "Show current spawn", defaultValue: true, "Show current spawn point in search mode");
             locationShowLastPoint = config("Locations", "Show last location", defaultValue: true, "Show last location from where you used fast travel last time in search mode");

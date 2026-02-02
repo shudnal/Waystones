@@ -1,6 +1,6 @@
 {
   "name": "Waystones",
-  "version_number": "1.0.13",
+  "version_number": "1.0.14",
   "website_url": "https://github.com/shudnal/Waystones",
   "description": "Build a waystone network, sit in front of one, locate with your gaze a distant place or another waystone and fast travel there. Nomap/noportals immersive alternative for regular portals.",
   "dependencies": [

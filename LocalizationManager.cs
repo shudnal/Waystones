@@ -1,21 +1,29 @@
-﻿using System;
+﻿// Based on https://github.com/blaxxun-boop/LocalizationManager
+
+using BepInEx;
+using BepInEx.Configuration;
+using HarmonyLib;
+using JetBrains.Annotations;
+using Splatform;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using BepInEx;
-using BepInEx.Configuration;
-using HarmonyLib;
-using JetBrains.Annotations;
+using UnityEngine;
 using YamlDotNet.Serialization;
 
 namespace LocalizationManager;
+
 #nullable enable
 
 [PublicAPI]
 public class Localizer
 {
+    private const string defaultLanguage = "English";
+
     private static readonly Dictionary<string, Dictionary<string, Func<string>>> PlaceholderProcessors = new();
 
     private static readonly Dictionary<string, Dictionary<string, string>> loadedTexts = new();
@@ -26,7 +34,7 @@ public class Localizer
 
     private static BaseUnityPlugin? _plugin;
 
-    private static BaseUnityPlugin plugin
+    private static BaseUnityPlugin Plugin
     {
         get
         {
@@ -54,9 +62,8 @@ public class Localizer
         localizationLanguage.TryGetValue(localization, out string language);
         string text = loadedTexts[language][key];
         if (PlaceholderProcessors.TryGetValue(key, out Dictionary<string, Func<string>> textProcessors))
-        {
             text = textProcessors.Aggregate(text, (current, kv) => current.Replace("{" + kv.Key + "}", kv.Value()));
-        }
+
         localization.AddWord(key, text);
     }
 
@@ -64,18 +71,16 @@ public class Localizer
     {
         convertConfigValue ??= val => val.ToString();
         if (!PlaceholderProcessors.ContainsKey(key))
-        {
             PlaceholderProcessors[key] = new Dictionary<string, Func<string>>();
-        }
+
+        config.SettingChanged += (_, _) => UpdatePlaceholder();
+        if (loadedTexts.ContainsKey(Localization.instance.GetSelectedLanguage()))
+            UpdatePlaceholder();
+
         void UpdatePlaceholder()
         {
             PlaceholderProcessors[key][placeholder] = () => convertConfigValue(config.Value);
             UpdatePlaceholderText(Localization.instance, key);
-        }
-        config.SettingChanged += (_, _) => UpdatePlaceholder();
-        if (loadedTexts.ContainsKey(Localization.instance.GetSelectedLanguage()))
-        {
-            UpdatePlaceholder();
         }
     }
 
@@ -83,7 +88,6 @@ public class Localizer
     {
         List<WeakReference<Localization>> remove = new();
         foreach (WeakReference<Localization> reference in localizationObjects)
-        {
             if (reference.TryGetTarget(out Localization localization))
             {
                 Dictionary<string, string> texts = loadedTexts[localizationLanguage.GetOrCreateValue(localization)];
@@ -94,82 +98,115 @@ public class Localizer
                 }
             }
             else
-            {
                 remove.Add(reference);
-            }
-        }
+
         foreach (WeakReference<Localization> reference in remove)
-        {
             localizationObjects.Remove(reference);
-        }
     }
 
-    public static void Load() => LoadLocalization(Localization.instance, Localization.instance.GetSelectedLanguage());
+    public static IEnumerator Load()
+    {
+        yield return new WaitUntil(() => PlatformManager.DistributionPlatform != null && PlatformInitializer.PreferencesInitialized);
+
+        // Prevent NRE if language has not been set explicitly yet
+        // It will fall into English anyway
+        if (string.IsNullOrEmpty(PlatformPrefs.GetString("language", "")))
+            PlatformPrefs.SetString("language", defaultLanguage);
+
+        LoadLocalization(Localization.instance, Localization.instance.GetSelectedLanguage());
+    }
 
     private static void LoadLocalization(Localization __instance, string language)
     {
         if (!localizationLanguage.Remove(__instance))
-        {
             localizationObjects.Add(new WeakReference<Localization>(__instance));
-        }
+
         localizationLanguage.Add(__instance, language);
 
-        Dictionary<string, string> localizationFiles = new();
-        foreach (string file in Directory.GetFiles(Path.GetDirectoryName(Paths.PluginPath)!, $"{plugin.Info.Metadata.Name}.*", SearchOption.AllDirectories).Where(f => fileExtensions.IndexOf(Path.GetExtension(f)) >= 0))
+        var localizationFiles = new Dictionary<string, string>();
+
+        string[] prefixes =
         {
-            string key = Path.GetFileNameWithoutExtension(file).Split('.')[1];
-            if (localizationFiles.ContainsKey(key))
+            Plugin.Info.Metadata.Name + ".",
+            Plugin.Info.Metadata.Name.Replace(" ", "") + "."
+        };
+
+        void Scan(string root, bool warn)
+        {
+            foreach (string file in Directory
+                .GetFiles(root, "*.*", SearchOption.AllDirectories)
+                .Where(f => fileExtensions.Contains(Path.GetExtension(f))))
             {
-                // Handle duplicate key
-                UnityEngine.Debug.LogWarning($"Duplicate key {key} found for {plugin.Info.Metadata.Name}. The duplicate file found at {file} will be skipped.");
-            }
-            else
-            {
-                localizationFiles[key] = file;
+                string name = Path.GetFileNameWithoutExtension(file);
+
+                foreach (string prefix in prefixes)
+                {
+                    if (!name.StartsWith(prefix))
+                        continue;
+
+                    string key = name.Substring(prefix.Length);
+                    if (string.IsNullOrWhiteSpace(key))
+                        break;
+
+                    if (localizationFiles.ContainsKey(key))
+                    {
+                        if (warn)
+                            Waystones.Waystones.LogInfo(
+                                $"Duplicate localization '{key}' for {Plugin.Info.Metadata.Name}. Skipping {file}"
+                            );
+                        break;
+                    }
+
+                    localizationFiles[key] = file;
+                    break;
+                }
             }
         }
 
-        if (LoadTranslationFromAssembly("English") is not { } englishAssemblyData)
-        {
-            throw new Exception($"Found no English localizations in mod {plugin.Info.Metadata.Name}. Expected an embedded resource translations/English.json or translations/English.yml.");
-        }
+        Scan(Paths.ConfigPath, true);
+        Scan(Paths.PluginPath, false);
+
+        if (LoadTranslationFromAssembly(defaultLanguage) is not { } englishAssemblyData)
+            throw new Exception($"Found no English localizations in mod {Plugin.Info.Metadata.Name}. Expected an embedded resource Translations/English.json or Translations/English.yml.");
 
         Dictionary<string, string>? localizationTexts = new DeserializerBuilder().IgnoreFields().Build().Deserialize<Dictionary<string, string>?>(System.Text.Encoding.UTF8.GetString(englishAssemblyData));
         if (localizationTexts is null)
-        {
-            throw new Exception($"Localization for mod {plugin.Info.Metadata.Name} failed: Localization file was empty.");
-        }
+            throw new Exception($"Localization for mod {Plugin.Info.Metadata.Name} failed: Localization file was empty.");
 
         string? localizationData = null;
-        if (language != "English")
-        {
+        if (language != defaultLanguage)
             if (localizationFiles.ContainsKey(language))
-            {
                 localizationData = File.ReadAllText(localizationFiles[language]);
-            }
             else if (LoadTranslationFromAssembly(language) is { } languageAssemblyData)
-            {
                 localizationData = System.Text.Encoding.UTF8.GetString(languageAssemblyData);
-            }
-        }
-        if (localizationData is null && localizationFiles.ContainsKey("English"))
-        {
-            localizationData = File.ReadAllText(localizationFiles["English"]);
-        }
+        if (localizationData is null && localizationFiles.ContainsKey(defaultLanguage))
+            localizationData = File.ReadAllText(localizationFiles[defaultLanguage]);
 
         if (localizationData is not null)
         {
-            foreach (KeyValuePair<string, string> kv in new DeserializerBuilder().IgnoreFields().Build().Deserialize<Dictionary<string, string>?>(localizationData) ?? new Dictionary<string, string>())
+            Dictionary<string, string> overrideTexts;
+
+            try
             {
-                localizationTexts[kv.Key] = kv.Value;
+                overrideTexts = new DeserializerBuilder()
+                    .IgnoreFields()
+                    .Build()
+                    .Deserialize<Dictionary<string, string>?>(localizationData)
+                    ?? new Dictionary<string, string>();
             }
+            catch (Exception ex)
+            {
+                Waystones.Waystones.LogInfo($"Failed to deserialize localization for language '{language}'. Using base localization only.\n{ex}");
+                overrideTexts = new Dictionary<string, string>();
+            }
+
+            foreach (KeyValuePair<string, string> kv in overrideTexts)
+                localizationTexts[kv.Key] = kv.Value;
         }
 
         loadedTexts[language] = localizationTexts;
         foreach (KeyValuePair<string, string> s in localizationTexts)
-        {
             UpdatePlaceholderText(__instance, s.Key);
-        }
     }
 
     static Localizer()
@@ -181,12 +218,8 @@ public class Localizer
     private static byte[]? LoadTranslationFromAssembly(string language)
     {
         foreach (string extension in fileExtensions)
-        {
             if (ReadEmbeddedFileBytes("translations." + language + extension) is { } data)
-            {
                 return data;
-            }
-        }
 
         return null;
     }
@@ -196,9 +229,8 @@ public class Localizer
         using MemoryStream stream = new();
         containingAssembly ??= Assembly.GetCallingAssembly();
         if (containingAssembly.GetManifestResourceNames().FirstOrDefault(str => str.EndsWith(resourceFileName, StringComparison.Ordinal)) is { } name)
-        {
             containingAssembly.GetManifestResourceStream(name)?.CopyTo(stream);
-        }
+
         return stream.Length == 0 ? null : stream.ToArray();
     }
 }
