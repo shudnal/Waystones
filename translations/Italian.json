@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Hai costruito una pietra di viaggio",
     "ws_piece_waystone_settag": "(Tieni premuto per impostare l’etichetta)",
     "ws_piece_waystone_tag": "Etichetta",
-    "ws_piece_waystone_cooldown_reduced": "Ricarica ridotta: $1 secondi"
+    "ws_piece_waystone_cooldown_reduced": "Ricarica ridotta: $1 secondi",
+    "ws_tutorial_waystone_text_orientation": "Le pietre di viaggio ti aiutano a <color=yellow>cercare e orientarti</color> con luoghi lontani e pietre di viaggio attive.\n\nSiediti davanti a una pietra di viaggio e inizia la tua ricerca.\nPunta i marcatori per controllare direzione e distanza.\n\n<color=yellow>Attiva e marca</color> una pietra di viaggio per vederla da lontano.",
+    "ws_tooltip_travel_cost": "Costo del viaggio:",
+    "ws_tooltip_arrival_charge": "Carica della pietra di arrivo:",
+    "ws_tooltip_return_check": "Carica sufficiente per il ritorno:",
+    "ws_message_not_enough_charge": "La pietra di viaggio è scarica",
+    "ws_piece_waystone_charge_added": "Pietra di viaggio caricata: +$1",
+    "ws_tooltip_distance": "Distanza:",
+    "ws_tooltip_waystone_charge": "Carica della pietra di viaggio:",
+    "ws_tooltip_player_charge": "Carica del personaggio:",
+    "ws_tooltip_player_charge_after": "Carica del personaggio dopo il viaggio:"
 }

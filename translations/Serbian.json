@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Изградио си путни камен",
     "ws_piece_waystone_settag": "(Drži za postavljanje oznake)",
     "ws_piece_waystone_tag": "Ознака",
-    "ws_piece_waystone_cooldown_reduced": "Време хлађења смањено: $1 секунди"
+    "ws_piece_waystone_cooldown_reduced": "Време хлађења смањено: $1 секунди",
+    "ws_tutorial_waystone_text_orientation": "Путни каменови ти помажу да <color=yellow>тражиш и оријентишеш се</color> према удаљеним местима и активним путним каменовима.\n\nСеди испред путног камена и започни потрагу.\nНишани у ознаке да провериш смер и удаљеност.\n\n<color=yellow>Активирај и означи</color> путни камен да би га видео издалека.",
+    "ws_tooltip_travel_cost": "Цена путовања:",
+    "ws_tooltip_arrival_charge": "Напуњеност одредишног путног камена:",
+    "ws_tooltip_return_check": "Довољно напуњености за повратак:",
+    "ws_message_not_enough_charge": "Путни камен је без напуњености",
+    "ws_piece_waystone_charge_added": "Путни камен напуњен: +$1",
+    "ws_tooltip_distance": "Удаљеност:",
+    "ws_tooltip_waystone_charge": "Напуњеност путног камена:",
+    "ws_tooltip_player_charge": "Напуњеност лика:",
+    "ws_tooltip_player_charge_after": "Напуњеност лика после путовања:"
 }

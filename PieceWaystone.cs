@@ -133,7 +133,7 @@ namespace Waystones
                 guidePoint.m_text.m_key = "ws_waystone";
                 guidePoint.m_text.m_topic = "$ws_tutorial_waystone_topic";
                 guidePoint.m_text.m_label = "$ws_tutorial_waystone_label";
-                guidePoint.m_text.m_text = "$ws_tutorial_waystone_text";
+                guidePoint.m_text.m_text = waystoneMode.Value == WaystoneMode.Orientation ? "$ws_tutorial_waystone_text_orientation" : "$ws_tutorial_waystone_text";
 
                 LogInfo("Waystone prefab added");
             }

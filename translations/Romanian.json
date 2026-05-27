@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Ai construit o piatră de drum",
     "ws_piece_waystone_settag": "(Ține apăsat pentru a seta eticheta)",
     "ws_piece_waystone_tag": "Etichetă",
-    "ws_piece_waystone_cooldown_reduced": "Timp de reîncărcare redus: $1 secunde"
+    "ws_piece_waystone_cooldown_reduced": "Timp de reîncărcare redus: $1 secunde",
+    "ws_tutorial_waystone_text_orientation": "Pietrele de drum te ajută să <color=yellow>cauți și să te orientezi</color> după locuri îndepărtate și pietre active.\n\nAșază-te în fața unei pietre de drum și începe căutarea.\nȚintește marcajele pentru a verifica direcția și distanța.\n\n<color=yellow>Activează și marchează</color> o piatră de drum ca să o vezi de la distanță.",
+    "ws_tooltip_travel_cost": "Costul călătoriei:",
+    "ws_tooltip_arrival_charge": "Încărcarea pietrei de sosire:",
+    "ws_tooltip_return_check": "Încărcare suficientă pentru întoarcere:",
+    "ws_message_not_enough_charge": "Piatra de drum nu mai are încărcare",
+    "ws_piece_waystone_charge_added": "Piatră de drum încărcată: +$1",
+    "ws_tooltip_distance": "Distanță:",
+    "ws_tooltip_waystone_charge": "Încărcarea pietrei de drum:",
+    "ws_tooltip_player_charge": "Încărcarea personajului:",
+    "ws_tooltip_player_charge_after": "Încărcarea personajului după călătorie:"
 }

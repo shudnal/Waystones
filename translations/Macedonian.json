@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Изгради патен камен",
     "ws_piece_waystone_settag": "(Задржи за да поставиш ознака)",
     "ws_piece_waystone_tag": "Ознака",
-    "ws_piece_waystone_cooldown_reduced": "Времето на обновување е намалено: $1 секунди"
+    "ws_piece_waystone_cooldown_reduced": "Времето на обновување е намалено: $1 секунди",
+    "ws_tutorial_waystone_text_orientation": "Патните камења ти помагаат да <color=yellow>пребаруваш и да се ориентираш</color> според далечни места и активни патни камења.\n\nСеди пред патен камен и започни со пребарување.\nНасочи кон ознаките за да ги провериш насоката и растојанието.\n\n<color=yellow>Активирај и означи</color> патен камен за да го гледаш оддалеку.",
+    "ws_tooltip_travel_cost": "Цена на патување:",
+    "ws_tooltip_arrival_charge": "Полнење на каменот за пристигнување:",
+    "ws_tooltip_return_check": "Доволно полнење за враќање:",
+    "ws_message_not_enough_charge": "Патниот камен е без полнење",
+    "ws_piece_waystone_charge_added": "Патниот камен е наполнет: +$1",
+    "ws_tooltip_distance": "Растојание:",
+    "ws_tooltip_waystone_charge": "Полнење на патниот камен:",
+    "ws_tooltip_player_charge": "Полнење на ликот:",
+    "ws_tooltip_player_charge_after": "Полнење на ликот по патување:"
 }

@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Þú hefur byggt vegstein",
     "ws_piece_waystone_settag": "(Haldið inni til að setja merki)",
     "ws_piece_waystone_tag": "Merki",
-    "ws_piece_waystone_cooldown_reduced": "Endurhleðsla stytt: $1 sekúndur"
+    "ws_piece_waystone_cooldown_reduced": "Endurhleðsla stytt: $1 sekúndur",
+    "ws_tutorial_waystone_text_orientation": "Vegsteinar hjálpa þér að <color=yellow>leita og rata</color> eftir fjarlægum stöðum og virkum vegsteinum.\n\nSettu þig niður fyrir framan vegstein og byrjaðu leitina.\nMiðaðu á merki til að athuga stefnu og fjarlægð.\n\n<color=yellow>Virkjaðu og merktu</color> vegstein til að sjá hann úr fjarlægð.",
+    "ws_tooltip_travel_cost": "Ferðakostnaður:",
+    "ws_tooltip_arrival_charge": "Hleðsla á komuvegsteini:",
+    "ws_tooltip_return_check": "Næg hleðsla fyrir heimferð:",
+    "ws_message_not_enough_charge": "Vegsteinninn er hleðslulaus",
+    "ws_piece_waystone_charge_added": "Vegsteinn hlaðinn: +$1",
+    "ws_tooltip_distance": "Fjarlægð:",
+    "ws_tooltip_waystone_charge": "Hleðsla vegsteins:",
+    "ws_tooltip_player_charge": "Hleðsla persónu:",
+    "ws_tooltip_player_charge_after": "Hleðsla persónu eftir ferð:"
 }

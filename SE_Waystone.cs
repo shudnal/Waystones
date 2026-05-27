@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -31,6 +31,10 @@ namespace Waystones
         public Quaternion targetRotation = Quaternion.identity;
         [NonSerialized]
         public double targetCooldown = 0;
+        [NonSerialized]
+        internal WaystoneList.WaystoneData sourceWaystone;
+        [NonSerialized]
+        internal int travelCost;
         [NonSerialized]
         private bool lookDirTriggered;
         [NonSerialized]
@@ -103,7 +107,15 @@ namespace Waystones
                 m_character.m_lookTransitionTime = 0f;
 
                 if (m_character == Player.m_localPlayer)
-                    WorldData.SetCooldown(teleportTriggered ? targetCooldown : Waystones.cooldownShort.Value);
+                {
+                    if (Waystones.waystoneMode.Value == Waystones.WaystoneMode.Cooldown)
+                        WorldData.SetCooldown(teleportTriggered ? targetCooldown : Waystones.cooldownShort.Value);
+                    else if (Waystones.waystoneMode.Value == Waystones.WaystoneMode.Charge && teleportTriggered && travelCost > 0)
+                    {
+                        if (!WaystoneList.TryConsumeTravelCharge(sourceWaystone, Player.m_localPlayer.GetPlayerID(), travelCost, Waystones.allowWaystoneChargeOverdraft.Value))
+                            Waystones.LogInfo($"Failed to consume travel charge after teleport. Cost: {travelCost}, storage: {Waystones.waystoneChargeStorage.Value}, source: {(sourceWaystone == null ? Vector3.zero : sourceWaystone.worldPosition)}");
+                    }
+                }
             }
         }
 

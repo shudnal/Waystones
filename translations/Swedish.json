@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Du har byggt en vägsten",
     "ws_piece_waystone_settag": "(Håll in för att ställa in etikett)",
     "ws_piece_waystone_tag": "Etikett",
-    "ws_piece_waystone_cooldown_reduced": "Nedkylning minskad: $1 sekunder"
+    "ws_piece_waystone_cooldown_reduced": "Nedkylning minskad: $1 sekunder",
+    "ws_tutorial_waystone_text_orientation": "Vägstenar hjälper dig att <color=yellow>söka och orientera dig</color> med avlägsna platser och aktiva vägstenar.\n\nSitt framför en vägsten och börja söka.\nSikta på markörer för att kontrollera riktning och avstånd.\n\n<color=yellow>Aktivera och markera</color> en vägsten för att se den på håll.",
+    "ws_tooltip_travel_cost": "Resekostnad:",
+    "ws_tooltip_arrival_charge": "Laddning i målvägstenen:",
+    "ws_tooltip_return_check": "Tillräcklig laddning för återresa:",
+    "ws_message_not_enough_charge": "Vägstenen är urladdad",
+    "ws_piece_waystone_charge_added": "Vägsten laddad: +$1",
+    "ws_tooltip_distance": "Avstånd:",
+    "ws_tooltip_waystone_charge": "Vägstenens laddning:",
+    "ws_tooltip_player_charge": "Karaktärens laddning:",
+    "ws_tooltip_player_charge_after": "Karaktärens laddning efter resa:"
 }

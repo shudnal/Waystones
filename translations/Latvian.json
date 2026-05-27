@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Tu esi uzbūvējis ceļa akmeni",
     "ws_piece_waystone_settag": "(Turiet nospiestu, lai iestatītu birku)",
     "ws_piece_waystone_tag": "Birka",
-    "ws_piece_waystone_cooldown_reduced": "Atdzišanas laiks samazināts: $1 sekundes"
+    "ws_piece_waystone_cooldown_reduced": "Atdzišanas laiks samazināts: $1 sekundes",
+    "ws_tutorial_waystone_text_orientation": "Ceļa akmeņi palīdz tev <color=yellow>meklēt un orientēties</color> pēc tālām vietām un aktīviem ceļa akmeņiem.\n\nApsēdies ceļa akmens priekšā un sāc meklēt.\nNotēmē uz marķieriem, lai pārbaudītu virzienu un attālumu.\n\n<color=yellow>Aktivē un atzīmē</color> ceļa akmeni, lai redzētu to no tālienes.",
+    "ws_tooltip_travel_cost": "Ceļojuma izmaksas:",
+    "ws_tooltip_arrival_charge": "Ierašanās ceļa akmens lādiņš:",
+    "ws_tooltip_return_check": "Pietiek lādiņa atpakaļceļam:",
+    "ws_message_not_enough_charge": "Ceļa akmens ir bez lādiņa",
+    "ws_piece_waystone_charge_added": "Ceļa akmens uzlādēts: +$1",
+    "ws_tooltip_distance": "Attālums:",
+    "ws_tooltip_waystone_charge": "Ceļa akmens lādiņš:",
+    "ws_tooltip_player_charge": "Tēla lādiņš:",
+    "ws_tooltip_player_charge_after": "Tēla lādiņš pēc ceļojuma:"
 }

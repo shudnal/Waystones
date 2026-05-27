@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Pastatėte kelio akmenį",
     "ws_piece_waystone_settag": "(Laikykite nuspaudę, kad nustatytumėte žymę)",
     "ws_piece_waystone_tag": "Žymė",
-    "ws_piece_waystone_cooldown_reduced": "Atsinaujinimo laikas sumažintas: $1 sekundės"
+    "ws_piece_waystone_cooldown_reduced": "Atsinaujinimo laikas sumažintas: $1 sekundės",
+    "ws_tutorial_waystone_text_orientation": "Kelio akmenys padeda <color=yellow>ieškoti ir orientuotis</color> pagal tolimas vietas bei aktyvius kelio akmenis.\n\nAtsisėsk prieš kelio akmenį ir pradėk paiešką.\nNutaikyk į žymes, kad patikrintum kryptį ir atstumą.\n\n<color=yellow>Aktyvuok ir pažymėk</color> kelio akmenį, kad matytum jį iš toli.",
+    "ws_tooltip_travel_cost": "Kelionės kaina:",
+    "ws_tooltip_arrival_charge": "Atvykimo kelio akmens įkrova:",
+    "ws_tooltip_return_check": "Pakanka įkrovos grįžimui:",
+    "ws_message_not_enough_charge": "Kelio akmeniui baigėsi įkrova",
+    "ws_piece_waystone_charge_added": "Kelio akmuo įkrautas: +$1",
+    "ws_tooltip_distance": "Atstumas:",
+    "ws_tooltip_waystone_charge": "Kelio akmens įkrova:",
+    "ws_tooltip_player_charge": "Veikėjo įkrova:",
+    "ws_tooltip_player_charge_after": "Veikėjo įkrova po kelionės:"
 }

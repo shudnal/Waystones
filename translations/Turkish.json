@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Bir yol taşı inşa ettiniz",
     "ws_piece_waystone_settag": "(Etiket ayarlamak için basılı tutun)",
     "ws_piece_waystone_tag": "Etiket",
-    "ws_piece_waystone_cooldown_reduced": "Soğuma süresi azaltıldı: $1 saniye"
+    "ws_piece_waystone_cooldown_reduced": "Soğuma süresi azaltıldı: $1 saniye",
+    "ws_tutorial_waystone_text_orientation": "Yol taşları uzak yerleri ve aktif yol taşlarını kullanarak <color=yellow>arama yapmanıza ve yön bulmanıza</color> yardımcı olur.\n\nBir yol taşının önüne oturun ve aramaya başlayın.\nYönü ve mesafeyi kontrol etmek için işaretlere nişan alın.\n\nUzaktan görebilmek için bir yol taşını <color=yellow>etkinleştirip işaretleyin</color>.",
+    "ws_tooltip_travel_cost": "Seyahat maliyeti:",
+    "ws_tooltip_arrival_charge": "Varış yol taşının şarjı:",
+    "ws_tooltip_return_check": "Dönüş için yeterli şarj:",
+    "ws_message_not_enough_charge": "Yol taşının şarjı yok",
+    "ws_piece_waystone_charge_added": "Yol taşı şarj edildi: +$1",
+    "ws_tooltip_distance": "Mesafe:",
+    "ws_tooltip_waystone_charge": "Yol taşı şarjı:",
+    "ws_tooltip_player_charge": "Karakter şarjı:",
+    "ws_tooltip_player_charge_after": "Seyahatten sonra karakter şarjı:"
 }

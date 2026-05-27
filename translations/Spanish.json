@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Has construido una piedra de camino",
     "ws_piece_waystone_settag": "(Mantén presionado para establecer la etiqueta)",
     "ws_piece_waystone_tag": "Etiqueta",
-    "ws_piece_waystone_cooldown_reduced": "Enfriamiento reducido: $1 segundo"
+    "ws_piece_waystone_cooldown_reduced": "Enfriamiento reducido: $1 segundo",
+    "ws_tutorial_waystone_text_orientation": "Las piedras de camino te ayudan a <color=yellow>buscar y orientarte</color> usando lugares distantes y piedras activas.\n\nSiéntate frente a una piedra de camino y comienza tu búsqueda.\nApunta a los marcadores para comprobar la dirección y la distancia.\n\n<color=yellow>Activa y marca</color> una piedra de camino para verla desde lejos.",
+    "ws_tooltip_travel_cost": "Coste del viaje:",
+    "ws_tooltip_arrival_charge": "Carga de la piedra de destino:",
+    "ws_tooltip_return_check": "Carga suficiente para volver:",
+    "ws_message_not_enough_charge": "La piedra de camino no tiene carga",
+    "ws_piece_waystone_charge_added": "Piedra de camino cargada: +$1",
+    "ws_tooltip_distance": "Distancia:",
+    "ws_tooltip_waystone_charge": "Carga de la piedra de camino:",
+    "ws_tooltip_player_charge": "Carga del personaje:",
+    "ws_tooltip_player_charge_after": "Carga del personaje tras viajar:"
 }

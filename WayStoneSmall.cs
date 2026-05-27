@@ -1,4 +1,4 @@
-﻿using Waystones;
+using Waystones;
 using System.Text;
 using UnityEngine;
 using static Waystones.Waystones;
@@ -29,7 +29,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (initial)
             return;
 
-        m_activeObject = base.transform.Find("WayEffect").gameObject;
+        m_activeObject = transform.Find("WayEffect").gameObject;
         m_activeObject.SetActive(value: false);
 
         m_nview = GetComponent<ZNetView>();
@@ -38,6 +38,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
             InvokeRepeating("UpdateStatus", 0f, 1f);
             m_nview.Register<string, string>("RPC_SetTag", RPC_SetTag);
             m_nview.Register<long, string>("ToggleActivated", RPC_ToggleActivated);
+            m_nview.Register<int>("RPC_AddCharge", RPC_AddCharge);
         }
     }
 
@@ -60,7 +61,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (permittedPlayers.RemoveAll(x => x.Key == playerID) > 0)
         {
             SetActivatedPlayers(permittedPlayers);
-            m_deactivateEffect.Create(base.transform.position, base.transform.rotation);
+            m_deactivateEffect.Create(transform.position, transform.rotation);
         }
     }
 
@@ -82,7 +83,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
         permittedPlayers.Add(new KeyValuePair<long, string>(playerID, playerName));
         SetActivatedPlayers(permittedPlayers);
-        m_activateEffect.Create(base.transform.position, base.transform.rotation);
+        m_activateEffect.Create(transform.position, transform.rotation);
     }
 
     public void SetActivatedPlayers(List<KeyValuePair<long, string>> users)
@@ -126,7 +127,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (Player.m_localPlayer.InInterior())
             return GetHoverName();
 
-        if (!PrivateArea.CheckAccess(base.transform.position, 0f, flash: false))
+        if (!PrivateArea.CheckAccess(transform.position, 0f, flash: false))
             return Localization.instance.Localize(GetHoverName() + "\n$piece_noaccess");
 
         sb.Clear();
@@ -141,6 +142,14 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
         sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] {(IsActive() ? "$ws_piece_waystone_deactivate" : "$ws_piece_waystone_activate")}");
 
+        if (waystoneMode.Value == WaystoneMode.Charge)
+        {
+            if (WaystoneList.IsPlayerChargeStorage())
+                sb.Append($"\n$ws_tooltip_player_charge <color=#add8e6>{WorldData.GetPlayerCharge()}</color>");
+            else
+                sb.Append($"\n$ws_tooltip_waystone_charge <color=#add8e6>{WaystoneList.GetWaystoneCharge(m_nview.GetZDO())}</color>");
+        }
+
         return Localization.instance.Localize(sb.ToString());
     }
 
@@ -151,7 +160,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
     public bool Interact(Humanoid human, bool hold, bool alt)
     {
-        if (Player.m_localPlayer == null || Player.m_localPlayer.InInterior() || !PrivateArea.CheckAccess(base.transform.position))
+        if (Player.m_localPlayer == null || Player.m_localPlayer.InInterior() || !PrivateArea.CheckAccess(transform.position))
             return true;
 
         if (hold)
@@ -184,7 +193,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (TextInput.IsVisible())
             yield break;
 
-        if (IsSearchAllowed(player) && CanCast())
+        if (IsSearchAllowed(player, validateCharge: false) && CanCast())
         {
             player.Message(MessageHud.MessageType.Center, "$ws_piece_waystone_activation");
             WaystoneList.EnterSearchMode();
@@ -193,14 +202,26 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
     public bool UseItem(Humanoid user, ItemDrop.ItemData item)
     {
-        int cooldown = 0;
-        if (itemSacrifitionReduceCooldown.Value && (TryReduceCooldownOnItemSacrifice(user, item, item.m_dropPrefab?.name, ref cooldown) || TryReduceCooldownOnItemSacrifice(user, item, item.m_shared.m_name, ref cooldown)))
+        if (waystoneMode.Value == WaystoneMode.Cooldown && itemSacrifitionReduceCooldown.Value)
         {
-            user.Message(MessageHud.MessageType.Center, Localization.instance.Localize("$ws_piece_waystone_cooldown_reduced", cooldown.ToString()));
-            if (WorldData.IsOnCooldown())
-                user.Message(MessageHud.MessageType.TopLeft, $"$hud_powernotready: {WorldData.GetCooldownString()}");
+            int cooldown = 0;
+            if (TryReduceCooldownOnItemSacrifice(user, item, item.m_shared.m_name, ref cooldown))
+            {
+                user.Message(MessageHud.MessageType.Center, Localization.instance.Localize("$ws_piece_waystone_cooldown_reduced", cooldown.ToString()));
+                if (WorldData.IsOnCooldown())
+                    user.Message(MessageHud.MessageType.TopLeft, $"$hud_powernotready: {WorldData.GetCooldownString()}");
+                return true;
+            }
+        }
 
-            return true;
+        if (waystoneMode.Value == WaystoneMode.Charge)
+        {
+            int charges = 0;
+            if (TryChargeWaystoneOnItemSacrifice(user, item, item.m_shared.m_name, ref charges))
+            {
+                user.Message(MessageHud.MessageType.Center, Localization.instance.Localize("$ws_piece_waystone_charge_added", charges.ToString()));
+                return true;
+            }
         }
 
         return false;
@@ -211,6 +232,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (itemName == null)
             return false;
 
+        itemName = itemName.GetItemName();
         if (itemsToReduceCooldown.Value.TryGetValue(itemName, out int reduceCooldown) && (cooldown = reduceCooldown) > 0)
             return user.GetInventory().RemoveOneItem(item) && WorldData.TryReduceCooldown(reduceCooldown);
 
@@ -223,9 +245,71 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         return false;
     }
 
+    private bool TryChargeWaystoneOnItemSacrifice(Humanoid user, ItemDrop.ItemData item, string itemName, ref int charge)
+    {
+        if (itemName == null || !m_nview.IsValid())
+            return false;
+
+        itemName = itemName.GetItemName();
+        if (itemsToReduceCooldown.Value.TryGetValue(itemName, out int addCharge) && addCharge > 0)
+            return TryConsumeChargeItem(user, item, itemName, addCharge, 1, ref charge);
+
+        if (itemsToReduceCooldown.Value.Keys.FirstOrDefault(key => key == itemName || key.StartsWith(itemName + ":")) is string itemKey && itemsToReduceCooldown.Value.TryGetValue(itemKey, out int add) && add > 0)
+        {
+            string[] pair = itemKey.Split(':');
+            if (pair.Length > 1 && pair[0] == itemName && int.TryParse(pair[1], out int amount))
+                return TryConsumeChargeItem(user, item, itemName, add, amount, ref charge);
+        }
+
+        return false;
+    }
+
+    private bool TryConsumeChargeItem(Humanoid user, ItemDrop.ItemData item, string itemName, int addCharge, int amount, ref int charge)
+    {
+        if (amount <= 0 || CountItems(user.GetInventory(), itemName) < amount)
+            return false;
+
+        charge = WaystoneList.GetPotentialChargeAdded(m_nview.GetZDO(), addCharge);
+        if (charge <= 0)
+            return false;
+
+        bool removed = amount == 1
+            ? user.GetInventory().RemoveOneItem(item)
+            : user.GetInventory().RemoveItem(item, amount);
+
+        if (!removed)
+            return false;
+
+        AddCharge(addCharge);
+        return true;
+    }
+
+    private void AddCharge(int amount)
+    {
+        if (!m_nview.IsValid() || amount <= 0)
+            return;
+
+        if (WaystoneList.IsPlayerChargeStorage())
+        {
+            WaystoneList.AddCharge(m_nview.GetZDO(), amount);
+            return;
+        }
+
+        if (m_nview.IsOwner())
+            WaystoneList.AddWaystoneCharge(m_nview.GetZDO(), amount);
+        else
+            m_nview.InvokeRPC("RPC_AddCharge", amount);
+    }
+
+    public void RPC_AddCharge(long sender, int amount)
+    {
+        if (m_nview.IsValid() && m_nview.IsOwner())
+            WaystoneList.AddWaystoneCharge(m_nview.GetZDO(), amount);
+    }
+
     private int CountItems(Inventory inventory, string itemName)
     {
-        return inventory.m_inventory.Where(item => item.m_shared.m_name == itemName || item.m_dropPrefab?.name == itemName).Sum(item => item.m_stack);
+        return inventory.m_inventory.Where(item => item.m_shared.m_name.GetItemName() == itemName).Sum(item => item.m_stack);
     }
 
     public bool IsActive()
@@ -296,7 +380,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         return false;
     }
 
-    internal static bool IsSearchAllowed(Player player)
+    internal static bool IsSearchAllowed(Player player, bool validateCharge = true)
     {
         if (player == null)
             return false;
@@ -304,12 +388,22 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (player != Player.m_localPlayer)
             return false;
 
-        if (WorldData.IsOnCooldown())
+        if (waystoneMode.Value == WaystoneMode.Cooldown && WorldData.IsOnCooldown())
         {
             player.Message(MessageHud.MessageType.Center, $"$hud_powernotready: {WorldData.GetCooldownString()}");
             return false;
         }
-        else if (IsNotInPosition(player))
+
+        if (validateCharge && waystoneMode.Value == WaystoneMode.Charge)
+        {
+            if (!WaystoneList.CanStartSearchWithCharge(WaystoneList.GetCurrentTravelCharge(player.GetPlayerID(), player.transform.position)))
+            {
+                player.Message(MessageHud.MessageType.Center, "$ws_message_not_enough_charge");
+                return false;
+            }
+        }
+
+        if (IsNotInPosition(player))
         {
             player.Message(MessageHud.MessageType.Center, "$msg_cart_incorrectposition");
             return false;

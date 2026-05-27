@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Вы построили путевой камень",
     "ws_piece_waystone_settag": "(Удерживать для пометки)",
     "ws_piece_waystone_tag": "Метка",
-    "ws_piece_waystone_cooldown_reduced": "Время восстановления сокращено: $1 секунд"
+    "ws_piece_waystone_cooldown_reduced": "Время восстановления сокращено: $1 секунд",
+    "ws_tutorial_waystone_text_orientation": "Путевые камни помогают <color=yellow>искать ориентиры</color> среди удалённых мест и активных камней.\n\nСядьте перед путевым камнем и начните поиск.\nНаводитесь на метки, чтобы видеть направление и расстояние.\n\n<color=yellow>Активируйте и оставляйте метки</color> на камнях, чтобы видеть их издалека.",
+    "ws_tooltip_travel_cost": "Стоимость перемещения:",
+    "ws_tooltip_arrival_charge": "Заряд камня прилёта:",
+    "ws_tooltip_return_check": "Хватит заряда на обратный путь:",
+    "ws_message_not_enough_charge": "Недостаточно заряда путевого камня",
+    "ws_piece_waystone_charge_added": "Камень заряжен: +$1",
+    "ws_tooltip_distance": "Расстояние:",
+    "ws_tooltip_waystone_charge": "Заряд камня:",
+    "ws_tooltip_player_charge": "Заряд персонажа:",
+    "ws_tooltip_player_charge_after": "Заряд персонажа после перемещения:"
 }

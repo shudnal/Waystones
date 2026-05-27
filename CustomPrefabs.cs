@@ -16,7 +16,7 @@ internal class CustomPrefabs
         if (rootObject == null)
             rootObject = GameObject.Find(c_rootObjectName) ?? new GameObject(c_rootObjectName);
 
-        UnityEngine.Object.DontDestroyOnLoad(rootObject);
+        Object.DontDestroyOnLoad(rootObject);
 
         if (rootPrefabs == null)
         {
@@ -39,7 +39,7 @@ internal class CustomPrefabs
             return rootPrefabs.transform.Find(prefabName).gameObject;
 
         prefabInit = true;
-        GameObject clonedPrefab = UnityEngine.Object.Instantiate(prefabToClone, rootPrefabs.transform, false);
+        GameObject clonedPrefab = Object.Instantiate(prefabToClone, rootPrefabs.transform, false);
         prefabInit = false;
         clonedPrefab.name = prefabName;
 

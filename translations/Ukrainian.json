@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Ви побудували путовий камінь",
     "ws_piece_waystone_settag": "(Утримуйте, щоб встановити мітку)",
     "ws_piece_waystone_tag": "Мітка",
-    "ws_piece_waystone_cooldown_reduced": "Час відновлення скорочено: $1 секунд"
+    "ws_piece_waystone_cooldown_reduced": "Час відновлення скорочено: $1 секунд",
+    "ws_tutorial_waystone_text_orientation": "Путові камені допомагають <color=yellow>шукати орієнтири</color> серед віддалених місць та активних каменів.\n\nСядьте перед путовим каменем і почніть пошук.\nНаводьтеся на мітки, щоб перевірити напрямок і відстань.\n\n<color=yellow>Активуйте й позначайте</color> путовий камінь, щоб бачити його здалеку.",
+    "ws_tooltip_travel_cost": "Вартість переміщення:",
+    "ws_tooltip_arrival_charge": "Заряд каменя прибуття:",
+    "ws_tooltip_return_check": "Достатньо заряду на зворотний шлях:",
+    "ws_message_not_enough_charge": "Путовому каменю бракує заряду",
+    "ws_piece_waystone_charge_added": "Камінь заряджено: +$1",
+    "ws_tooltip_distance": "Відстань:",
+    "ws_tooltip_waystone_charge": "Заряд путового каменя:",
+    "ws_tooltip_player_charge": "Заряд персонажа:",
+    "ws_tooltip_player_charge_after": "Заряд персонажа після переміщення:"
 }

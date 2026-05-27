@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Du har bygget en vejsten",
     "ws_piece_waystone_settag": "(Hold nede for at sætte mærke)",
     "ws_piece_waystone_tag": "Mærke",
-    "ws_piece_waystone_cooldown_reduced": "Nedkøling reduceret: $1 sekunder"
+    "ws_piece_waystone_cooldown_reduced": "Nedkøling reduceret: $1 sekunder",
+    "ws_tutorial_waystone_text_orientation": "Vejsten hjælper dig med at <color=yellow>søge og orientere dig</color> efter fjerne steder og aktive vejsten.\n\nSæt dig foran en vejsten og begynd din søgning.\nSigt på markører for at kontrollere retning og afstand.\n\n<color=yellow>Aktivér og markér</color> en vejsten for at se den på afstand.",
+    "ws_tooltip_travel_cost": "Rejseomkostning:",
+    "ws_tooltip_arrival_charge": "Ladning i ankomstvejstenen:",
+    "ws_tooltip_return_check": "Nok ladning til returrejsen:",
+    "ws_message_not_enough_charge": "Vejstenen er løbet tør for ladning",
+    "ws_piece_waystone_charge_added": "Vejsten opladet: +$1",
+    "ws_tooltip_distance": "Afstand:",
+    "ws_tooltip_waystone_charge": "Vejstenens ladning:",
+    "ws_tooltip_player_charge": "Figurens ladning:",
+    "ws_tooltip_player_charge_after": "Figurens ladning efter rejsen:"
 }

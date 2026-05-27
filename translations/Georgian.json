@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "შენ ააგე გზის ქვა",
     "ws_piece_waystone_settag": "(დააჭირე და გააჩერე ნიშნულის დასაყენებლად)",
     "ws_piece_waystone_tag": "ნიშანი",
-    "ws_piece_waystone_cooldown_reduced": "გაგრილების დრო შემცირდა: $1 წამი"
+    "ws_piece_waystone_cooldown_reduced": "გაგრილების დრო შემცირდა: $1 წამი",
+    "ws_tutorial_waystone_text_orientation": "გზის ქვები გეხმარება შორეული ადგილებისა და აქტიური გზის ქვების მიხედვით <color=yellow>ძიებასა და ორიენტირებაში</color>.\n\nდაჯექი გზის ქვის წინ და დაიწყე ძიება.\nდაუმიზნე ნიშნებს, რომ შეამოწმო მიმართულება და მანძილი.\n\n<color=yellow>გაააქტიურე და მონიშნე</color> გზის ქვა, რომ შორიდან დაინახო.",
+    "ws_tooltip_travel_cost": "მგზავრობის ღირებულება:",
+    "ws_tooltip_arrival_charge": "დანიშნულების გზის ქვის მუხტი:",
+    "ws_tooltip_return_check": "საკმარისი მუხტი დაბრუნებისთვის:",
+    "ws_message_not_enough_charge": "გზის ქვას მუხტი გამოელია",
+    "ws_piece_waystone_charge_added": "გზის ქვა დაიმუხტა: +$1",
+    "ws_tooltip_distance": "მანძილი:",
+    "ws_tooltip_waystone_charge": "გზის ქვის მუხტი:",
+    "ws_tooltip_player_charge": "პერსონაჟის მუხტი:",
+    "ws_tooltip_player_charge_after": "პერსონაჟის მუხტი მგზავრობის შემდეგ:"
 }

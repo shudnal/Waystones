@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Você construiu uma pedra do caminho",
     "ws_piece_waystone_settag": "(Segure para definir a etiqueta)",
     "ws_piece_waystone_tag": "Etiqueta",
-    "ws_piece_waystone_cooldown_reduced": "Tempo de espera reduzido: $1 segundo"
+    "ws_piece_waystone_cooldown_reduced": "Tempo de espera reduzido: $1 segundo",
+    "ws_tutorial_waystone_text_orientation": "Waystones ajudam você a <color=yellow>procurar e se orientar</color> por locais distantes e waystones ativos.\n\nSente-se diante de um waystone e comece sua busca.\nMire nos marcadores para verificar direção e distância.\n\n<color=yellow>Ative e marque</color> um waystone para vê-lo de longe.",
+    "ws_tooltip_travel_cost": "Custo da viagem:",
+    "ws_tooltip_arrival_charge": "Carga do waystone de destino:",
+    "ws_tooltip_return_check": "Carga suficiente para voltar:",
+    "ws_message_not_enough_charge": "Waystone sem carga",
+    "ws_piece_waystone_charge_added": "Waystone carregado: +$1",
+    "ws_tooltip_distance": "Distância:",
+    "ws_tooltip_waystone_charge": "Carga do waystone:",
+    "ws_tooltip_player_charge": "Carga do personagem:",
+    "ws_tooltip_player_charge_after": "Carga do personagem após a viagem:"
 }

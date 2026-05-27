@@ -3,9 +3,9 @@ Build a waystone network, sit in front of one, locate with your gaze a distant p
 
 ![](https://staticdelivery.nexusmods.com/mods/3667/images/headers/2832_1722236465.jpg)
 
-This mod allows you to build a waystone, new piece which you can use to fast travel to some fixed and dynamic locations and also other activate and tagged waystones.
+This mod allows you to build a waystone, new piece which you can use to fast travel to some fixed and dynamic locations and also other activated and tagged waystones. It supports cooldown-based travel, charge-based travel and orientation-only navigation mode.
 
-This mod is meant mainly to use on nomap mode and/or noportals mode. In nomap mode it could be also used for orienting and in noportals mode as somewhat alternative way of fast travel. A waystone could be used as a landmark visible from afar and as an alternative to a signs.
+This mod is meant mainly to use on nomap mode and/or noportals mode. In nomap mode it could be used for orientation and in noportals mode as an alternative way of fast travel. A waystone could be used as a landmark visible from afar and as an alternative to signs.
 
 On your first approach a waystone the Hugin will hint you how to use it. If you disabled raven hints there will be no Hugin for you.
 
@@ -21,13 +21,13 @@ Sound pitch and screen brightness will reflect a distance between current look d
 
 "Touch" the direction with your gaze and you can start fast travelling there.
 
-You can use Zoom buttons (mouse scroll) to change camera FoV and actually zoom in and zoom out the view to increase/decrese look sensitivity.
+You can use Zoom buttons (mouse scroll) to change camera FoV and actually zoom in and zoom out the view to increase/decrease look sensitivity.
 
 ![](https://staticdelivery.nexusmods.com/mods/3667/images/2832/2832-1722237104-706801051.png)
 
 In singleplayer time flow will be slowed as well.
 
-## Cooldown
+## Cooldown mode
 
 Fast travelling ability takes some time to recover. The length of that recovery depends on a travelling distance. Max and min distance and cooldown are configurable. In location hover in search mode you will see what cooldown will be set after fast travelling.
 
@@ -62,12 +62,35 @@ JSON
 YAML entry can be set like this
 ﻿`'Coins:50': 10`
 
+## Charge mode
+
+Charge mode replaces cooldown with stored charge. Search mode requires a charged source and successful fast travelling consumes charge based on distance.
+
+By default, max charge is 100, travel costs 20 charge at short distance up to 500 meters, and scales up to 50 charge at 5000 meters and beyond. All distance and charge cost limits are configurable in the `Travel charge` config section.
+
+The same sacrifice config file used for cooldown reduction is used in Charge mode to add charge instead. Item values become charge values. For example, `TrophyNeck: 10` adds 10 charge instead of reducing cooldown by 10 seconds.
+
+Charge storage is configurable:
+* `Waystone` - items charge the interacted waystone, and travel consumes charge from the source waystone.
+* `Player` - items charge the character in the current world data, and travel consumes character charge.
+
+Waystone hover shows current waystone or character charge depending on storage mode. Search hover shows travel cost and either return charge check for the arrival waystone or character charge after travel.
+
+Additional charge mode options allow empty or full default charge for uninitialized waystones/characters, charge overdraft when the current charge is positive but lower than travel cost, and charging above configured maximum.
+
+## Orientation mode
+
+Orientation mode disables fast travel and turns waystones into navigation landmarks. Search mode only shows direction and distance to available points of interest and waystones.
+
+This mode is useful when you want distant landmarks without teleportation. Maximum waystone visibility distance, distant marker visibility and displayed distance units are configurable.
+
 ## Available directions
 
 ### Fixed locations
 * start temple (Sacrificial stones)
 * Haldor (if discovered)
 * Hildir (if discovered)
+* Bog Witch (if discovered)
 
 ### Dynamic points
 * current spawn point (bed or other spawn point)

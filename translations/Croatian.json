@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Izgradio si putni kamen",
     "ws_piece_waystone_settag": "(Drži za postavljanje oznake)",
     "ws_piece_waystone_tag": "Oznaka",
-    "ws_piece_waystone_cooldown_reduced": "Vrijeme hlađenja smanjeno: $1 sekundi"
+    "ws_piece_waystone_cooldown_reduced": "Vrijeme hlađenja smanjeno: $1 sekundi",
+    "ws_tutorial_waystone_text_orientation": "Putni kamenovi pomažu ti <color=yellow>tražiti i orijentirati se</color> prema udaljenim mjestima i aktivnim putnim kamenovima.\n\nSjedni ispred putnog kamena i započni potragu.\nNaciljaj oznake kako bi provjerio smjer i udaljenost.\n\n<color=yellow>Aktiviraj i označi</color> putni kamen kako bi ga vidio izdaleka.",
+    "ws_tooltip_travel_cost": "Cijena putovanja:",
+    "ws_tooltip_arrival_charge": "Naboj odredišnog putnog kamena:",
+    "ws_tooltip_return_check": "Dovoljno naboja za povratak:",
+    "ws_message_not_enough_charge": "Putni kamen je bez naboja",
+    "ws_piece_waystone_charge_added": "Putni kamen napunjen: +$1",
+    "ws_tooltip_distance": "Udaljenost:",
+    "ws_tooltip_waystone_charge": "Naboj putnog kamena:",
+    "ws_tooltip_player_charge": "Naboj lika:",
+    "ws_tooltip_player_charge_after": "Naboj lika nakon putovanja:"
 }

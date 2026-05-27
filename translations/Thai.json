@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "คุณได้สร้างหินเดินทางแล้ว",
     "ws_piece_waystone_settag": "(กดค้างเพื่อกำหนดป้าย)",
     "ws_piece_waystone_tag": "ป้าย",
-    "ws_piece_waystone_cooldown_reduced": "คูลดาวน์ลดลง: $1 วินาที"
+    "ws_piece_waystone_cooldown_reduced": "คูลดาวน์ลดลง: $1 วินาที",
+    "ws_tutorial_waystone_text_orientation": "หินเดินทางช่วยให้คุณ<color=yellow>ค้นหาและนำทาง</color>จากสถานที่ห่างไกลและหินเดินทางที่เปิดใช้งานอยู่ได้\n\nนั่งหน้าหินเดินทางและเริ่มค้นหา\nเล็งไปที่เครื่องหมายเพื่อตรวจสอบทิศทางและระยะทาง\n\n<color=yellow>เปิดใช้งานและทำเครื่องหมาย</color>หินเดินทางเพื่อให้มองเห็นได้จากระยะไกล",
+    "ws_tooltip_travel_cost": "ค่าเดินทาง:",
+    "ws_tooltip_arrival_charge": "ประจุของหินเดินทางปลายทาง:",
+    "ws_tooltip_return_check": "มีประจุพอสำหรับกลับ:",
+    "ws_message_not_enough_charge": "หินเดินทางไม่มีประจุ",
+    "ws_piece_waystone_charge_added": "ชาร์จหินเดินทางแล้ว: +$1",
+    "ws_tooltip_distance": "ระยะทาง:",
+    "ws_tooltip_waystone_charge": "ประจุของหินเดินทาง:",
+    "ws_tooltip_player_charge": "ประจุของตัวละคร:",
+    "ws_tooltip_player_charge_after": "ประจุของตัวละครหลังเดินทาง:"
 }

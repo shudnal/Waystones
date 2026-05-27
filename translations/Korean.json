@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "웨이스톤을 건설했습니다",
     "ws_piece_waystone_settag": "(태그를 설정하려면 누르세요)",
     "ws_piece_waystone_tag": "태그",
-    "ws_piece_waystone_cooldown_reduced": "쿨다운 감소: $1 초"
+    "ws_piece_waystone_cooldown_reduced": "쿨다운 감소: $1 초",
+    "ws_tutorial_waystone_text_orientation": "웨이스톤은 먼 장소와 활성화된 웨이스톤을 기준으로 <color=yellow>탐색하고 방향을 잡는</color> 데 도움이 됩니다.\n\n웨이스톤 앞에 앉아 탐색을 시작하세요.\n표식에 조준해 방향과 거리를 확인하세요.\n\n웨이스톤을 <color=yellow>활성화하고 표시</color>하면 멀리서도 볼 수 있습니다.",
+    "ws_tooltip_travel_cost": "이동 비용:",
+    "ws_tooltip_arrival_charge": "도착 웨이스톤 충전량:",
+    "ws_tooltip_return_check": "귀환에 충분한 충전량:",
+    "ws_message_not_enough_charge": "웨이스톤의 충전량이 부족합니다",
+    "ws_piece_waystone_charge_added": "웨이스톤 충전됨: +$1",
+    "ws_tooltip_distance": "거리:",
+    "ws_tooltip_waystone_charge": "웨이스톤 충전량:",
+    "ws_tooltip_player_charge": "캐릭터 충전량:",
+    "ws_tooltip_player_charge_after": "이동 후 캐릭터 충전량:"
 }

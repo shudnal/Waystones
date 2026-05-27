@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "你已經建造了一塊路石",
     "ws_piece_waystone_settag": "(按住設定標籤)",
     "ws_piece_waystone_tag": "標籤",
-    "ws_piece_waystone_cooldown_reduced": "冷卻時間減少：$1 秒"
+    "ws_piece_waystone_cooldown_reduced": "冷卻時間減少：$1 秒",
+    "ws_tutorial_waystone_text_orientation": "路石可帮助你根据遥远地点和已激活的路石<color=yellow>搜索并辨认方向</color>。\n\n坐在路石前开始搜索。\n瞄准标记以查看方向和距离。\n\n<color=yellow>启动并标记</color>路石，使其能从远处看到。",
+    "ws_tooltip_travel_cost": "旅行消耗：",
+    "ws_tooltip_arrival_charge": "目的地路石充能：",
+    "ws_tooltip_return_check": "返程充能足够：",
+    "ws_message_not_enough_charge": "路石已无充能",
+    "ws_piece_waystone_charge_added": "路石已充能：+$1",
+    "ws_tooltip_distance": "距离：",
+    "ws_tooltip_waystone_charge": "路石充能：",
+    "ws_tooltip_player_charge": "角色充能：",
+    "ws_tooltip_player_charge_after": "旅行后角色充能："
 }

@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Olet rakentanut tiekiven",
     "ws_piece_waystone_settag": "(Pidä painettuna asettaaksesi tunnisteen)",
     "ws_piece_waystone_tag": "Tunniste",
-    "ws_piece_waystone_cooldown_reduced": "Jäähdytysaika lyhennetty: $1 sekuntia"
+    "ws_piece_waystone_cooldown_reduced": "Jäähdytysaika lyhennetty: $1 sekuntia",
+    "ws_tutorial_waystone_text_orientation": "Tiekivet auttavat sinua <color=yellow>etsimään ja suunnistamaan</color> kaukaisten paikkojen ja aktiivisten tiekivien mukaan.\n\nIstu tiekiven eteen ja aloita etsintäsi.\nTähtää merkkeihin tarkistaaksesi suunnan ja etäisyyden.\n\n<color=yellow>Aktivoi ja merkitse</color> tiekivi, jotta näet sen kaukaa.",
+    "ws_tooltip_travel_cost": "Matkan hinta:",
+    "ws_tooltip_arrival_charge": "Saapumistiekiven lataus:",
+    "ws_tooltip_return_check": "Riittävä lataus paluumatkaan:",
+    "ws_message_not_enough_charge": "Tiekiven lataus on loppu",
+    "ws_piece_waystone_charge_added": "Tiekivi ladattu: +$1",
+    "ws_tooltip_distance": "Etäisyys:",
+    "ws_tooltip_waystone_charge": "Tiekiven lataus:",
+    "ws_tooltip_player_charge": "Hahmon lataus:",
+    "ws_tooltip_player_charge_after": "Hahmon lataus matkan jälkeen:"
 }

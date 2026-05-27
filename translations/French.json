@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Vous avez construit une pierre de chemin",
     "ws_piece_waystone_settag": "(Maintenez pour définir la balise)",
     "ws_piece_waystone_tag": "Balise",
-    "ws_piece_waystone_cooldown_reduced": "Temps de recharge réduit : $1 seconde"
+    "ws_piece_waystone_cooldown_reduced": "Temps de recharge réduit : $1 seconde",
+    "ws_tutorial_waystone_text_orientation": "Les pierres de chemin vous aident à <color=yellow>chercher et vous orienter</color> grâce aux endroits éloignés et aux pierres actives.\n\nAsseyez-vous devant une pierre de chemin et commencez votre recherche.\nVisez les marqueurs pour vérifier la direction et la distance.\n\n<color=yellow>Activez et marquez</color> une pierre de chemin pour la voir de loin.",
+    "ws_tooltip_travel_cost": "Coût du voyage :",
+    "ws_tooltip_arrival_charge": "Charge de la pierre d’arrivée :",
+    "ws_tooltip_return_check": "Charge suffisante pour le retour :",
+    "ws_message_not_enough_charge": "La pierre de chemin est déchargée",
+    "ws_piece_waystone_charge_added": "Pierre de chemin chargée : +$1",
+    "ws_tooltip_distance": "Distance:",
+    "ws_tooltip_waystone_charge": "Charge de la pierre de chemin :",
+    "ws_tooltip_player_charge": "Charge du personnage :",
+    "ws_tooltip_player_charge_after": "Charge du personnage après le voyage :"
 }

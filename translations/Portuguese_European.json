@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Construíste uma pedra de viagem",
     "ws_piece_waystone_settag": "(Manter pressionado para definir etiqueta)",
     "ws_piece_waystone_tag": "Etiqueta",
-    "ws_piece_waystone_cooldown_reduced": "Tempo de recarga reduzido: $1 segundos"
+    "ws_piece_waystone_cooldown_reduced": "Tempo de recarga reduzido: $1 segundos",
+    "ws_tutorial_waystone_text_orientation": "As pedras de viagem ajudam-te a <color=yellow>procurar e orientar-te</color> por locais distantes e pedras de viagem ativas.\n\nSenta-te diante de uma pedra de viagem e começa a tua busca.\nAponta para os marcadores para verificar a direção e a distância.\n\n<color=yellow>Ativa e marca</color> uma pedra de viagem para a veres de longe.",
+    "ws_tooltip_travel_cost": "Custo da viagem:",
+    "ws_tooltip_arrival_charge": "Carga da pedra de viagem de destino:",
+    "ws_tooltip_return_check": "Carga suficiente para voltar:",
+    "ws_message_not_enough_charge": "A pedra de viagem está sem carga",
+    "ws_piece_waystone_charge_added": "Pedra de viagem carregada: +$1",
+    "ws_tooltip_distance": "Distância:",
+    "ws_tooltip_waystone_charge": "Carga da pedra de viagem:",
+    "ws_tooltip_player_charge": "Carga da personagem:",
+    "ws_tooltip_player_charge_after": "Carga da personagem após a viagem:"
 }

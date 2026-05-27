@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
@@ -19,7 +19,7 @@ namespace Waystones
     {
         public const string pluginID = "shudnal.Waystones";
         public const string pluginName = "Waystones";
-        public const string pluginVersion = "1.0.14";
+        public const string pluginVersion = "1.1.0";
 
         private readonly Harmony harmony = new(pluginID);
 
@@ -78,6 +78,30 @@ namespace Waystones
         internal static ConfigEntry<int> cooldownShort;
         internal static ConfigEntry<int> cooldownSearchMode;
 
+        internal static ConfigEntry<WaystoneMode> waystoneMode;
+
+        internal static ConfigEntry<int> maxWaystoneCharge;
+        internal static ConfigEntry<bool> allowWaystoneChargeOverdraft;
+        internal static ConfigEntry<bool> defaultWaystoneChargeFull;
+        internal static ConfigEntry<bool> allowWaystoneChargeOverflow;
+        internal static ConfigEntry<ChargeStorage> waystoneChargeStorage;
+        internal static ConfigEntry<int> chargeCostMaximum;
+        internal static ConfigEntry<int> chargeCostMinimum;
+        internal static ConfigEntry<int> chargeDistanceMaximum;
+        internal static ConfigEntry<int> chargeDistanceMinimum;
+
+        internal static ConfigEntry<int> orientationWaystoneVisibilityDistance;
+        internal static ConfigEntry<DistanceUnit> orientationDistanceUnit;
+        internal static ConfigEntry<bool> orientationShowDistantCurrentSpawn;
+        internal static ConfigEntry<bool> orientationShowDistantLastPoint;
+        internal static ConfigEntry<bool> orientationShowDistantLastShip;
+        internal static ConfigEntry<bool> orientationShowDistantLastTombstone;
+        internal static ConfigEntry<bool> orientationShowDistantStartTemple;
+        internal static ConfigEntry<bool> orientationShowDistantHaldor;
+        internal static ConfigEntry<bool> orientationShowDistantHildir;
+        internal static ConfigEntry<bool> orientationShowDistantBogWitch;
+        internal static ConfigEntry<bool> orientationShowDistantWaystones;
+
         internal static ConfigEntry<bool> particlesCollision;
         internal static ConfigEntry<int> particlesMaxAmount;
         internal static ConfigEntry<int> particlesMinRateOverTime;
@@ -91,11 +115,10 @@ namespace Waystones
         internal static FileSystemWatcher configWatcher;
         private const string itemsToReduceCooldownFilter = $"{pluginID}.reduce_cooldowns.*";
 
-        public enum CooldownTime
-        {
-            WorldTime,
-            GlobalTime
-        }
+        public enum CooldownTime { WorldTime, GlobalTime }
+        public enum WaystoneMode { Cooldown, Charge, Orientation }
+        public enum ChargeStorage { Waystone, Player }
+        public enum DistanceUnit { Meters, Yards }
 
         private void Awake()
         {
@@ -123,11 +146,22 @@ namespace Waystones
             loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
             pieceRecipe = config("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
             disableWaystoneSparcs = config("General", "Disable waystone sparcs", defaultValue: false, "Enable sacrifition of item from list to reduce waystone cooldown. Restart required. [Not Synced with Server]", false);
+            waystoneMode = config("General", "Waystone mode", defaultValue: WaystoneMode.Cooldown, "Cooldown - You will only be able to teleport again after the specified time has passed" +
+                "\nCharge - requires waystone to be charged to start teleportation, charges consumption depends on distance, no cooldown on teleportation" +
+                "\nOrientation - Use waystones only for navigation, not teleportation");
+            maxWaystoneCharge = config("General", "Max waystone charge", defaultValue: 100, new ConfigDescription("Maximum waystone charge for Charge mode.", new AcceptableValueRange<int>(1, 100000)));
+            
+            allowWaystoneChargeOverdraft = config("Charge mode", "Allow charge overdraft", defaultValue: true, "If enabled, teleportation can consume more charge than the source waystone currently has as long as its charge is positive. This may leave negative charge.");
+            defaultWaystoneChargeFull = config("Charge mode", "Default charge is full", defaultValue: false, "If enabled, waystones without stored charge data start with maximum charge. If disabled, they start empty.");
+            allowWaystoneChargeOverflow = config("Charge mode", "Allow charge above maximum", defaultValue: true, "If enabled, item sacrifices can increase stored charge above Max waystone charge.");
+            waystoneChargeStorage = config("Charge mode", "Charge storage", defaultValue: ChargeStorage.Waystone, "Where charge is stored and consumed." +
+                "\nWaystone - item sacrifices charge the interacted waystone, and travel consumes the source waystone charge." +
+                "\nPlayer - item sacrifices charge the player in current world data, and travel consumes player charge.");
 
             pieceRecipe.SettingChanged += (sender, args) => PieceWaystone.SetPieceRequirements();
 
             itemSacrifitionReduceCooldown = config("Item sacrifition", "Sacrifice item from list to reduce cooldown", defaultValue: true, "Enable sacrifition of item from list to reduce waystone cooldown");
-            
+
             locationWaystonesShowOnMap = config("Locations", "Show waystones on map", defaultValue: true, "Show waystone map pins");
             locationShowCurrentSpawn = config("Locations", "Show current spawn", defaultValue: true, "Show current spawn point in search mode");
             locationShowLastPoint = config("Locations", "Show last location", defaultValue: true, "Show last location from where you used fast travel last time in search mode");
@@ -175,6 +209,23 @@ namespace Waystones
             cooldownMinimum = config("Travel cooldown", "Fast travelling cooldown minimum", defaultValue: 600, "Minimal cooldown to be set after successfull fast travelling");
             cooldownShort = config("Travel cooldown", "Fast travelling interrupted cooldown", defaultValue: 60, "Cooldown to be set if fast travelling was interrupted");
             cooldownSearchMode = config("Travel cooldown", "Search mode cooldown", defaultValue: 30, "Cooldown to be set on search mode exit");
+
+            chargeDistanceMaximum = config("Travel charge", "Fast travelling distance maximum", defaultValue: 5000, "If fast travelling distance is larger than that, charge cost will be set to maximum. World radius is 10000.");
+            chargeDistanceMinimum = config("Travel charge", "Fast travelling distance minimum", defaultValue: 500, "If fast travelling distance is smaller than that, charge cost will be set to minimum. World radius is 10000.");
+            chargeCostMaximum = config("Travel charge", "Fast travelling charge maximum", defaultValue: 50, new ConfigDescription("Maximum charge cost after successful fast travelling.", new AcceptableValueRange<int>(1, 100000)));
+            chargeCostMinimum = config("Travel charge", "Fast travelling charge minimum", defaultValue: 20, new ConfigDescription("Minimum charge cost after successful fast travelling.", new AcceptableValueRange<int>(1, 100000)));
+
+            orientationWaystoneVisibilityDistance = config("Orientation mode", "Waystone visibility distance", defaultValue: 1000, "Maximum distance to show other waystones in orientation mode.");
+            orientationDistanceUnit = config("Orientation mode", "Distance unit", defaultValue: DistanceUnit.Meters, "Displayed units for orientation mode distance.");
+            orientationShowDistantCurrentSpawn = config("Orientation mode", "Show distant current spawn", defaultValue: true, "Show current spawn marker even if farther than orientation distance.");
+            orientationShowDistantLastPoint = config("Orientation mode", "Show distant last location", defaultValue: true, "Show last location marker even if farther than orientation distance.");
+            orientationShowDistantLastShip = config("Orientation mode", "Show distant last ship", defaultValue: true, "Show last ship marker even if farther than orientation distance.");
+            orientationShowDistantLastTombstone = config("Orientation mode", "Show distant last tombstone", defaultValue: true, "Show last tombstone marker even if farther than orientation distance.");
+            orientationShowDistantStartTemple = config("Orientation mode", "Show distant sacrificial stones", defaultValue: true, "Show sacrificial stones marker even if farther than orientation distance.");
+            orientationShowDistantHaldor = config("Orientation mode", "Show distant Haldor", defaultValue: true, "Show Haldor marker even if farther than orientation distance.");
+            orientationShowDistantHildir = config("Orientation mode", "Show distant Hildir", defaultValue: true, "Show Hildir marker even if farther than orientation distance.");
+            orientationShowDistantBogWitch = config("Orientation mode", "Show distant Bog Witch", defaultValue: true, "Show Bog Witch marker even if farther than orientation distance.");
+            orientationShowDistantWaystones = config("Orientation mode", "Show distant waystones", defaultValue: false, "Show player-built waystone markers even if farther than orientation distance.");
 
             particlesCollision = config("Travelling effect", "Particles physics collision", defaultValue: false, "Make particles emitted while fast travelling collide with objects. Restart required.");
             particlesMaxAmount = config("Travelling effect", "Particles amount maximum", defaultValue: 8000, "Maximum amount of particles emitted. Restart required.");
@@ -224,6 +275,11 @@ namespace Waystones
 
         public static void TeleportAttempt(Vector3 targetPoint, Quaternion targetRotation, double cooldown, string location)
         {
+            TeleportAttempt(targetPoint, targetRotation, cooldown, location, null, 0);
+        }
+
+        internal static void TeleportAttempt(Vector3 targetPoint, Quaternion targetRotation, double cooldown, string location, WaystoneList.WaystoneData sourceWaystone, int travelCost)
+        {
             if (!CanCast())
                 return;
 
@@ -245,6 +301,8 @@ namespace Waystones
                         se.targetPoint = targetPoint;
                         se.targetCooldown = cooldown;
                         se.targetRotation = targetRotation;
+                        se.sourceWaystone = sourceWaystone;
+                        se.travelCost = travelCost;
 
                         if (emitNoiseOnTeleportation.Value)
                         {
@@ -431,7 +489,7 @@ namespace Waystones
             configWatcher.EnableRaisingEvents = enabled;
         }
 
-        private static void ReadInitialConfigs()
+        internal static void ReadInitialConfigs()
         {
             foreach (FileInfo file in new DirectoryInfo(Paths.ConfigPath).GetFiles(itemsToReduceCooldownFilter, SearchOption.AllDirectories))
                 ReadConfigFile(file.Name, file.FullName);
@@ -454,7 +512,7 @@ namespace Waystones
 #nullable enable
                 if (content is not null)
                     foreach (KeyValuePair<string, int> kv in new DeserializerBuilder().IgnoreFields().Build().Deserialize<Dictionary<string, int>?>(content) ?? new Dictionary<string, int>())
-                        newValue[kv.Key] = kv.Value;
+                        newValue[kv.Key.GetItemName()] = kv.Value;
 #nullable disable
             }
             catch (Exception e)

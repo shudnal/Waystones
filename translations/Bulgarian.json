@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Построи пътен камък",
     "ws_piece_waystone_settag": "(Задръж, за да зададеш отметка)",
     "ws_piece_waystone_tag": "Отметка",
-    "ws_piece_waystone_cooldown_reduced": "Възстановяването е намалено: $1 секунди"
+    "ws_piece_waystone_cooldown_reduced": "Възстановяването е намалено: $1 секунди",
+    "ws_tutorial_waystone_text_orientation": "Пътните камъни ти помагат да <color=yellow>търсиш и да се ориентираш</color> по далечни места и активни пътни камъни.\n\nСедни пред пътен камък и започни търсенето.\nНасочи се към маркерите, за да провериш посоката и разстоянието.\n\n<color=yellow>Активирай и отбележи</color> пътен камък, за да го виждаш отдалеч.",
+    "ws_tooltip_travel_cost": "Цена на пътуването:",
+    "ws_tooltip_arrival_charge": "Заряд на камъка за пристигане:",
+    "ws_tooltip_return_check": "Достатъчно заряд за връщане:",
+    "ws_message_not_enough_charge": "Пътният камък е без заряд",
+    "ws_piece_waystone_charge_added": "Пътен камък зареден: +$1",
+    "ws_tooltip_distance": "Разстояние:",
+    "ws_tooltip_waystone_charge": "Заряд на пътния камък:",
+    "ws_tooltip_player_charge": "Заряд на персонажа:",
+    "ws_tooltip_player_charge_after": "Заряд на персонажа след пътуване:"
 }

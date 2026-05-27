@@ -25,13 +25,13 @@ namespace Waystones
 
         void Start()
         {
-            sfx = base.transform.Find(SE_Waystone.vfx_WaystonesSfx).GetComponent<AudioSource>();
+            sfx = transform.Find(SE_Waystone.vfx_WaystonesSfx).GetComponent<AudioSource>();
             sfx.enabled = true;
             volume = sfx.volume; // Initial value
 
-            main = base.transform.Find(SE_Waystone.vfx_WaystonesParticles).GetComponent<ParticleSystem>().main;
+            main = transform.Find(SE_Waystone.vfx_WaystonesParticles).GetComponent<ParticleSystem>().main;
 
-            light = base.transform.Find(SE_Waystone.vfx_WaystonesLight).GetComponent<Light>();
+            light = transform.Find(SE_Waystone.vfx_WaystonesLight).GetComponent<Light>();
         }
 
         void Update()

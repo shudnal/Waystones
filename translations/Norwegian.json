@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Du har bygget en veistein",
     "ws_piece_waystone_settag": "(Hold inne for å sette merke)",
     "ws_piece_waystone_tag": "Merke",
-    "ws_piece_waystone_cooldown_reduced": "Nedkjøling redusert: $1 sekunder"
+    "ws_piece_waystone_cooldown_reduced": "Nedkjøling redusert: $1 sekunder",
+    "ws_tutorial_waystone_text_orientation": "Veisteiner hjelper deg med å <color=yellow>søke og orientere deg</color> etter fjerne steder og aktive veisteiner.\n\nSett deg foran en veistein og begynn søket.\nSikt på markører for å sjekke retning og avstand.\n\n<color=yellow>Aktiver og marker</color> en veistein for å se den på avstand.",
+    "ws_tooltip_travel_cost": "Reisekostnad:",
+    "ws_tooltip_arrival_charge": "Ladning i ankomstveisteinen:",
+    "ws_tooltip_return_check": "Nok ladning til returen:",
+    "ws_message_not_enough_charge": "Veisteinen er tom for ladning",
+    "ws_piece_waystone_charge_added": "Veistein ladet: +$1",
+    "ws_tooltip_distance": "Avstand:",
+    "ws_tooltip_waystone_charge": "Veisteinens ladning:",
+    "ws_tooltip_player_charge": "Figurens ladning:",
+    "ws_tooltip_player_charge_after": "Figurens ladning etter reisen:"
 }

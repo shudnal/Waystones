@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "You have built a waystone",
     "ws_piece_waystone_settag": "(Hold to set tag)",
     "ws_piece_waystone_tag": "Tag",
-    "ws_piece_waystone_cooldown_reduced": "Cooldown reduced: $1 seconds"
+    "ws_piece_waystone_cooldown_reduced": "Cooldown reduced: $1 seconds",
+    "ws_tutorial_waystone_text_orientation": "Waystones help you <color=yellow>search and orient</color> by distant locations and active waystones.\n\nSit in front of a waystone and begin your search.\nAim at markers to check direction and distance.\n\n<color=yellow>Activate and mark</color> a waystone to see it from distance.",
+    "ws_tooltip_travel_cost": "Travel cost:",
+    "ws_tooltip_arrival_charge": "Arrival waystone charge:",
+    "ws_tooltip_return_check": "Enough charge for return:",
+    "ws_message_not_enough_charge": "Waystone is out of charge",
+    "ws_piece_waystone_charge_added": "Waystone charged: +$1",
+    "ws_tooltip_distance": "Distance:",
+    "ws_tooltip_waystone_charge": "Waystone charge:",
+    "ws_tooltip_player_charge": "Player charge:",
+    "ws_tooltip_player_charge_after": "Player charge after travel:"
 }

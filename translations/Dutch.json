@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Je hebt een waystone gebouwd",
     "ws_piece_waystone_settag": "(Houd ingedrukt om tag in te stellen)",
     "ws_piece_waystone_tag": "Tag",
-    "ws_piece_waystone_cooldown_reduced": "Afkoeltijd verlaagd: $1 seconden"
+    "ws_piece_waystone_cooldown_reduced": "Afkoeltijd verlaagd: $1 seconden",
+    "ws_tutorial_waystone_text_orientation": "Waystones helpen je <color=yellow>zoeken en oriënteren</color> op verre locaties en actieve waystones.\n\nGa voor een waystone zitten en begin je zoektocht.\nRicht op markeringen om richting en afstand te controleren.\n\n<color=yellow>Activeer en markeer</color> een waystone om hem van ver te zien.",
+    "ws_tooltip_travel_cost": "Reiskosten:",
+    "ws_tooltip_arrival_charge": "Lading van doel-waystone:",
+    "ws_tooltip_return_check": "Genoeg lading voor terugkeer:",
+    "ws_message_not_enough_charge": "Waystone is leeg",
+    "ws_piece_waystone_charge_added": "Waystone opgeladen: +$1",
+    "ws_tooltip_distance": "Afstand:",
+    "ws_tooltip_waystone_charge": "Lading van waystone:",
+    "ws_tooltip_player_charge": "Lading van personage:",
+    "ws_tooltip_player_charge_after": "Lading van personage na reis:"
 }

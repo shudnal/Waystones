@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Du hast einen Wegstein gebaut",
     "ws_piece_waystone_settag": "(Gedrückt halten, um Tag zu setzen)",
     "ws_piece_waystone_tag": "Tag",
-    "ws_piece_waystone_cooldown_reduced": "Abklingzeit reduziert: $1 Sekunden"
+    "ws_piece_waystone_cooldown_reduced": "Abklingzeit reduziert: $1 Sekunden",
+    "ws_tutorial_waystone_text_orientation": "Wegsteine helfen Ihnen, sich an entfernten Orten und aktiven Wegsteinen <color=yellow>zu orientieren und sie zu suchen</color>.\n\nSetzen Sie sich vor einen Wegstein und beginnen Sie Ihre Suche.\nZielen Sie auf Markierungen, um Richtung und Entfernung zu prüfen.\n\n<color=yellow>Aktivieren und markieren</color> Sie einen Wegstein, um ihn aus der Ferne zu sehen.",
+    "ws_tooltip_travel_cost": "Reisekosten:",
+    "ws_tooltip_arrival_charge": "Ladung des Ziel-Wegsteins:",
+    "ws_tooltip_return_check": "Genug Ladung für die Rückkehr:",
+    "ws_message_not_enough_charge": "Wegstein ist entladen",
+    "ws_piece_waystone_charge_added": "Wegstein geladen: +$1",
+    "ws_tooltip_distance": "Entfernung:",
+    "ws_tooltip_waystone_charge": "Wegsteinladung:",
+    "ws_tooltip_player_charge": "Charakterladung:",
+    "ws_tooltip_player_charge_after": "Charakterladung nach der Reise:"
 }

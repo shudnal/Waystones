@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "ウェイストーンを構築しました",
     "ws_piece_waystone_settag": "(タグを設定するには長押ししてください)",
     "ws_piece_waystone_tag": "タグ",
-    "ws_piece_waystone_cooldown_reduced": "クールダウンが短縮されました: $1 秒"
+    "ws_piece_waystone_cooldown_reduced": "クールダウンが短縮されました: $1 秒",
+    "ws_tutorial_waystone_text_orientation": "ウェイストーンは、遠くの場所や有効なウェイストーンを手がかりに<color=yellow>探して方角を知る</color>のに役立ちます。\n\nウェイストーンの前に座り、探索を始めましょう。\nマーカーに照準を合わせると、方向と距離を確認できます。\n\nウェイストーンを<color=yellow>起動してマーク</color>すると、遠くから見えるようになります。",
+    "ws_tooltip_travel_cost": "移動コスト:",
+    "ws_tooltip_arrival_charge": "到着先ウェイストーンのチャージ:",
+    "ws_tooltip_return_check": "帰還に十分なチャージ:",
+    "ws_message_not_enough_charge": "ウェイストーンのチャージがありません",
+    "ws_piece_waystone_charge_added": "ウェイストーンをチャージ: +$1",
+    "ws_tooltip_distance": "距離:",
+    "ws_tooltip_waystone_charge": "ウェイストーンのチャージ:",
+    "ws_tooltip_player_charge": "キャラクターのチャージ:",
+    "ws_tooltip_player_charge_after": "移動後のキャラクターのチャージ:"
 }

@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Έχεις χτίσει έναν οδοδείκτη",
     "ws_piece_waystone_settag": "(Κράτησέ το πατημένο για να ορίσεις ετικέτα)",
     "ws_piece_waystone_tag": "Ετικέτα",
-    "ws_piece_waystone_cooldown_reduced": "Χρόνος επαναφόρτισης μειώθηκε: $1 δευτερόλεπτα"
+    "ws_piece_waystone_cooldown_reduced": "Χρόνος επαναφόρτισης μειώθηκε: $1 δευτερόλεπτα",
+    "ws_tutorial_waystone_text_orientation": "Οι οδοδείκτες σε βοηθούν να <color=yellow>αναζητάς και να προσανατολίζεσαι</color> με βάση μακρινά μέρη και ενεργούς οδοδείκτες.\n\nΚάτσε μπροστά σε έναν οδοδείκτη και ξεκίνα την αναζήτηση.\nΣτόχευσε τους δείκτες για να ελέγξεις κατεύθυνση και απόσταση.\n\n<color=yellow>Ενεργοποίησε και σημάδεψε</color> έναν οδοδείκτη για να τον βλέπεις από μακριά.",
+    "ws_tooltip_travel_cost": "Κόστος ταξιδιού:",
+    "ws_tooltip_arrival_charge": "Φόρτιση οδοδείκτη άφιξης:",
+    "ws_tooltip_return_check": "Αρκετή φόρτιση για επιστροφή:",
+    "ws_message_not_enough_charge": "Ο οδοδείκτης δεν έχει φόρτιση",
+    "ws_piece_waystone_charge_added": "Ο οδοδείκτης φορτίστηκε: +$1",
+    "ws_tooltip_distance": "Απόσταση:",
+    "ws_tooltip_waystone_charge": "Φόρτιση οδοδείκτη:",
+    "ws_tooltip_player_charge": "Φόρτιση χαρακτήρα:",
+    "ws_tooltip_player_charge_after": "Φόρτιση χαρακτήρα μετά το ταξίδι:"
 }

@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,40 +17,98 @@ namespace Waystones
             public Vector3 position;
             public Quaternion rotation;
             public double cooldown;
+            public int travelCost;
+            public int arrivalCharge;
+            private const int NoArrivalCharge = int.MinValue;
+            private readonly WaystoneList.WaystoneData waystone;
 
             public Direction(string name, Vector3 position)
+                : this(name, position, Quaternion.identity, null)
             {
-                this.name = name; 
-                this.position = position;
-                rotation = Quaternion.identity;
-                cooldown = WorldData.GetCooldownTimeToTarget(position);
             }
 
             public Direction(string name, Vector3 position, Quaternion rotation)
+                : this(name, position, rotation, null)
+            {
+            }
+
+            internal Direction(string name, WaystoneList.WaystoneData waystone)
+                : this(name, waystone.searchPosition, waystone.searchRotation, waystone)
+            {
+            }
+
+            private Direction(string name, Vector3 position, Quaternion rotation, WaystoneList.WaystoneData waystone)
             {
                 this.name = name;
                 this.position = position;
                 this.rotation = rotation;
+                this.waystone = waystone;
                 cooldown = WorldData.GetCooldownTimeToTarget(position);
+
+                Vector3 from = Player.m_localPlayer ? Player.m_localPlayer.transform.position : Vector3.zero;
+                travelCost = WorldData.GetTravelChargeCost(from, position);
+                arrivalCharge = waystone == null ? NoArrivalCharge : waystone.charge;
             }
 
-            public static readonly StringBuilder _sb = new(3);
+            public static readonly StringBuilder _sb = new(5);
 
             public string GetHoverText()
             {
                 _sb.Clear();
                 _sb.Append(name);
-                _sb.Append($"\n[<color=yellow><b>$KEY_Use</b></color>] $ws_tooltip_moving_to");
-                _sb.Append($"\n\n$ws_tooltip_cooldown_after <color=#add8e6>{WorldData.TimerString(cooldown)}</color>");
+
+                if (waystoneMode.Value == WaystoneMode.Cooldown)
+                {
+                    _sb.Append($"\n[<color=yellow><b>$KEY_Use</b></color>] $ws_tooltip_moving_to");
+                    _sb.Append($"\n\n$ws_tooltip_cooldown_after <color=#add8e6>{WorldData.TimerString(cooldown)}</color>");
+                }
+                else if (waystoneMode.Value == WaystoneMode.Charge)
+                {
+                    _sb.Append($"\n[<color=yellow><b>$KEY_Use</b></color>] $ws_tooltip_moving_to");
+                    _sb.Append($"\n\n$ws_tooltip_travel_cost <color=#add8e6>{travelCost}</color>");
+                    if (WaystoneList.IsPlayerChargeStorage())
+                    {
+                        int currentCharge = WorldData.GetPlayerCharge();
+                        _sb.Append($"\n$ws_tooltip_player_charge <color=#add8e6>{currentCharge}</color>");
+                        _sb.Append($"\n$ws_tooltip_player_charge_after <color=#add8e6>{currentCharge - travelCost}</color>");
+                    }
+                    else if (arrivalCharge != NoArrivalCharge)
+                    {
+                        _sb.Append($"\n$ws_tooltip_arrival_charge <color=#add8e6>{arrivalCharge}</color>");
+                        bool canReturn = WaystoneList.HasEnoughWaystoneCharge(arrivalCharge, travelCost, allowWaystoneChargeOverdraft.Value);
+                        _sb.Append($"\n$ws_tooltip_return_check <color=#add8e6>{(canReturn ? "$menu_yes" : "$menu_no")}</color>");
+                    }
+                }
+                else
+                {
+                    float distance = Utils.DistanceXZ(Player.m_localPlayer.transform.position, position);
+                    string distanceString = orientationDistanceUnit.Value == DistanceUnit.Yards
+                        ? FormatUnits(distance * 1.09361f, " yd")
+                        : FormatUnits(distance, "m");
+                    _sb.Append($"\n$ws_tooltip_distance <color=#add8e6>{distanceString}</color>");
+                }
                 return Localization.instance.Localize(_sb.ToString());
+            }
+
+            private static string FormatUnits(float value, string unit)
+            {
+                if (value < 1000f)
+                    return $"{Mathf.RoundToInt(value)}{unit}";
+
+                float kilo = value / 1000f;
+
+                return kilo >= 10f
+                    ? $"{kilo:0}k{unit}"
+                    : $"{kilo:0.#}k{unit}";
             }
         }
 
         private static List<Direction> directions = new();
         private static Direction current;
         private static bool activated;
-        private static readonly Direction placeOfMystery = new("$ws_location_random_point", Vector2.zero);
+        private static readonly Direction placeOfMystery = new("$ws_location_random_point", Vector3.zero);
         private static float currentAngle;
+        private static WaystoneList.WaystoneData sourceWaystone;
 
         private static float defaultFoV;
         private static float targetFoV;
@@ -64,26 +122,34 @@ namespace Waystones
         {
             if (activated)
                 Exit();
-            else if (useShortcutToEnter.Value && CanCast() && WaystoneSmall.IsSearchAllowed(Player.m_localPlayer))
+            else if (useShortcutToEnter.Value && CanCast() && WaystoneSmall.IsSearchAllowed(Player.m_localPlayer, validateCharge: false))
                 WaystoneList.EnterSearchMode();
         }
 
         internal static void Enter()
         {
-            if (!CanCast())
+            Player player = Player.m_localPlayer;
+            if (!CanCast() || !WaystoneSmall.IsSearchAllowed(player, validateCharge: false))
                 return;
+
+            sourceWaystone = WaystoneList.GetClosestActivatedWaystoneData(player.transform.position);
+            if (waystoneMode.Value == WaystoneMode.Charge && !WaystoneList.HasEnoughTravelCharge(sourceWaystone, WorldData.MinWaystoneChargeCost, allowWaystoneChargeOverdraft.Value))
+            {
+                sourceWaystone = null;
+                player.Message(MessageHud.MessageType.Center, "$ws_message_not_enough_charge");
+                return;
+            }
 
             if (!activated)
             {
                 Game.FadeTimeScale(slowFactorTime.Value, 4f);
                 targetFoV = defaultFoV;
 
-                LogInfo($"Search mode activated at {Player.m_localPlayer.transform.position}");
+                LogInfo($"Search mode activated at {player.transform.position}");
             }
 
             FillDirections();
             activated = true;
-            
             WaystoneList.UpdatePins();
         }
 
@@ -99,7 +165,7 @@ namespace Waystones
                 if (Game.m_timeScale >= slowFactorTime.Value)
                     Game.FadeTimeScale(1f, 1f);
 
-                if (!WorldData.IsOnCooldown())
+                if (waystoneMode.Value == WaystoneMode.Cooldown && !WorldData.IsOnCooldown())
                     WorldData.SetCooldown(cooldownSearchMode.Value);
                
                 LogInfo($"Search mode ended");
@@ -108,6 +174,7 @@ namespace Waystones
             activated = false;
             current = null;
             currentAngle = 0f;
+            sourceWaystone = null;
 
             WaystoneList.UpdatePins();
         }
@@ -142,6 +209,30 @@ namespace Waystones
             directions.Do(d => LogInfo($"{Localization.instance.Localize(d.name)} {d.position} {WorldData.TimerString(d.cooldown)} {(Utils.DistanceXZ(Player.m_localPlayer.transform.position, d.position) < 10f ? "(filtered, too close)" : "")}"));
 
             directions.RemoveAll(d => Utils.DistanceXZ(Player.m_localPlayer.transform.position, d.position) < 10f);
+
+            if (waystoneMode.Value == WaystoneMode.Orientation)
+            {
+                float maxDistance = orientationWaystoneVisibilityDistance.Value;
+                directions.RemoveAll(d =>
+                {
+                    float distance = Utils.DistanceXZ(Player.m_localPlayer.transform.position, d.position);
+                    if (distance <= maxDistance)
+                        return false;
+
+                    return d.name switch
+                    {
+                        "$ws_location_spawn_point" => !orientationShowDistantCurrentSpawn.Value,
+                        "$ws_location_last_tombstone" => !orientationShowDistantLastTombstone.Value,
+                        "$ws_location_last_ship" => !orientationShowDistantLastShip.Value,
+                        "$ws_location_last_location" => !orientationShowDistantLastPoint.Value,
+                        "$ws_location_start_temple" => !orientationShowDistantStartTemple.Value,
+                        "$npc_haldor" => !orientationShowDistantHaldor.Value,
+                        "$npc_hildir" => !orientationShowDistantHildir.Value,
+                        "$npc_bogwitch" => !orientationShowDistantBogWitch.Value,
+                        _ => d.name.Contains("$ws_piece_waystone_name") && !orientationShowDistantWaystones.Value
+                    };
+                });
+            }
         }
 
         internal static Vector3 GetSpawnPoint()
@@ -168,10 +259,26 @@ namespace Waystones
 
             if (current != null && (ZInput.GetButton("Use") || ZInput.GetButton("JoyUse")) && CanCast())
             {
-                if (current == placeOfMystery)
-                    current.position = GetRandomPoint();
+                Direction selected = current == placeOfMystery
+                    ? new Direction("$ws_location_random_point", GetRandomPoint())
+                    : current;
 
-                TeleportAttempt(current.position, current.rotation, current.cooldown, current.name);
+                if (waystoneMode.Value == WaystoneMode.Orientation)
+                {
+                    Exit();
+                    return;
+                }
+
+                if (waystoneMode.Value == WaystoneMode.Charge)
+                {
+                    if (!WaystoneList.HasEnoughTravelCharge(sourceWaystone, selected.travelCost, allowWaystoneChargeOverdraft.Value))
+                    {
+                        MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, "$ws_message_not_enough_charge");
+                        return;
+                    }
+                }
+
+                TeleportAttempt(selected.position, selected.rotation, selected.cooldown, selected.name, sourceWaystone, selected.travelCost);
                 Exit();
             }
 

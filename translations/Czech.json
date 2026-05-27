@@ -23,5 +23,15 @@
     "ws_tutorial_waystone_topic": "Postavil jsi cestovní kámen",
     "ws_piece_waystone_settag": "(Podrž pro nastavení značky)",
     "ws_piece_waystone_tag": "Značka",
-    "ws_piece_waystone_cooldown_reduced": "Obnovení zkráceno: $1 sekund"
+    "ws_piece_waystone_cooldown_reduced": "Obnovení zkráceno: $1 sekund",
+    "ws_tutorial_waystone_text_orientation": "Cestovní kameny ti pomáhají <color=yellow>hledat a orientovat se</color> podle vzdálených míst a aktivních cestovních kamenů.\n\nSedni si před cestovní kámen a začni hledat.\nZamiř na značky a zkontroluj směr a vzdálenost.\n\n<color=yellow>Aktivuj a označ</color> cestovní kámen, abys ho viděl z dálky.",
+    "ws_tooltip_travel_cost": "Cena cesty:",
+    "ws_tooltip_arrival_charge": "Nabití cílového cestovního kamene:",
+    "ws_tooltip_return_check": "Dostatek nabití pro návrat:",
+    "ws_message_not_enough_charge": "Cestovní kámen je vybitý",
+    "ws_piece_waystone_charge_added": "Cestovní kámen nabit: +$1",
+    "ws_tooltip_distance": "Vzdálenost:",
+    "ws_tooltip_waystone_charge": "Nabití cestovního kamene:",
+    "ws_tooltip_player_charge": "Nabití postavy:",
+    "ws_tooltip_player_charge_after": "Nabití postavy po cestě:"
 }
