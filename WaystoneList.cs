@@ -20,6 +20,7 @@ namespace Waystones
         public static Sprite iconWaystone;
         public static readonly List<Minimap.PinData> waystonePins = new();
         public static readonly List<WaystoneData> activatedWaystones = new();
+        private static WaystoneData searchSourceWaystone;
 
         public static readonly HashSet<ZDO> waystoneObjects = new();
 
@@ -79,6 +80,7 @@ namespace Waystones
             {
                 waystoneObjects.Clear();
                 activatedWaystones.Clear();
+                searchSourceWaystone = null;
             }
         }
 
@@ -86,7 +88,7 @@ namespace Waystones
         {
             if (ZNet.instance.IsServer())
             {
-                ZRoutedRpc.instance.Register<long>(markedLocationRequestRpc, RPC_MarkedLocationRequest);
+                ZRoutedRpc.instance.Register<ZPackage>(markedLocationRequestRpc, RPC_MarkedLocationRequest);
                 ZRoutedRpc.instance.Register<ZPackage>(consumeWaystoneChargeRequestRpc, RPC_ConsumeWaystoneChargeRequest);
             }
             else
@@ -95,28 +97,41 @@ namespace Waystones
             }
         }
 
-        public static void EnterSearchMode()
+        public static void EnterSearchMode(ZDO sourceZdo = null)
         {
-            if (!Player.m_localPlayer || ZNet.instance == null)
+            Player player = Player.m_localPlayer;
+            if (!player || ZNet.instance == null)
                 return;
 
             if (!ZNet.instance.IsServer())
             {
-                MarkedLocationRequest();
+                MarkedLocationRequest(sourceZdo);
                 return;
             }
 
-            GetActivatedWaystones(Player.m_localPlayer.GetPlayerID());
+            GetActivatedWaystones(player.GetPlayerID());
+            searchSourceWaystone = CreateSearchSourceWaystone(sourceZdo, player.transform.position);
             DirectionSearch.Enter();
         }
 
-        public static void MarkedLocationRequest()
+        public static void MarkedLocationRequest(ZDO sourceZdo = null)
         {
-            if (!Player.m_localPlayer)
+            Player player = Player.m_localPlayer;
+            if (!player)
                 return;
 
             LogInfo("Marked location request");
-            ZRoutedRpc.instance.InvokeRoutedRPC(markedLocationRequestRpc, Player.m_localPlayer.GetPlayerID());
+
+            ZPackage pkg = new();
+            pkg.Write(player.GetPlayerID());
+            pkg.Write(player.transform.position);
+
+            bool hasSource = sourceZdo != null;
+            pkg.Write(hasSource ? 1 : 0);
+            if (hasSource)
+                pkg.Write(sourceZdo.GetPosition());
+
+            ZRoutedRpc.instance.InvokeRoutedRPC(markedLocationRequestRpc, pkg);
         }
 
         public static List<WaystoneData> GetActivatedWaystones(long playerID)
@@ -141,6 +156,9 @@ namespace Waystones
 
         private static WaystoneData CreateWaystoneData(ZDO zdo, string tag)
         {
+            if (zdo == null)
+                return null;
+
             Vector3 position = zdo.GetPosition();
             Quaternion rotation = zdo.GetRotation();
             Vector3 forward = rotation * Vector3.forward;
@@ -153,6 +171,17 @@ namespace Waystones
                 searchRotation = rotation * Quaternion.Euler(0, 180f, 0),
                 charge = GetWaystoneCharge(zdo)
             };
+        }
+
+        private static WaystoneData CreateSearchSourceWaystone(ZDO sourceZdo, Vector3 playerPosition)
+        {
+            sourceZdo ??= GetClosestWaystone(playerPosition);
+            return CreateWaystoneData(sourceZdo, sourceZdo == null ? "" : sourceZdo.GetString(ZDOVars.s_tag));
+        }
+
+        public static WaystoneData GetSearchSourceWaystone()
+        {
+            return searchSourceWaystone;
         }
 
         public static WaystoneData GetClosestActivatedWaystoneData(Vector3 point, float maxDistance = defaultWaystoneMatchDistance)
@@ -181,7 +210,7 @@ namespace Waystones
 
             if (ZNet.instance != null && ZNet.instance.IsServer())
             {
-                ZDO zdo = GetClosestActivatedWaystone(playerID, point, maxDistance);
+                ZDO zdo = GetClosestWaystone(point, maxDistance);
                 return zdo == null ? 0 : GetWaystoneCharge(zdo);
             }
 
@@ -227,10 +256,12 @@ namespace Waystones
                 return 0;
 
             int current = GetWaystoneCharge(zdo);
-            if (allowWaystoneChargeOverflow.Value)
-                return amount;
+            int max = WorldData.MaxWaystoneCharge;
 
-            int next = Mathf.Min(current + amount, WorldData.MaxWaystoneCharge);
+            if (allowWaystoneChargeOverflow.Value)
+                return current < max ? amount : 0;
+
+            int next = Mathf.Min(current + amount, max);
             return Mathf.Max(0, next - current);
         }
 
@@ -272,7 +303,7 @@ namespace Waystones
 
             if (ZNet.instance != null && ZNet.instance.IsServer())
             {
-                ZDO zdo = GetClosestActivatedWaystone(playerID, waystone.worldPosition, 2f);
+                ZDO zdo = GetClosestWaystone(waystone.worldPosition, 2f);
                 if (!TryConsumeWaystoneCharge(zdo, amount, allowOverdraftWhenPositive))
                     return false;
 
@@ -341,6 +372,26 @@ namespace Waystones
             return result;
         }
 
+        public static ZDO GetClosestWaystone(Vector3 point, float maxDistance = defaultWaystoneMatchDistance)
+        {
+            ZDO result = null;
+            float closest = maxDistance;
+
+            waystoneObjects.RemoveWhere(zdo => zdo == null);
+
+            foreach (ZDO zdo in waystoneObjects)
+            {
+                float distance = Utils.DistanceXZ(point, zdo.GetPosition());
+                if (distance <= closest)
+                {
+                    closest = distance;
+                    result = zdo;
+                }
+            }
+
+            return result;
+        }
+
         private static void ConsumeWaystoneChargeRequest(long playerID, Vector3 worldPosition, int amount, bool allowOverdraftWhenPositive)
         {
             ZPackage pkg = new();
@@ -360,22 +411,35 @@ namespace Waystones
             pkg.ReadInt();
             bool allowOverdraftWhenPositive = allowWaystoneChargeOverdraft.Value;
 
-            ZDO zdo = GetClosestActivatedWaystone(playerID, worldPosition, 2f);
+            ZDO zdo = GetClosestWaystone(worldPosition, 2f);
             if (!TryConsumeWaystoneCharge(zdo, amount, allowOverdraftWhenPositive))
                 LogInfo($"Rejected waystone charge consume request from {sender}. Player: {playerID}, amount: {amount}, position: {worldPosition}");
         }
 
-        public static void RPC_MarkedLocationRequest(long sender, long playerID)
+        public static void RPC_MarkedLocationRequest(long sender, ZPackage request)
         {
-            GetActivatedWaystones(playerID);
+            long playerID = request.ReadLong();
+            Vector3 playerPosition = request.ReadVector3();
 
-            ZPackage pkg = new();
-            pkg.Write(activatedWaystones.Count);
+            ZDO sourceZdo = null;
+            bool hasSource = request.ReadInt() != 0;
+            if (hasSource)
+                sourceZdo = GetClosestWaystone(request.ReadVector3(), 2f);
+
+            GetActivatedWaystones(playerID);
+            WaystoneData source = CreateSearchSourceWaystone(sourceZdo, playerPosition);
+
+            ZPackage response = new();
+            response.Write(activatedWaystones.Count);
 
             foreach (WaystoneData waystone in activatedWaystones)
-                WriteWaystoneData(pkg, waystone);
+                WriteWaystoneData(response, waystone);
 
-            ZRoutedRpc.instance.InvokeRoutedRPC(sender, markedLocationResponseRpc, pkg);
+            response.Write(source != null ? 1 : 0);
+            if (source != null)
+                WriteWaystoneData(response, source);
+
+            ZRoutedRpc.instance.InvokeRoutedRPC(sender, markedLocationResponseRpc, response);
         }
 
         public static void RPC_MarkedLocationResponse(long sender, ZPackage pkg)
@@ -386,6 +450,8 @@ namespace Waystones
             int num = pkg.ReadInt();
             for (int i = 0; i < num; i++)
                 activatedWaystones.Add(ReadWaystoneData(pkg));
+
+            searchSourceWaystone = pkg.ReadInt() != 0 ? ReadWaystoneData(pkg) : null;
 
             DirectionSearch.Enter();
         }

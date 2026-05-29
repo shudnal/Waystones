@@ -196,7 +196,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (IsSearchAllowed(player, validateCharge: false) && CanCast())
         {
             player.Message(MessageHud.MessageType.Center, "$ws_piece_waystone_activation");
-            WaystoneList.EnterSearchMode();
+            WaystoneList.EnterSearchMode(m_nview.GetZDO());
         }
     }
 
@@ -323,7 +323,9 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (zDO == null)
             return "";
 
-        return CensorShittyWords.FilterUGC(zDO.GetString(ZDOVars.s_tag), UGCType.Text, new PlatformUserID(zDO.GetString(ZDOVars.s_tagauthor)), 0L);
+        string text = zDO.GetString(ZDOVars.s_tagauthor);
+        PlatformUserID userId = (string.IsNullOrEmpty(text) ? PlatformUserID.None : new PlatformUserID(text));
+        return CensorShittyWords.FilterUGC(zDO.GetString(ZDOVars.s_tag), UGCType.Text, userId, 0L);
     }
 
     public void GetTagSignature(out string tagRaw, out string authorId)

@@ -153,7 +153,7 @@ namespace Waystones
             
             allowWaystoneChargeOverdraft = config("Charge mode", "Allow charge overdraft", defaultValue: true, "If enabled, teleportation can consume more charge than the source waystone currently has as long as its charge is positive. This may leave negative charge.");
             defaultWaystoneChargeFull = config("Charge mode", "Default charge is full", defaultValue: false, "If enabled, waystones without stored charge data start with maximum charge. If disabled, they start empty.");
-            allowWaystoneChargeOverflow = config("Charge mode", "Allow charge above maximum", defaultValue: true, "If enabled, item sacrifices can increase stored charge above Max waystone charge.");
+            allowWaystoneChargeOverflow = config("Charge mode", "Allow charge above maximum", defaultValue: true, "If enabled, item sacrifices can increase stored charge above Max waystone charge, but only once.");
             waystoneChargeStorage = config("Charge mode", "Charge storage", defaultValue: ChargeStorage.Waystone, "Where charge is stored and consumed." +
                 "\nWaystone - item sacrifices charge the interacted waystone, and travel consumes the source waystone charge." +
                 "\nPlayer - item sacrifices charge the player in current world data, and travel consumes player charge.");
@@ -293,7 +293,8 @@ namespace Waystones
             }
             else
             {
-                if (WaystoneSmall.IsSearchAllowed(Player.m_localPlayer))
+                bool validateCharge = waystoneMode.Value != WaystoneMode.Charge || travelCost <= 0;
+                if (WaystoneSmall.IsSearchAllowed(Player.m_localPlayer, validateCharge))
                 {
                     SE_Waystone se = Player.m_localPlayer.GetSEMan().AddStatusEffect(SE_Waystone.statusEffectWaystonesHash) as SE_Waystone;
                     if (se != null)

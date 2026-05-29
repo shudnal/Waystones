@@ -82,9 +82,7 @@ namespace Waystones
                 else
                 {
                     float distance = Utils.DistanceXZ(Player.m_localPlayer.transform.position, position);
-                    string distanceString = orientationDistanceUnit.Value == DistanceUnit.Yards
-                        ? FormatUnits(distance * 1.09361f, " yd")
-                        : FormatUnits(distance, "m");
+                    string distanceString = FormatUnits(distance, orientationDistanceUnit.Value == DistanceUnit.Yards ? " yd" : "m");
                     _sb.Append($"\n$ws_tooltip_distance <color=#add8e6>{distanceString}</color>");
                 }
                 return Localization.instance.Localize(_sb.ToString());
@@ -132,7 +130,7 @@ namespace Waystones
             if (!CanCast() || !WaystoneSmall.IsSearchAllowed(player, validateCharge: false))
                 return;
 
-            sourceWaystone = WaystoneList.GetClosestActivatedWaystoneData(player.transform.position);
+            sourceWaystone = WaystoneList.GetSearchSourceWaystone() ?? WaystoneList.GetClosestActivatedWaystoneData(player.transform.position);
             if (waystoneMode.Value == WaystoneMode.Charge && !WaystoneList.HasEnoughTravelCharge(sourceWaystone, WorldData.MinWaystoneChargeCost, allowWaystoneChargeOverdraft.Value))
             {
                 sourceWaystone = null;
