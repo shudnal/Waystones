@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Atstumas:",
     "ws_tooltip_waystone_charge": "Kelio akmens įkrova:",
     "ws_tooltip_player_charge": "Veikėjo įkrova:",
-    "ws_tooltip_player_charge_after": "Veikėjo įkrova po kelionės:"
+    "ws_tooltip_player_charge_after": "Veikėjo įkrova po kelionės:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Paaukok daiktus, kad sutrumpintum kelionės atvėsimą:",
+    "ws_tooltip_sacrifice_add_charge": "Paaukok daiktus, kad pridėtum įkrovos:",
+    "ws_tooltip_seconds": "Sekundės",
+    "ws_tooltip_charges": "Įkrovos",
+    "ws_compendium_sacrifice_items_topic": "Aukos kelio akmeniui"
 }

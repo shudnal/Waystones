@@ -64,25 +64,54 @@ YAML entry can be set like this
 
 ## Charge mode
 
-Charge mode replaces cooldown with stored charge. Search mode requires a charged source and successful fast travelling consumes charge based on distance.
+Charge mode replaces travel cooldown with stored charge. Search mode requires a charged source, and successful fast travelling consumes charge based on travel distance.
 
-By default, max charge is 100, travel costs 20 charge at short distance up to 500 meters, and scales up to 50 charge at 5000 meters and beyond. All distance and charge cost limits are configurable in the `Travel charge` config section.
+By default, maximum charge is 100. Travel costs 20 charge at short distance up to 500 meters, and scales up to 50 charge at 5000 meters and beyond. Distance and charge cost limits are configurable in the `Travel charge` config section.
 
 The same sacrifice config file used for cooldown reduction is used in Charge mode to add charge instead. Item values become charge values. For example, `TrophyNeck: 10` adds 10 charge instead of reducing cooldown by 10 seconds.
 
+If you want several items to be sacrificed at once, use the same stack syntax:
+
+```json
+{
+  "Coins:50": 10
+}
+```
+
 Charge storage is configurable:
+
 * `Waystone` - items charge the interacted waystone, and travel consumes charge from the source waystone.
 * `Player` - items charge the character in the current world data, and travel consumes character charge.
 
-Waystone hover shows current waystone or character charge depending on storage mode. Search hover shows travel cost and either return charge check for the arrival waystone or character charge after travel.
+Waystone hover shows current charge or current cooldown depending on the selected mode. It can also show sacrifice items currently available to the character. If another mod extends accessible items, the hover can show both character inventory count and total available count.
 
-Additional charge mode options allow empty or full default charge for uninitialized waystones/characters, charge overdraft when the current charge is positive but lower than travel cost, and charging above configured maximum.
+Search hover shows travel cost and charge-related travel information:
+
+* in `Waystone` storage mode, it shows arrival waystone charge and whether there is enough charge for return travel;
+* in `Player` storage mode, it shows character charge after travel.
+
+Additional Charge mode options allow:
+
+* empty or full default charge for uninitialized waystones or characters;
+* charge overdraft when current charge is positive but lower than travel cost;
+* one-time overcharge when adding charge to a not-yet-full waystone.
+
+Charge is consumed only after successful teleportation. Interrupted teleportation does not spend charge.
 
 ## Orientation mode
 
-Orientation mode disables fast travel and turns waystones into navigation landmarks. Search mode only shows direction and distance to available points of interest and waystones.
+Orientation mode disables fast travel and turns waystones into navigation landmarks.
 
-This mode is useful when you want distant landmarks without teleportation. Maximum waystone visibility distance, distant marker visibility and displayed distance units are configurable.
+Search mode still works, but it only shows direction and distance to available points of interest and waystones. You can use it to find distant landmarks without teleporting.
+
+This mode is useful for no-map or immersive navigation playthroughs where waystones should guide the player without replacing travel.
+
+Configurable options include:
+
+* maximum waystone visibility distance;
+* distance units shown in hover text;
+* whether distant fixed locations can be shown beyond normal visibility distance;
+* whether distant player-built waystones can be shown beyond normal visibility distance.
 
 ## Available directions
 

@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Distância:",
     "ws_tooltip_waystone_charge": "Carga do waystone:",
     "ws_tooltip_player_charge": "Carga do personagem:",
-    "ws_tooltip_player_charge_after": "Carga do personagem após a viagem:"
+    "ws_tooltip_player_charge_after": "Carga do personagem após a viagem:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Sacrifique itens para reduzir o tempo de recarga da viagem:",
+    "ws_tooltip_sacrifice_add_charge": "Sacrifique itens para adicionar carga:",
+    "ws_tooltip_seconds": "Segundos",
+    "ws_tooltip_charges": "Cargas",
+    "ws_compendium_sacrifice_items_topic": "Oferendas ao waystone"
 }

@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Distanță:",
     "ws_tooltip_waystone_charge": "Încărcarea pietrei de drum:",
     "ws_tooltip_player_charge": "Încărcarea personajului:",
-    "ws_tooltip_player_charge_after": "Încărcarea personajului după călătorie:"
+    "ws_tooltip_player_charge_after": "Încărcarea personajului după călătorie:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Sacrifică obiecte pentru a reduce timpul de reîncărcare al călătoriei:",
+    "ws_tooltip_sacrifice_add_charge": "Sacrifică obiecte pentru a adăuga încărcare:",
+    "ws_tooltip_seconds": "Secunde",
+    "ws_tooltip_charges": "Încărcări",
+    "ws_compendium_sacrifice_items_topic": "Ofrande pentru piatra de drum"
 }

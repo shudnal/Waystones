@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Afstand:",
     "ws_tooltip_waystone_charge": "Lading van waystone:",
     "ws_tooltip_player_charge": "Lading van personage:",
-    "ws_tooltip_player_charge_after": "Lading van personage na reis:"
+    "ws_tooltip_player_charge_after": "Lading van personage na reis:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Offer voorwerpen om de reisafkoeltijd te verkorten:",
+    "ws_tooltip_sacrifice_add_charge": "Offer voorwerpen om lading toe te voegen:",
+    "ws_tooltip_seconds": "Seconden",
+    "ws_tooltip_charges": "Ladingen",
+    "ws_compendium_sacrifice_items_topic": "Offers voor de waystone"
 }

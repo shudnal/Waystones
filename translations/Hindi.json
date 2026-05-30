@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "दूरी:",
     "ws_tooltip_waystone_charge": "मार्ग पत्थर का चार्ज:",
     "ws_tooltip_player_charge": "चरित्र का चार्ज:",
-    "ws_tooltip_player_charge_after": "यात्रा के बाद चरित्र का चार्ज:"
+    "ws_tooltip_player_charge_after": "यात्रा के बाद चरित्र का चार्ज:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "यात्रा कूलडाउन घटाने के लिए वस्तुएँ अर्पित करें:",
+    "ws_tooltip_sacrifice_add_charge": "चार्ज जोड़ने के लिए वस्तुएँ अर्पित करें:",
+    "ws_tooltip_seconds": "सेकंड",
+    "ws_tooltip_charges": "चार्ज",
+    "ws_compendium_sacrifice_items_topic": "मार्ग पत्थर को अर्पण"
 }

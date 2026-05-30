@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Fjarlægð:",
     "ws_tooltip_waystone_charge": "Hleðsla vegsteins:",
     "ws_tooltip_player_charge": "Hleðsla persónu:",
-    "ws_tooltip_player_charge_after": "Hleðsla persónu eftir ferð:"
+    "ws_tooltip_player_charge_after": "Hleðsla persónu eftir ferð:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Fórnaðu hlutum til að stytta biðtíma ferðar:",
+    "ws_tooltip_sacrifice_add_charge": "Fórnaðu hlutum til að bæta við hleðslu:",
+    "ws_tooltip_seconds": "Sekúndur",
+    "ws_tooltip_charges": "Hleðslur",
+    "ws_compendium_sacrifice_items_topic": "Fórnargjafir til vegsteins"
 }

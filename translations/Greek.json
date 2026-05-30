@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Απόσταση:",
     "ws_tooltip_waystone_charge": "Φόρτιση οδοδείκτη:",
     "ws_tooltip_player_charge": "Φόρτιση χαρακτήρα:",
-    "ws_tooltip_player_charge_after": "Φόρτιση χαρακτήρα μετά το ταξίδι:"
+    "ws_tooltip_player_charge_after": "Φόρτιση χαρακτήρα μετά το ταξίδι:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Θυσίασε αντικείμενα για να μειώσεις τον χρόνο επαναφόρτισης ταξιδιού:",
+    "ws_tooltip_sacrifice_add_charge": "Θυσίασε αντικείμενα για να προσθέσεις φόρτιση:",
+    "ws_tooltip_seconds": "Δευτερόλεπτα",
+    "ws_tooltip_charges": "Φορτίσεις",
+    "ws_compendium_sacrifice_items_topic": "Προσφορές στον οδοδείκτη"
 }

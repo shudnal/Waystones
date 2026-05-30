@@ -1,3 +1,12 @@
+# 1.1.0
+* added Orientation mode: waystones can be used as navigation landmarks without teleportation
+* added Charge mode: waystones can now use stored charge instead of travel cooldown
+* charge cost is based on travel distance and is configurable
+* charge can be stored on waystones or on characters
+* added optional charge overdraft and one-time overcharge
+* charge sacrifices reuse the existing sacrifice item config
+* sacrifice item list is now shown in waystone hover text and in the compendium
+
 # 1.0.14
 * patch 0.221.10
 

@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Odległość:",
     "ws_tooltip_waystone_charge": "Ładunek waystone:",
     "ws_tooltip_player_charge": "Ładunek postaci:",
-    "ws_tooltip_player_charge_after": "Ładunek postaci po podróży:"
+    "ws_tooltip_player_charge_after": "Ładunek postaci po podróży:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Poświęć przedmioty, aby skrócić czas odnowienia podróży:",
+    "ws_tooltip_sacrifice_add_charge": "Poświęć przedmioty, aby dodać ładunki:",
+    "ws_tooltip_seconds": "Sekundy",
+    "ws_tooltip_charges": "Ładunki",
+    "ws_compendium_sacrifice_items_topic": "Ofiary dla waystone"
 }

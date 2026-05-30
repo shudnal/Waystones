@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Distance:",
     "ws_tooltip_waystone_charge": "Waystone charge:",
     "ws_tooltip_player_charge": "Player charge:",
-    "ws_tooltip_player_charge_after": "Player charge after travel:"
+    "ws_tooltip_player_charge_after": "Player charge after travel:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Sacrifice items to reduce travel cooldown:",
+    "ws_tooltip_sacrifice_add_charge": "Sacrifice items to add charges:",
+    "ws_tooltip_seconds": "Seconds",
+    "ws_tooltip_charges": "Charges",
+    "ws_compendium_sacrifice_items_topic": "Waystone sacrifices"
 }

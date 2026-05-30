@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Entfernung:",
     "ws_tooltip_waystone_charge": "Wegsteinladung:",
     "ws_tooltip_player_charge": "Charakterladung:",
-    "ws_tooltip_player_charge_after": "Charakterladung nach der Reise:"
+    "ws_tooltip_player_charge_after": "Charakterladung nach der Reise:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Opfere Gegenstände, um die Reiseabklingzeit zu verringern:",
+    "ws_tooltip_sacrifice_add_charge": "Opfere Gegenstände, um Ladung hinzuzufügen:",
+    "ws_tooltip_seconds": "Sekunden",
+    "ws_tooltip_charges": "Ladungen",
+    "ws_compendium_sacrifice_items_topic": "Wegsteinopfergaben"
 }

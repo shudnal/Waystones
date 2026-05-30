@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "거리:",
     "ws_tooltip_waystone_charge": "웨이스톤 충전량:",
     "ws_tooltip_player_charge": "캐릭터 충전량:",
-    "ws_tooltip_player_charge_after": "이동 후 캐릭터 충전량:"
+    "ws_tooltip_player_charge_after": "이동 후 캐릭터 충전량:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "이동 재사용 대기시간을 줄이려면 아이템을 바치세요:",
+    "ws_tooltip_sacrifice_add_charge": "충전량을 추가하려면 아이템을 바치세요:",
+    "ws_tooltip_seconds": "초",
+    "ws_tooltip_charges": "충전량",
+    "ws_compendium_sacrifice_items_topic": "웨이스톤 공물"
 }

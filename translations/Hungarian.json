@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Távolság:",
     "ws_tooltip_waystone_charge": "Útjelző kő töltése:",
     "ws_tooltip_player_charge": "Karakter töltése:",
-    "ws_tooltip_player_charge_after": "Karakter töltése utazás után:"
+    "ws_tooltip_player_charge_after": "Karakter töltése utazás után:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Áldozz fel tárgyakat az utazási lehűlés csökkentéséhez:",
+    "ws_tooltip_sacrifice_add_charge": "Áldozz fel tárgyakat töltés hozzáadásához:",
+    "ws_tooltip_seconds": "Másodpercek",
+    "ws_tooltip_charges": "Töltések",
+    "ws_compendium_sacrifice_items_topic": "Felajánlások az útjelző kőnek"
 }

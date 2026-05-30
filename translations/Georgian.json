@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "მანძილი:",
     "ws_tooltip_waystone_charge": "გზის ქვის მუხტი:",
     "ws_tooltip_player_charge": "პერსონაჟის მუხტი:",
-    "ws_tooltip_player_charge_after": "პერსონაჟის მუხტი მგზავრობის შემდეგ:"
+    "ws_tooltip_player_charge_after": "პერსონაჟის მუხტი მგზავრობის შემდეგ:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "მგზავრობის გაგრილების შესამცირებლად შესწირე ნივთები:",
+    "ws_tooltip_sacrifice_add_charge": "მუხტის დასამატებლად შესწირე ნივთები:",
+    "ws_tooltip_seconds": "წამები",
+    "ws_tooltip_charges": "მუხტები",
+    "ws_compendium_sacrifice_items_topic": "შესაწირები გზის ქვისთვის"
 }

@@ -32,6 +32,7 @@ namespace Waystones
         internal static ConfigEntry<KeyboardShortcut> shortcut;
         internal static ConfigEntry<string> pieceRecipe;
         internal static ConfigEntry<bool> itemSacrifitionReduceCooldown;
+        internal static ConfigEntry<bool> showSacrificeItemsInHover;
         internal static ConfigEntry<bool> disableWaystoneSparcs;
 
         internal static ConfigEntry<bool> locationWaystonesShowOnMap;
@@ -161,6 +162,7 @@ namespace Waystones
             pieceRecipe.SettingChanged += (sender, args) => PieceWaystone.SetPieceRequirements();
 
             itemSacrifitionReduceCooldown = config("Item sacrifition", "Sacrifice item from list to reduce cooldown", defaultValue: true, "Enable sacrifition of item from list to reduce waystone cooldown");
+            showSacrificeItemsInHover = config("Item sacrifition", "Show available sacrifice items in hover text", defaultValue: true, "Show sacrifice items available to the player in waystone hover text. [Not Synced with Server]", false);
 
             locationWaystonesShowOnMap = config("Locations", "Show waystones on map", defaultValue: true, "Show waystone map pins");
             locationShowCurrentSpawn = config("Locations", "Show current spawn", defaultValue: true, "Show current spawn point in search mode");
@@ -195,7 +197,7 @@ namespace Waystones
             sfxPitchMax = config("Search mode", "Sound effect max pitch", defaultValue: 1.0f, "Pitch of sound effect played in direction mode when looking at a target");
             sfxPitchMin = config("Search mode", "Sound effect min pitch", defaultValue: 0.8f, "Pitch of sound effect played in direction mode when sensitivity threshold is not met.");
             slowFactorTime = config("Search mode", "Slow factor time", defaultValue: 0.25f, "Multiplier of speed ​​of time (singleplayer)");
-            slowFactorLookDeceleration = config("Search mode", "Slow factor mouse deceleration", defaultValue: 60f, "Mouse camera sensitivity acceleration factor. [Not Synced with Server]" +
+            slowFactorLookDeceleration = config("Search mode", "Slow factor mouse deceleration", defaultValue: 40f, "Mouse camera sensitivity acceleration factor. [Not Synced with Server]" +
                                                                                                                     "\nIncrease to make mouse acceleration proportionally lower, decrease to make mouse movement faster ", false);
             slowFactorLookMinimum = config("Search mode", "Slow factor mouse minimum", defaultValue: 0.08f, "Minimum mouse camera sensitivity factor in search mode. [Not Synced with Server]", false);
             fovDelta = config("Search mode", "FoV delta", defaultValue: 40f, "How much camera FoV can be changed both sides using zoom");
@@ -507,13 +509,24 @@ namespace Waystones
         private static void ReadConfigFile(string filename, string fullname)
         {
             Dictionary<string, int> newValue = new();
+
             try
             {
                 string content = File.ReadAllText(fullname);
+
 #nullable enable
                 if (content is not null)
+                {
                     foreach (KeyValuePair<string, int> kv in new DeserializerBuilder().IgnoreFields().Build().Deserialize<Dictionary<string, int>?>(content) ?? new Dictionary<string, int>())
-                        newValue[kv.Key.GetItemName()] = kv.Value;
+                    {
+                        if (kv.Value <= 0)
+                            continue;
+
+                        string itemKey = NormalizeSacrificeItemKey(kv.Key);
+                        if (!itemKey.IsNullOrWhiteSpace())
+                            newValue[itemKey] = kv.Value;
+                    }
+                }
 #nullable disable
             }
             catch (Exception e)
@@ -524,6 +537,29 @@ namespace Waystones
             itemsToReduceCooldown.AssignValueSafe(newValue);
 
             LogInfo($"Loaded {newValue.Count} items from file {filename}");
+        }
+
+        private static string NormalizeSacrificeItemKey(string key)
+        {
+            if (key.IsNullOrWhiteSpace())
+                return "";
+
+            key = key.Trim();
+
+            int separatorIndex = key.LastIndexOf(':');
+            if (separatorIndex < 0)
+                return key.GetItemName();
+
+            string itemName = key.Substring(0, separatorIndex).Trim();
+            string amount = key.Substring(separatorIndex + 1).Trim();
+
+            if (itemName.IsNullOrWhiteSpace())
+                return "";
+
+            if (amount.IsNullOrWhiteSpace())
+                return itemName.GetItemName();
+
+            return $"{itemName.GetItemName()}:{amount}";
         }
     }
 }

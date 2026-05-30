@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Distance:",
     "ws_tooltip_waystone_charge": "Charge de la pierre de chemin :",
     "ws_tooltip_player_charge": "Charge du personnage :",
-    "ws_tooltip_player_charge_after": "Charge du personnage après le voyage :"
+    "ws_tooltip_player_charge_after": "Charge du personnage après le voyage :",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Sacrifiez des objets pour réduire le temps de recharge du voyage:",
+    "ws_tooltip_sacrifice_add_charge": "Sacrifiez des objets pour ajouter de la charge:",
+    "ws_tooltip_seconds": "Secondes",
+    "ws_tooltip_charges": "Charges",
+    "ws_compendium_sacrifice_items_topic": "Offrandes à la pierre de chemin"
 }

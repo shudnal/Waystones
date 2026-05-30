@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "ระยะทาง:",
     "ws_tooltip_waystone_charge": "ประจุของหินเดินทาง:",
     "ws_tooltip_player_charge": "ประจุของตัวละคร:",
-    "ws_tooltip_player_charge_after": "ประจุของตัวละครหลังเดินทาง:"
+    "ws_tooltip_player_charge_after": "ประจุของตัวละครหลังเดินทาง:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "สังเวยไอเทมเพื่อลดคูลดาวน์การเดินทาง:",
+    "ws_tooltip_sacrifice_add_charge": "สังเวยไอเทมเพื่อเพิ่มประจุ:",
+    "ws_tooltip_seconds": "วินาที",
+    "ws_tooltip_charges": "ประจุ",
+    "ws_compendium_sacrifice_items_topic": "ของถวายหินเดินทาง"
 }

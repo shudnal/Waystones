@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Distancia:",
     "ws_tooltip_waystone_charge": "Carga de la piedra de camino:",
     "ws_tooltip_player_charge": "Carga del personaje:",
-    "ws_tooltip_player_charge_after": "Carga del personaje tras viajar:"
+    "ws_tooltip_player_charge_after": "Carga del personaje tras viajar:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Sacrifica objetos para reducir el enfriamiento de viaje:",
+    "ws_tooltip_sacrifice_add_charge": "Sacrifica objetos para añadir cargas:",
+    "ws_tooltip_seconds": "Segundos",
+    "ws_tooltip_charges": "Cargas",
+    "ws_compendium_sacrifice_items_topic": "Ofrendas para la piedra de camino"
 }

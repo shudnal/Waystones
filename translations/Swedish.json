@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Avstånd:",
     "ws_tooltip_waystone_charge": "Vägstenens laddning:",
     "ws_tooltip_player_charge": "Karaktärens laddning:",
-    "ws_tooltip_player_charge_after": "Karaktärens laddning efter resa:"
+    "ws_tooltip_player_charge_after": "Karaktärens laddning efter resa:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Offra föremål för att minska resekylningen:",
+    "ws_tooltip_sacrifice_add_charge": "Offra föremål för att lägga till laddning:",
+    "ws_tooltip_seconds": "Sekunder",
+    "ws_tooltip_charges": "Laddningar",
+    "ws_compendium_sacrifice_items_topic": "Offer till vägstenen"
 }

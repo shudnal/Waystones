@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Mesafe:",
     "ws_tooltip_waystone_charge": "Yol taşı şarjı:",
     "ws_tooltip_player_charge": "Karakter şarjı:",
-    "ws_tooltip_player_charge_after": "Seyahatten sonra karakter şarjı:"
+    "ws_tooltip_player_charge_after": "Seyahatten sonra karakter şarjı:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Seyahat bekleme süresini azaltmak için eşyalar kurban et:",
+    "ws_tooltip_sacrifice_add_charge": "Şarj eklemek için eşyalar kurban et:",
+    "ws_tooltip_seconds": "Saniye",
+    "ws_tooltip_charges": "Şarj",
+    "ws_compendium_sacrifice_items_topic": "Yol taşı adakları"
 }

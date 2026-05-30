@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Distanza:",
     "ws_tooltip_waystone_charge": "Carica della pietra di viaggio:",
     "ws_tooltip_player_charge": "Carica del personaggio:",
-    "ws_tooltip_player_charge_after": "Carica del personaggio dopo il viaggio:"
+    "ws_tooltip_player_charge_after": "Carica del personaggio dopo il viaggio:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Sacrifica oggetti per ridurre il tempo di recupero del viaggio:",
+    "ws_tooltip_sacrifice_add_charge": "Sacrifica oggetti per aggiungere cariche:",
+    "ws_tooltip_seconds": "Secondi",
+    "ws_tooltip_charges": "Cariche",
+    "ws_compendium_sacrifice_items_topic": "Offerte per la pietra di viaggio"
 }

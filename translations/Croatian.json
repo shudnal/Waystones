@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Udaljenost:",
     "ws_tooltip_waystone_charge": "Naboj putnog kamena:",
     "ws_tooltip_player_charge": "Naboj lika:",
-    "ws_tooltip_player_charge_after": "Naboj lika nakon putovanja:"
+    "ws_tooltip_player_charge_after": "Naboj lika nakon putovanja:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Žrtvuj predmete za smanjenje hlađenja putovanja:",
+    "ws_tooltip_sacrifice_add_charge": "Žrtvuj predmete za dodavanje naboja:",
+    "ws_tooltip_seconds": "Sekunde",
+    "ws_tooltip_charges": "Naboji",
+    "ws_compendium_sacrifice_items_topic": "Prinosi za putni kamen"
 }

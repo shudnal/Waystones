@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Etäisyys:",
     "ws_tooltip_waystone_charge": "Tiekiven lataus:",
     "ws_tooltip_player_charge": "Hahmon lataus:",
-    "ws_tooltip_player_charge_after": "Hahmon lataus matkan jälkeen:"
+    "ws_tooltip_player_charge_after": "Hahmon lataus matkan jälkeen:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Uhraa esineitä lyhentääksesi matkan jäähtymisaikaa:",
+    "ws_tooltip_sacrifice_add_charge": "Uhraa esineitä lisätäksesi latausta:",
+    "ws_tooltip_seconds": "Sekunnit",
+    "ws_tooltip_charges": "Lataukset",
+    "ws_compendium_sacrifice_items_topic": "Uhrilahjat tiekivelle"
 }

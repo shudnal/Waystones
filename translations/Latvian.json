@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Attālums:",
     "ws_tooltip_waystone_charge": "Ceļa akmens lādiņš:",
     "ws_tooltip_player_charge": "Tēla lādiņš:",
-    "ws_tooltip_player_charge_after": "Tēla lādiņš pēc ceļojuma:"
+    "ws_tooltip_player_charge_after": "Tēla lādiņš pēc ceļojuma:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Upurē priekšmetus, lai samazinātu ceļojuma atdzišanu:",
+    "ws_tooltip_sacrifice_add_charge": "Upurē priekšmetus, lai pievienotu lādiņu:",
+    "ws_tooltip_seconds": "Sekundes",
+    "ws_tooltip_charges": "Lādiņi",
+    "ws_compendium_sacrifice_items_topic": "Ziedojumi ceļa akmenim"
 }

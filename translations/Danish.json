@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Afstand:",
     "ws_tooltip_waystone_charge": "Vejstenens ladning:",
     "ws_tooltip_player_charge": "Figurens ladning:",
-    "ws_tooltip_player_charge_after": "Figurens ladning efter rejsen:"
+    "ws_tooltip_player_charge_after": "Figurens ladning efter rejsen:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Ofr genstande for at reducere rejseafkølingen:",
+    "ws_tooltip_sacrifice_add_charge": "Ofr genstande for at tilføje ladning:",
+    "ws_tooltip_seconds": "Sekunder",
+    "ws_tooltip_charges": "Ladninger",
+    "ws_compendium_sacrifice_items_topic": "Offergaver til vejstenen"
 }

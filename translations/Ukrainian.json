@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Відстань:",
     "ws_tooltip_waystone_charge": "Заряд путового каменя:",
     "ws_tooltip_player_charge": "Заряд персонажа:",
-    "ws_tooltip_player_charge_after": "Заряд персонажа після переміщення:"
+    "ws_tooltip_player_charge_after": "Заряд персонажа після переміщення:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Пожертвуйте предмети, щоб скоротити час відновлення переміщення:",
+    "ws_tooltip_sacrifice_add_charge": "Пожертвуйте предмети, щоб додати зарядів:",
+    "ws_tooltip_seconds": "Секунди",
+    "ws_tooltip_charges": "Заряди",
+    "ws_compendium_sacrifice_items_topic": "Пожертви путовому каменю"
 }

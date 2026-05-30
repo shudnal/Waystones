@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Растојание:",
     "ws_tooltip_waystone_charge": "Полнење на патниот камен:",
     "ws_tooltip_player_charge": "Полнење на ликот:",
-    "ws_tooltip_player_charge_after": "Полнење на ликот по патување:"
+    "ws_tooltip_player_charge_after": "Полнење на ликот по патување:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Пожртвувај предмети за да го намалиш времето на обновување за патување:",
+    "ws_tooltip_sacrifice_add_charge": "Пожртвувај предмети за да додадеш полнење:",
+    "ws_tooltip_seconds": "Секунди",
+    "ws_tooltip_charges": "Полнења",
+    "ws_compendium_sacrifice_items_topic": "Приноси за патниот камен"
 }

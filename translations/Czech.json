@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Vzdálenost:",
     "ws_tooltip_waystone_charge": "Nabití cestovního kamene:",
     "ws_tooltip_player_charge": "Nabití postavy:",
-    "ws_tooltip_player_charge_after": "Nabití postavy po cestě:"
+    "ws_tooltip_player_charge_after": "Nabití postavy po cestě:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Obětuj předměty ke zkrácení doby obnovení cesty:",
+    "ws_tooltip_sacrifice_add_charge": "Obětuj předměty pro přidání nabití:",
+    "ws_tooltip_seconds": "Sekundy",
+    "ws_tooltip_charges": "Nabití",
+    "ws_compendium_sacrifice_items_topic": "Obětiny pro cestovní kámen"
 }

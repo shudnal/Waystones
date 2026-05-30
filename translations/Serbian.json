@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Удаљеност:",
     "ws_tooltip_waystone_charge": "Напуњеност путног камена:",
     "ws_tooltip_player_charge": "Напуњеност лика:",
-    "ws_tooltip_player_charge_after": "Напуњеност лика после путовања:"
+    "ws_tooltip_player_charge_after": "Напуњеност лика после путовања:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Жртвуј предмете да скратиш време хлађења путовања:",
+    "ws_tooltip_sacrifice_add_charge": "Жртвуј предмете да додаш напуњеност:",
+    "ws_tooltip_seconds": "Секунде",
+    "ws_tooltip_charges": "Напуњеност",
+    "ws_compendium_sacrifice_items_topic": "Прилози за путни камен"
 }

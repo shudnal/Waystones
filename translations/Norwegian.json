@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "Avstand:",
     "ws_tooltip_waystone_charge": "Veisteinens ladning:",
     "ws_tooltip_player_charge": "Figurens ladning:",
-    "ws_tooltip_player_charge_after": "Figurens ladning etter reisen:"
+    "ws_tooltip_player_charge_after": "Figurens ladning etter reisen:",
+    "ws_tooltip_sacrifice_reduce_cooldown": "Ofre gjenstander for å redusere reisens nedkjøling:",
+    "ws_tooltip_sacrifice_add_charge": "Ofre gjenstander for å legge til ladning:",
+    "ws_tooltip_seconds": "Sekunder",
+    "ws_tooltip_charges": "Ladninger",
+    "ws_compendium_sacrifice_items_topic": "Offergaver til veisteinen"
 }

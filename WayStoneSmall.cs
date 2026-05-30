@@ -24,6 +24,19 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
     public static float blockInputUntil;
     public const float waystoneHoldSetTagDelay = 0.35f;
 
+    private const float sacrificeHoverItemsUpdateInterval = 1f;
+    private static float nextSacrificeHoverItemsUpdate;
+    private static readonly List<SacrificeHoverItem> sacrificeHoverItems = new();
+
+    private class SacrificeHoverItem
+    {
+        public string itemName;
+        public int amount;
+        public int value;
+        public int inventoryCount;
+        public int totalCount;
+    }
+
     public void Awake()
     {
         if (initial)
@@ -142,13 +155,20 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         string altKey = !ZInput.IsNonClassicFunctionality() || !ZInput.IsGamepadActive() ? "$KEY_AltPlace" : "$KEY_JoyAltKeys";
         sb.Append($"\n[<color=yellow><b>{altKey} + $KEY_Use</b></color>] {(IsActive() ? "$ws_piece_waystone_deactivate" : "$ws_piece_waystone_activate")}");
 
-        if (waystoneMode.Value == WaystoneMode.Charge)
+        if (waystoneMode.Value == WaystoneMode.Cooldown)
+        {
+            if (WorldData.IsOnCooldown())
+                sb.Append($"\n$hud_powernotready: <color=#add8e6>{WorldData.GetCooldownString()}</color>");
+        }
+        else if (waystoneMode.Value == WaystoneMode.Charge)
         {
             if (WaystoneList.IsPlayerChargeStorage())
                 sb.Append($"\n$ws_tooltip_player_charge <color=#add8e6>{WorldData.GetPlayerCharge()}</color>");
             else
                 sb.Append($"\n$ws_tooltip_waystone_charge <color=#add8e6>{WaystoneList.GetWaystoneCharge(m_nview.GetZDO())}</color>");
         }
+
+        AppendSacrificeItemsHoverText(Player.m_localPlayer);
 
         return Localization.instance.Localize(sb.ToString());
     }
@@ -309,7 +329,149 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
     private int CountItems(Inventory inventory, string itemName)
     {
-        return inventory.m_inventory.Where(item => item.m_shared.m_name.GetItemName() == itemName).Sum(item => item.m_stack);
+        return CountOwnInventoryItems(inventory, itemName);
+    }
+
+    private static int CountOwnInventoryItems(Inventory inventory, string itemName)
+    {
+        if (inventory == null)
+            return 0;
+
+        int count = 0;
+        foreach (ItemDrop.ItemData item in inventory.m_inventory)
+            if (item.m_shared.m_name.GetItemName() == itemName && item.m_worldLevel >= Game.m_worldLevel)
+                count += item.m_stack;
+
+        return count;
+    }
+
+    private static int CountAvailableItems(Inventory inventory, string itemName)
+    {
+        if (inventory == null)
+            return 0;
+
+        return inventory.CountItems(itemName);
+    }
+
+    private static void AppendSacrificeItemsHoverText(Player player)
+    {
+        if (!showSacrificeItemsInHover.Value)
+            return;
+
+        if (!ShouldShowSacrificeItems())
+            return;
+
+        RefreshSacrificeHoverItems(player);
+        if (sacrificeHoverItems.Count == 0)
+            return;
+
+        sb.Append("\n\n");
+        sb.Append(waystoneMode.Value == WaystoneMode.Charge
+            ? "$ws_tooltip_sacrifice_add_charge"
+            : "$ws_tooltip_sacrifice_reduce_cooldown");
+
+        string valueToken = waystoneMode.Value == WaystoneMode.Charge ? "$ws_tooltip_charges" : "$ws_tooltip_seconds";
+        foreach (SacrificeHoverItem item in sacrificeHoverItems)
+        {
+            sb.Append("\n - ");
+            sb.Append($"<color=#add8e6>{item.itemName}</color>");
+            if (item.amount > 1)
+                sb.Append($" x{item.amount}");
+
+            sb.Append($" - {valueToken}: <color=orange>{(waystoneMode.Value == WaystoneMode.Charge ? "+" : "-")}{item.value}</color>. $settings_inventory: <color=yellow>{item.inventoryCount}</color>");
+            if (item.totalCount != item.inventoryCount)
+                sb.Append($", $item_total: <color=yellow>{item.totalCount}</color>");
+        }
+    }
+
+    private static bool ShouldShowSacrificeItems()
+    {
+        return waystoneMode.Value == WaystoneMode.Charge
+            || (waystoneMode.Value == WaystoneMode.Cooldown && itemSacrifitionReduceCooldown.Value);
+    }
+
+    private static void RefreshSacrificeHoverItems(Player player)
+    {
+        if (Time.time < nextSacrificeHoverItemsUpdate)
+            return;
+
+        nextSacrificeHoverItemsUpdate = Time.time + sacrificeHoverItemsUpdateInterval;
+        sacrificeHoverItems.Clear();
+
+        if (player == null)
+            return;
+
+        Inventory inventory = player.GetInventory();
+        if (inventory == null)
+            return;
+
+        foreach (KeyValuePair<string, int> entry in itemsToReduceCooldown.Value)
+        {
+            if (entry.Value <= 0 || !TryParseSacrificeEntry(entry.Key, out string itemName, out int amount))
+                continue;
+
+            int inventoryCount = CountOwnInventoryItems(inventory, itemName);
+            int totalCount = CountAvailableItems(inventory, itemName);
+            if (inventoryCount <= 0 && totalCount <= 0)
+                continue;
+
+            sacrificeHoverItems.Add(new SacrificeHoverItem
+            {
+                itemName = itemName,
+                amount = amount,
+                value = entry.Value,
+                inventoryCount = inventoryCount,
+                totalCount = totalCount
+            });
+        }
+    }
+
+    private static bool TryParseSacrificeEntry(string key, out string itemName, out int amount)
+    {
+        itemName = key;
+        amount = 1;
+
+        if (string.IsNullOrWhiteSpace(key))
+            return false;
+
+        string[] pair = key.Split(':');
+        if (pair.Length == 1)
+            return true;
+
+        if (pair.Length != 2 || string.IsNullOrWhiteSpace(pair[0]) || !int.TryParse(pair[1], out amount) || amount <= 0)
+            return false;
+
+        itemName = pair[0];
+        return true;
+    }
+
+    private static string BuildConfiguredSacrificeItemsText()
+    {
+        if (!ShouldShowSacrificeItems())
+            return "";
+
+        if (itemsToReduceCooldown.Value.Count == 0)
+            return "";
+
+        StringBuilder builder = new();
+        builder.Append(waystoneMode.Value == WaystoneMode.Charge
+            ? "$ws_tooltip_sacrifice_add_charge"
+            : "$ws_tooltip_sacrifice_reduce_cooldown");
+
+        string valueToken = waystoneMode.Value == WaystoneMode.Charge ? "$ws_tooltip_charges" : "$ws_tooltip_seconds";
+        foreach (KeyValuePair<string, int> entry in itemsToReduceCooldown.Value)
+        {
+            if (entry.Value <= 0 || !TryParseSacrificeEntry(entry.Key, out string itemName, out int amount))
+                continue;
+
+            builder.Append("\n - ");
+            builder.Append(itemName);
+            if (amount > 1)
+                builder.Append($" x{amount}");
+            builder.Append($" - {valueToken}: <color=#add8e6>{(waystoneMode.Value == WaystoneMode.Charge ? "+" : "-")}{entry.Value}</color>");
+        }
+
+        return builder.ToString();
     }
 
     public bool IsActive()
@@ -443,6 +605,30 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
     {
         return player.IsAttachedToShip() || player.IsAttached() || player.IsDead() || player.IsRiding() || player.IsSleeping() ||
                player.IsTeleporting() || player.InPlaceMode() || player.InBed() || player.InCutscene() || player.InInterior();
+    }
+
+    [HarmonyPatch(typeof(TextsDialog), nameof(TextsDialog.UpdateTextsList))]
+    public static class TextsDialog_UpdateTextsList_WaystoneSacrificeItems
+    {
+        private static void Postfix(TextsDialog __instance)
+        {
+            string text = BuildConfiguredSacrificeItemsText();
+            if (text.Length == 0)
+                return;
+
+            string waystoneTopic = Localization.instance.Localize("$ws_tutorial_waystone_label");
+
+            int waystoneIndex = __instance.m_texts.FindIndex(info =>
+                info != null &&
+                (info.m_topic == "$ws_tutorial_waystone_label" ||
+                 info.m_topic == waystoneTopic ||
+                 Localization.instance.Localize(info.m_topic) == waystoneTopic));
+
+            if (waystoneIndex < 0)
+                return;
+
+            __instance.m_texts.Insert(waystoneIndex + 1, new TextsDialog.TextInfo("$ws_compendium_sacrifice_items_topic", text));
+        }
     }
 
     [HarmonyPatch(typeof(TextInput), nameof(TextInput.Update))]

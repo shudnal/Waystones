@@ -33,5 +33,10 @@
     "ws_tooltip_distance": "距離：",
     "ws_tooltip_waystone_charge": "路石充能：",
     "ws_tooltip_player_charge": "角色充能：",
-    "ws_tooltip_player_charge_after": "旅行後角色充能："
+    "ws_tooltip_player_charge_after": "旅行後角色充能：",
+    "ws_tooltip_sacrifice_reduce_cooldown": "獻祭物品以縮短旅行冷卻時間：",
+    "ws_tooltip_sacrifice_add_charge": "獻祭物品以增加充能：",
+    "ws_tooltip_seconds": "秒",
+    "ws_tooltip_charges": "充能",
+    "ws_compendium_sacrifice_items_topic": "路石供品"
 }
