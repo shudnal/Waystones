@@ -146,7 +146,7 @@ namespace Waystones
             configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
             loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
             pieceRecipe = config("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
-            disableWaystoneSparcs = config("General", "Disable waystone sparcs", defaultValue: false, "Enable sacrifition of item from list to reduce waystone cooldown. Restart required. [Not Synced with Server]", false);
+            disableWaystoneSparcs = config("General", "Disable waystone sparks", defaultValue: false, "Disable little sparks constantly emitting from waystone object. Restart required. [Not Synced with Server]", false);
             waystoneMode = config("General", "Waystone mode", defaultValue: WaystoneMode.Cooldown, "Cooldown - You will only be able to teleport again after the specified time has passed" +
                 "\nCharge - requires waystone to be charged to start teleportation, charges consumption depends on distance, no cooldown on teleportation" +
                 "\nOrientation - Use waystones only for navigation, not teleportation");
