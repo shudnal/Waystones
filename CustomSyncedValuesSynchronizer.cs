@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using ServerSync;
+using ConditionalConfigSync;
 using UnityEngine;
 
 namespace Waystones

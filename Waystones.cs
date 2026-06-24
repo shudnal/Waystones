@@ -2,7 +2,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
-using ServerSync;
+using ConditionalConfigSync;
 using System.Linq;
 using System.IO;
 using System.Reflection;
@@ -19,11 +19,11 @@ namespace Waystones
     {
         public const string pluginID = "shudnal.Waystones";
         public const string pluginName = "Waystones";
-        public const string pluginVersion = "1.1.0";
+        public const string pluginVersion = "1.1.1";
 
         private readonly Harmony harmony = new(pluginID);
 
-        internal static readonly ConfigSync configSync = new(pluginID) { DisplayName = pluginName, CurrentVersion = pluginVersion, MinimumRequiredVersion = pluginVersion };
+        internal static readonly ConfigSync configSync = new(pluginID) { DisplayName = pluginName, CurrentVersion = pluginVersion, MinimumRequiredVersion = pluginVersion, ModRequired = true };
 
         internal static Waystones instance;
 
