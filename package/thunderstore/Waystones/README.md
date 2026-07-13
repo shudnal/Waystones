@@ -1,4 +1,4 @@
-﻿# Waystones
+# Waystones
 Build a waystone network, sit in front of one, locate with your gaze a distant place or another waystone and fast travel there
 
 ![](https://staticdelivery.nexusmods.com/mods/3667/images/headers/2832_1722236465.jpg)

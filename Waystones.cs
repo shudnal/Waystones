@@ -575,7 +575,7 @@ namespace Waystones
                 LogInfo($"Error reading file ({fullname})! Error: {e.Message}");
             }
 
-            itemsToReduceCooldown.AssignValueSafe(newValue);
+            itemsToReduceCooldown.AssignLocalValueIfChanged(newValue);
 
             LogInfo($"Loaded {newValue.Count} items from file {filename}");
         }

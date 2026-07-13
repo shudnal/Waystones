@@ -35,7 +35,6 @@
     <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CustomSyncedValuesSynchronizer.cs" />
     <Compile Include="DirectionSearch.cs" />
     <Compile Include="ItemNameTokens.cs" />
     <Compile Include="LocalizationManager.cs" />
