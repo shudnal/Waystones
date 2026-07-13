@@ -1,3 +1,7 @@
+# 1.1.1
+* migrated to ConditionalConfigSync; server administrators can override the ownership policy of policy-controlled settings, making them server- or client-controlled
+* fixed sparcs config name
+
 # 1.1.0
 * added Orientation mode: waystones can be used as navigation landmarks without teleportation
 * added Charge mode: waystones can now use stored charge instead of travel cooldown

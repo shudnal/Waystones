@@ -1,4 +1,4 @@
-# Waystones
+﻿# Waystones
 Build a waystone network, sit in front of one, locate with your gaze a distant place or another waystone and fast travel there
 
 ![](https://staticdelivery.nexusmods.com/mods/3667/images/headers/2832_1722236465.jpg)
@@ -8,6 +8,17 @@ This mod allows you to build a waystone, new piece which you can use to fast tra
 This mod is meant mainly to use on nomap mode and/or noportals mode. In nomap mode it could be used for orientation and in noportals mode as an alternative way of fast travel. A waystone could be used as a landmark visible from afar and as an alternative to signs.
 
 On your first approach a waystone the Hugin will hint you how to use it. If you disabled raven hints there will be no Hugin for you.
+
+## Conditional Config Sync
+* Config values marked with [Synced with Server] are synchronized from the server by default. Most of them control shared travel behavior, available destinations or search rules, while local presentation and input preferences remain configurable by each client
+* Server administrators can change the synchronization policy for policy-controlled settings in BepInEx/config/shudnal.ConditionalConfigSync/ConditionalConfigSync.SyncPolicy.cfg
+* Prefix an exact setting or whole-section identifier with + to force server control or - to make it client-controlled. Exact-setting rules take precedence over whole-section rules
+* Core shared mechanics such as the recipe, waystone mode, charge and cooldown calculations, access rules, sacrifice behavior and tag limits are always server-controlled and cannot be made client-controlled through policy
+* Policy-controlled settings include available destinations, search restrictions, orientation visibility options and visual or travelling effects
+* Logging, the local shortcut, local input and sound preferences, waystone sparks and sacrifice hover display are client-controlled by default, but server policy can force them to be server-controlled
+* The sacrifice-item JSON or YAML data is synchronized as runtime state by the server and is not controlled by SyncPolicy.cfg
+* Use shared modpack configs or distribute your config manually if you also want client-controlled settings to be identical for all players initially
+* If you install this mod manually do not forget to install [ConditionalConfigSync](https://thunderstore.io/c/valheim/p/shudnal/ConditionalConfigSync/)
 
 ![](https://staticdelivery.nexusmods.com/mods/3667/images/2832/2832-1722236953-1648019909.png)
 

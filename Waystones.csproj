@@ -71,6 +71,7 @@
     <Reference Include="ConditionalConfigSync, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Assemblies\Managers\ConditionalConfigSync.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="gui_framework, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -142,9 +143,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <None Include="EmbeddedLocalizations.csv" />
-    <None Include="Libs\LocalizationManager.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <EmbeddedResource Include="translations\Chinese.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -244,6 +242,7 @@
     <EmbeddedResource Include="translations\Ukrainian.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <None Include="UpdateThunderstoreManifest.ps1" />
     <None Include="UpdateTranslations.ps1" />
   </ItemGroup>
   <ItemGroup>

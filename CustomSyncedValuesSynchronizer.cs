@@ -38,11 +38,12 @@ namespace Waystones
 
         private static IEnumerator AssignAfterServerUpdate<T>(CustomSyncedValue<T> syncedValue, T value, bool assignIfChanged)
         {
-            if (assignIfChanged && syncedValue.Value.Equals(value))
-                yield break;
-
             yield return waitForServerUpdate;
-            syncedValue.AssignLocalValue(value);
+
+            if (assignIfChanged)
+                syncedValue.AssignLocalValueIfChanged(value);
+            else
+                syncedValue.AssignLocalValue(value);
         }
 
         private static void AddToQueue(IEnumerator coroutine)

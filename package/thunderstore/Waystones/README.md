@@ -1,4 +1,4 @@
-# Waystones
+﻿# Waystones
 Build a waystone network, sit in front of one, locate with your gaze a distant place or another waystone and fast travel there
 
 ![](https://staticdelivery.nexusmods.com/mods/3667/images/headers/2832_1722236465.jpg)
@@ -190,8 +190,16 @@ English localization example is located in `Waystones.English.json` file next to
 ## Installation (manual)
 copy Waystones.dll to your BepInEx\Plugins\ folder.
 
-## Incompatibility
-Mod should be compatible with anything.
+## Conditional Config Sync
+* Config values marked with [Synced with Server] are synchronized from the server by default. Most of them control shared travel behavior, available destinations or search rules, while local presentation and input preferences remain configurable by each client
+* Server administrators can change the synchronization policy for policy-controlled settings in BepInEx/config/shudnal.ConditionalConfigSync/ConditionalConfigSync.SyncPolicy.cfg
+* Prefix an exact setting or whole-section identifier with + to force server control or - to make it client-controlled. Exact-setting rules take precedence over whole-section rules
+* Core shared mechanics such as the recipe, waystone mode, charge and cooldown calculations, access rules, sacrifice behavior and tag limits are always server-controlled and cannot be made client-controlled through policy
+* Policy-controlled settings include available destinations, search restrictions, orientation visibility options and visual or travelling effects
+* Logging, the local shortcut, local input and sound preferences, waystone sparks and sacrifice hover display are client-controlled by default, but server policy can force them to be server-controlled
+* The sacrifice-item JSON or YAML data is synchronized as runtime state by the server and is not controlled by SyncPolicy.cfg
+* Use shared modpack configs or distribute your config manually if you also want client-controlled settings to be identical for all players initially
+* If you install this mod manually do not forget to install [ConditionalConfigSync](https://thunderstore.io/c/valheim/p/shudnal/ConditionalConfigSync/)
 
 ## Configurating
 The best way to handle configs is [Configuration Manager](https://thunderstore.io/c/valheim/p/shudnal/ConfigurationManager/).

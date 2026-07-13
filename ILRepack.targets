@@ -1,46 +1,195 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<Target Name="UpdateTranslations" BeforeTargets="BeforeBuild">
-		<Exec Command="powershell -ExecutionPolicy Bypass -NoProfile -File &quot;UpdateTranslations.ps1&quot;" />
-		<Message Text="Updated embedded translations." Importance="High" />
-	</Target>
-	<Target Name="CopyDLLThunderstore" AfterTargets="Build">
-		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)package\thunderstore\$(SolutionName)\" />
-		<Message Text="Copied to thunderstore package folder." Importance="High" />
-	</Target>
-	<Target Name="CopyLanguageFileThunderstore" AfterTargets="UpdateTranslations">
-		<Copy SourceFiles="$(ProjectDir)translations\English.json" DestinationFiles="$(ProjectDir)package\thunderstore\$(SolutionName)\$(SolutionName).English.json" />
-		<Message Text="Copied English.json to thunderstore package folder." Importance="High" />
-	</Target>
-	<Target Name="RepackNexus" AfterTargets="CopyLanguageFileThunderstore">
-		<ItemGroup>
-			<InputAssemblies Include="$(TargetPath)" />
-			<InputAssemblies Include="$(OutputPath)YamlDotNet.dll" />
-		</ItemGroup>
-		<ILRepack Parallel="true" DebugInfo="true" Internalize="true" InputAssemblies="@(InputAssemblies)" OutputFile="$(TargetPath)" TargetKind="SameAsPrimaryAssembly" LibraryPath="$(OutputPath)" />
-	</Target>
-	<Target Name="CopyDLLNexus" AfterTargets="RepackNexus">
-		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)package\nexus\$(SolutionName)\" />
-		<Message Text="Copied to nexus package folder." Importance="High" />
-	</Target>
-	<Target Name="CopyLanguageFileNexus" AfterTargets="CopyDLLNexus">
-		<Copy SourceFiles="$(ProjectDir)translations\English.json" DestinationFiles="$(ProjectDir)package\nexus\$(SolutionName)\$(SolutionName).English.json" />
-		<Message Text="Copied English.json to nexus package folder." Importance="High" />
-	</Target>
-	<Target Name="ZipNexus" AfterTargets="CopyLanguageFileNexus">
-		<ZipDirectory
-				SourceDirectory="$(ProjectDir)package\nexus\$(SolutionName)\"
-				DestinationFile="$(ProjectDir)package\nexus\$(SolutionName).zip"
-				Overwrite="true"/>
-	</Target>
-	<Target Name="ZipThunderstore" AfterTargets="CopyDLLThunderstore">
-		<ZipDirectory
-				SourceDirectory="$(ProjectDir)package\thunderstore\$(SolutionName)\"
-				DestinationFile="$(ProjectDir)package\thunderstore\$(SolutionName).zip"
-				Overwrite="true"/>
-	</Target>
-	<Target Name="CopyDLLPlugins" AfterTargets="CopyDLLThunderstore">
-		<Copy SourceFiles="$(TargetPath)" DestinationFolder="D:\r2modman\Valheim\profiles\beta\BepInEx\plugins\shudnal-$(SolutionName)\" />
-		<Message Text="Copied to r2 folder." Importance="High" />
-	</Target>
+
+  <PropertyGroup>
+    <ModName>Waystones</ModName>
+  </PropertyGroup>
+
+  <Target Name="InitializeWaystonesPackageProperties">
+    <PropertyGroup>
+      <EffectiveModName Condition="'$(ModName)' != ''">$(ModName)</EffectiveModName>
+      <EffectiveModName Condition="'$(EffectiveModName)' == '' and '$(TargetName)' != ''">$(TargetName)</EffectiveModName>
+      <EffectiveModName Condition="'$(EffectiveModName)' == '' and '$(AssemblyName)' != ''">$(AssemblyName)</EffectiveModName>
+      <EffectiveModName Condition="'$(EffectiveModName)' == '' and '$(MSBuildProjectName)' != ''">$(MSBuildProjectName)</EffectiveModName>
+
+      <ResolvedR2ModManProfilePluginsDir Condition="'$(R2ModManProfilePluginsDir)' != ''">$(R2ModManProfilePluginsDir)</ResolvedR2ModManProfilePluginsDir>
+      <ResolvedR2ModManProfilePluginsDir Condition="'$(ResolvedR2ModManProfilePluginsDir)' == ''">D:\r2modman\Valheim\profiles\beta\BepInEx\plugins\shudnal-$(EffectiveModName)\</ResolvedR2ModManProfilePluginsDir>
+
+      <ThunderstorePackageDir>$(ProjectDir)package\thunderstore\$(EffectiveModName)\</ThunderstorePackageDir>
+      <ThunderstoreZipPath>$(ProjectDir)package\thunderstore\$(EffectiveModName).zip</ThunderstoreZipPath>
+      <ThunderstoreManifestPath>$(ThunderstorePackageDir)manifest.json</ThunderstoreManifestPath>
+
+      <NexusPackageDir>$(ProjectDir)package\nexus\$(EffectiveModName)\</NexusPackageDir>
+      <NexusZipPath>$(ProjectDir)package\nexus\$(EffectiveModName).zip</NexusZipPath>
+
+      <EnglishLocalizationSource>$(ProjectDir)translations\English.json</EnglishLocalizationSource>
+      <ThunderstoreEnglishLocalizationDestination>$(ThunderstorePackageDir)$(EffectiveModName).English.json</ThunderstoreEnglishLocalizationDestination>
+      <NexusEnglishLocalizationDestination>$(NexusPackageDir)$(EffectiveModName).English.json</NexusEnglishLocalizationDestination>
+
+      <YamlDotNetAssemblyPath>$(TargetDir)YamlDotNet.dll</YamlDotNetAssemblyPath>
+    </PropertyGroup>
+
+    <Error Condition="'$(EffectiveModName)' == ''" Text="Mod name was not resolved. Set &lt;ModName&gt;Waystones&lt;/ModName&gt; in ILRepack.targets." />
+    <Error Condition="'$(ThunderstorePackageDir)' == ''" Text="Thunderstore package directory was not resolved." />
+    <Error Condition="'$(ThunderstoreZipPath)' == ''" Text="Thunderstore ZIP path was not resolved." />
+    <Error Condition="'$(NexusPackageDir)' == ''" Text="Nexus package directory was not resolved." />
+    <Error Condition="'$(NexusZipPath)' == ''" Text="Nexus ZIP path was not resolved." />
+    <Error Condition="'$(ResolvedR2ModManProfilePluginsDir)' == ''" Text="r2modman profile plugins directory was not resolved." />
+  </Target>
+
+  <Target
+    Name="UpdateWaystonesEmbeddedTranslationsBeforeBuild"
+    BeforeTargets="CoreCompile"
+    Condition="'$(DesignTimeBuild)' != 'true'">
+
+    <Error Condition="!Exists('$(ProjectDir)UpdateTranslations.ps1')" Text="UpdateTranslations.ps1 was not found in $(ProjectDir)." />
+    <Error Condition="!Exists('$(ProjectDir)EmbeddedLocalizations.csv')" Text="EmbeddedLocalizations.csv was not found in $(ProjectDir)." />
+
+    <Exec
+      WorkingDirectory="$(ProjectDir)"
+      Command="powershell -ExecutionPolicy Bypass -NoProfile -File &quot;$(ProjectDir)UpdateTranslations.ps1&quot;" />
+
+    <Message Text="Updated embedded translations before build." Importance="High" />
+  </Target>
+
+  <Target
+    Name="ReadWaystonesPackageVersion"
+    DependsOnTargets="InitializeWaystonesPackageProperties">
+
+    <Error Condition="!Exists('$(TargetPath)')" Text="Built mod DLL was not found: $(TargetPath)" />
+
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="_WaystonesPackageAssemblyIdentity" />
+    </GetAssemblyIdentity>
+
+    <PropertyGroup>
+      <PackageVersion>%(_WaystonesPackageAssemblyIdentity.Version)</PackageVersion>
+    </PropertyGroup>
+
+    <Error Condition="'$(PackageVersion)' == ''" Text="Package version was not resolved from $(TargetPath)." />
+    <Message Text="Detected package version from DLL: $(PackageVersion)" Importance="High" />
+  </Target>
+
+  <Target
+    Name="PrepareWaystonesThunderstorePackage"
+    DependsOnTargets="ReadWaystonesPackageVersion">
+
+    <Error Condition="!Exists('$(EnglishLocalizationSource)')" Text="English localization was not found: $(EnglishLocalizationSource)" />
+
+    <MakeDir Directories="$(ThunderstorePackageDir)" />
+
+    <Copy
+      SourceFiles="$(TargetPath)"
+      DestinationFolder="$(ThunderstorePackageDir)"
+      OverwriteReadOnlyFiles="true" />
+
+    <Copy
+      SourceFiles="$(EnglishLocalizationSource)"
+      DestinationFiles="$(ThunderstoreEnglishLocalizationDestination)"
+      OverwriteReadOnlyFiles="true" />
+
+    <Message Text="Thunderstore package directory updated: $(ThunderstorePackageDir)" Importance="High" />
+  </Target>
+
+  <Target
+    Name="UpdateWaystonesThunderstoreManifest"
+    DependsOnTargets="PrepareWaystonesThunderstorePackage">
+
+    <Error Condition="!Exists('$(ProjectDir)UpdateThunderstoreManifest.ps1')" Text="UpdateThunderstoreManifest.ps1 was not found in $(ProjectDir)." />
+    <Error Condition="!Exists('$(ThunderstoreManifestPath)')" Text="Thunderstore manifest was not found: $(ThunderstoreManifestPath)" />
+
+    <Exec
+      WorkingDirectory="$(ProjectDir)"
+      Command="powershell -ExecutionPolicy Bypass -NoProfile -File &quot;$(ProjectDir)UpdateThunderstoreManifest.ps1&quot; -ManifestPath &quot;$(ThunderstoreManifestPath)&quot; -Version &quot;$(PackageVersion)&quot;" />
+  </Target>
+
+  <Target
+    Name="ZipWaystonesThunderstorePackage"
+    DependsOnTargets="UpdateWaystonesThunderstoreManifest">
+
+    <ZipDirectory
+      SourceDirectory="$(ThunderstorePackageDir)"
+      DestinationFile="$(ThunderstoreZipPath)"
+      Overwrite="true" />
+
+    <Message Text="Thunderstore archive created: $(ThunderstoreZipPath)" Importance="High" />
+  </Target>
+
+  <Target
+    Name="CopyWaystonesToR2ModMan"
+    DependsOnTargets="ZipWaystonesThunderstorePackage">
+
+    <MakeDir Directories="$(ResolvedR2ModManProfilePluginsDir)" />
+
+    <Copy
+      SourceFiles="$(TargetPath)"
+      DestinationFolder="$(ResolvedR2ModManProfilePluginsDir)"
+      OverwriteReadOnlyFiles="true" />
+
+    <Message Text="Copied Waystones.dll to r2modman profile: $(ResolvedR2ModManProfilePluginsDir)" Importance="High" />
+  </Target>
+
+  <Target
+    Name="RepackWaystonesForNexus"
+    DependsOnTargets="CopyWaystonesToR2ModMan">
+
+    <Error Condition="!Exists('$(YamlDotNetAssemblyPath)')" Text="YamlDotNet.dll was not found: $(YamlDotNetAssemblyPath)" />
+
+    <ItemGroup>
+      <_WaystonesNexusInputAssemblies Include="$(TargetPath)" />
+      <_WaystonesNexusInputAssemblies Include="$(YamlDotNetAssemblyPath)" />
+    </ItemGroup>
+
+    <ILRepack
+      Parallel="true"
+      DebugInfo="true"
+      Internalize="true"
+      InputAssemblies="@(_WaystonesNexusInputAssemblies)"
+      OutputFile="$(TargetPath)"
+      TargetKind="SameAsPrimaryAssembly"
+      LibraryPath="$(TargetDir)" />
+
+    <Message Text="Repacked Waystones.dll with YamlDotNet for Nexus." Importance="High" />
+  </Target>
+
+  <Target
+    Name="PrepareWaystonesNexusPackage"
+    DependsOnTargets="RepackWaystonesForNexus">
+
+    <Error Condition="!Exists('$(TargetPath)')" Text="Repacked mod DLL was not found: $(TargetPath)" />
+    <Error Condition="!Exists('$(EnglishLocalizationSource)')" Text="English localization was not found: $(EnglishLocalizationSource)" />
+
+    <MakeDir Directories="$(NexusPackageDir)" />
+
+    <Copy
+      SourceFiles="$(TargetPath)"
+      DestinationFolder="$(NexusPackageDir)"
+      OverwriteReadOnlyFiles="true" />
+
+    <Copy
+      SourceFiles="$(EnglishLocalizationSource)"
+      DestinationFiles="$(NexusEnglishLocalizationDestination)"
+      OverwriteReadOnlyFiles="true" />
+
+    <Message Text="Nexus package directory updated: $(NexusPackageDir)" Importance="High" />
+  </Target>
+
+  <Target
+    Name="ZipWaystonesNexusPackage"
+    DependsOnTargets="PrepareWaystonesNexusPackage">
+
+    <ZipDirectory
+      SourceDirectory="$(NexusPackageDir)"
+      DestinationFile="$(NexusZipPath)"
+      Overwrite="true" />
+
+    <Message Text="Nexus archive created: $(NexusZipPath)" Importance="High" />
+  </Target>
+
+  <Target
+    Name="PublishWaystonesAfterBuild"
+    AfterTargets="Build"
+    Condition="'$(DesignTimeBuild)' != 'true'"
+    DependsOnTargets="ZipWaystonesNexusPackage" />
+
 </Project>

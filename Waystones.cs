@@ -1,4 +1,4 @@
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
@@ -14,6 +14,7 @@ using YamlDotNet.Serialization;
 
 namespace Waystones
 {
+    [BepInDependency("_shudnal.ConditionalConfigSync", BepInDependency.DependencyFlags.HardDependency)]
     [BepInPlugin(pluginID, pluginName, pluginVersion)]
     public class Waystones : BaseUnityPlugin
     {
@@ -110,7 +111,45 @@ namespace Waystones
         internal static ConfigEntry<int> particlesMinForceOverTime;
         internal static ConfigEntry<int> particlesMaxForceOverTime;
 
-        public static readonly CustomSyncedValue<Dictionary<string, int>> itemsToReduceCooldown = new(configSync, "Items to reduce cooldowns", new Dictionary<string, int>());
+        private sealed class SacrificeItemsComparer : IEqualityComparer<Dictionary<string, int>>
+        {
+            public static readonly SacrificeItemsComparer Instance = new();
+
+            public bool Equals(Dictionary<string, int> first, Dictionary<string, int> second)
+            {
+                if (ReferenceEquals(first, second))
+                    return true;
+
+                if (first is null || second is null || first.Count != second.Count)
+                    return false;
+
+                foreach (KeyValuePair<string, int> entry in first)
+                {
+                    if (!second.TryGetValue(entry.Key, out int value) || value != entry.Value)
+                        return false;
+                }
+
+                return true;
+            }
+
+            public int GetHashCode(Dictionary<string, int> value)
+            {
+                if (value is null)
+                    return 0;
+
+                int hash = 0;
+                foreach (KeyValuePair<string, int> entry in value)
+                    hash ^= ((entry.Key?.GetHashCode() ?? 0) * 397) ^ entry.Value;
+
+                return hash;
+            }
+        }
+
+        public static readonly CustomSyncedValue<Dictionary<string, int>> itemsToReduceCooldown = new(
+            configSync,
+            "Items to reduce cooldowns",
+            new Dictionary<string, int>(),
+            valueComparer: SacrificeItemsComparer.Instance);
 
         public static string configDirectory;
         internal static FileSystemWatcher configWatcher;
@@ -141,28 +180,26 @@ namespace Waystones
 
         public void ConfigInit()
         {
-            config("General", "NexusID", 2832, "Nexus mod ID for updates", false);
-
-            configLocked = config("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
-            loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging. [Not Synced with Server]", false);
-            pieceRecipe = config("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
-            disableWaystoneSparcs = config("General", "Disable waystone sparks", defaultValue: false, "Disable little sparks constantly emitting from waystone object. Restart required. [Not Synced with Server]", false);
-            waystoneMode = config("General", "Waystone mode", defaultValue: WaystoneMode.Cooldown, "Cooldown - You will only be able to teleport again after the specified time has passed" +
+            configLocked = serverConfig("General", "Lock Configuration", defaultValue: true, "Configuration is locked and can be changed by server admins only.");
+            loggingEnabled = config("General", "Logging enabled", defaultValue: false, "Enable logging.", false);
+            pieceRecipe = serverConfig("General", "Recipe", defaultValue: "SurtlingCore:1,GreydwarfEye:5,Stone:5", "Piece recipe");
+            disableWaystoneSparcs = config("General", "Disable waystone sparks", defaultValue: false, "Disable little sparks constantly emitting from waystone object. Restart required.", false);
+            waystoneMode = serverConfig("General", "Waystone mode", defaultValue: WaystoneMode.Cooldown, "Cooldown - You will only be able to teleport again after the specified time has passed" +
                 "\nCharge - requires waystone to be charged to start teleportation, charges consumption depends on distance, no cooldown on teleportation" +
                 "\nOrientation - Use waystones only for navigation, not teleportation");
-            maxWaystoneCharge = config("General", "Max waystone charge", defaultValue: 100, new ConfigDescription("Maximum waystone charge for Charge mode.", new AcceptableValueRange<int>(1, 100000)));
+            maxWaystoneCharge = serverConfig("General", "Max waystone charge", defaultValue: 100, new ConfigDescription("Maximum waystone charge for Charge mode.", new AcceptableValueRange<int>(1, 100000)));
             
-            allowWaystoneChargeOverdraft = config("Charge mode", "Allow charge overdraft", defaultValue: true, "If enabled, teleportation can consume more charge than the source waystone currently has as long as its charge is positive. This may leave negative charge.");
-            defaultWaystoneChargeFull = config("Charge mode", "Default charge is full", defaultValue: false, "If enabled, waystones without stored charge data start with maximum charge. If disabled, they start empty.");
-            allowWaystoneChargeOverflow = config("Charge mode", "Allow charge above maximum", defaultValue: true, "If enabled, item sacrifices can increase stored charge above Max waystone charge, but only once.");
-            waystoneChargeStorage = config("Charge mode", "Charge storage", defaultValue: ChargeStorage.Waystone, "Where charge is stored and consumed." +
+            allowWaystoneChargeOverdraft = serverConfig("Charge mode", "Allow charge overdraft", defaultValue: true, "If enabled, teleportation can consume more charge than the source waystone currently has as long as its charge is positive. This may leave negative charge.");
+            defaultWaystoneChargeFull = serverConfig("Charge mode", "Default charge is full", defaultValue: false, "If enabled, waystones without stored charge data start with maximum charge. If disabled, they start empty.");
+            allowWaystoneChargeOverflow = serverConfig("Charge mode", "Allow charge above maximum", defaultValue: true, "If enabled, item sacrifices can increase stored charge above Max waystone charge, but only once.");
+            waystoneChargeStorage = serverConfig("Charge mode", "Charge storage", defaultValue: ChargeStorage.Waystone, "Where charge is stored and consumed." +
                 "\nWaystone - item sacrifices charge the interacted waystone, and travel consumes the source waystone charge." +
                 "\nPlayer - item sacrifices charge the player in current world data, and travel consumes player charge.");
 
             pieceRecipe.SettingChanged += (sender, args) => PieceWaystone.SetPieceRequirements();
 
-            itemSacrifitionReduceCooldown = config("Item sacrifition", "Sacrifice item from list to reduce cooldown", defaultValue: true, "Enable sacrifition of item from list to reduce waystone cooldown");
-            showSacrificeItemsInHover = config("Item sacrifition", "Show available sacrifice items in hover text", defaultValue: true, "Show sacrifice items available to the player in waystone hover text. [Not Synced with Server]", false);
+            itemSacrifitionReduceCooldown = serverConfig("Item sacrifition", "Sacrifice item from list to reduce cooldown", defaultValue: true, "Enable sacrifition of item from list to reduce waystone cooldown");
+            showSacrificeItemsInHover = config("Item sacrifition", "Show available sacrifice items in hover text", defaultValue: true, "Show sacrifice items available to the player in waystone hover text.", false);
 
             locationWaystonesShowOnMap = config("Locations", "Show waystones on map", defaultValue: true, "Show waystone map pins");
             locationShowCurrentSpawn = config("Locations", "Show current spawn", defaultValue: true, "Show current spawn point in search mode");
@@ -183,41 +220,41 @@ namespace Waystones
             allowSensed = config("Restrictions", "Ignore nearby enemies to start search", defaultValue: false, "If enabled then Sensed by nearby enemies check before search start will be omitted.");
             allowNonSitting = config("Restrictions", "Ignore sitting to start search", defaultValue: false, "If enabled then sitting position check before search start will be omitted.");
             useShortcutToEnter = config("Restrictions", "Use shortcut to toggle search mode", defaultValue: false, "If set you can enter direction search mode by pressing shortcut. If not set - you have to sit in front of the waystone to start search mode.");
-            shortcut = config("Restrictions", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y), "Enter/Exit direction search mode [Not Synced with Server]", false);
-            tagCharactersLimit = config("Restrictions", "Tag characters limit", defaultValue: 15, "Max length of waystone tag. Values less than 10 will be ignored.");
-            allowForEveryone = config("Restrictions", "Allow all players to use activated waystones", defaultValue: false, "If enabled, any player can use a waystone once it has been activated by someone.");
+            shortcut = config("Restrictions", "Shortcut", defaultValue: new KeyboardShortcut(KeyCode.Y), "Enter/Exit direction search mode", false);
+            tagCharactersLimit = serverConfig("Restrictions", "Tag characters limit", defaultValue: 15, "Max length of waystone tag. Values less than 10 will be ignored.");
+            allowForEveryone = serverConfig("Restrictions", "Allow all players to use activated waystones", defaultValue: false, "If enabled, any player can use a waystone once it has been activated by someone.");
 
             directionSensitivity = config("Search mode", "Target sensitivity threshold", defaultValue: 2f, "Angle between look direction and target direction for location to appear in search mode");
             directionSensitivityThreshold = config("Search mode", "Screen sensitivity threshold", defaultValue: 6f, "Angle between look direction and target direction for location to start appearing in search mode");
             fadeMax = config("Search mode", "Screen fade max", defaultValue: 0.98f, "Screen darkness when sensitivity threshold is not met.");
             fadeMin = config("Search mode", "Screen fade min", defaultValue: 0.88f, "Screen darkness when looking at target");
             sfxSensitivityThreshold = config("Search mode", "Sound effect sensitivity threshold", defaultValue: 20f, "Angle between look direction and target direction for sound to start appearing in direction search mode");
-            sfxMax = config("Search mode", "Sound effect max volume", defaultValue: 1.1f, "Volume of sound effect played in direction mode when looking at a target [Not Synced with Server]", false);
-            sfxMin = config("Search mode", "Sound effect min volume", defaultValue: 0.4f, "Volume of sound effect played in direction mode when sensitivity threshold is not met [Not Synced with Server]", false);
+            sfxMax = config("Search mode", "Sound effect max volume", defaultValue: 1.1f, "Volume of sound effect played in direction mode when looking at a target", false);
+            sfxMin = config("Search mode", "Sound effect min volume", defaultValue: 0.4f, "Volume of sound effect played in direction mode when sensitivity threshold is not met", false);
             sfxPitchMax = config("Search mode", "Sound effect max pitch", defaultValue: 1.0f, "Pitch of sound effect played in direction mode when looking at a target");
             sfxPitchMin = config("Search mode", "Sound effect min pitch", defaultValue: 0.8f, "Pitch of sound effect played in direction mode when sensitivity threshold is not met.");
             slowFactorTime = config("Search mode", "Slow factor time", defaultValue: 0.25f, "Multiplier of speed ​​of time (singleplayer)");
-            slowFactorLookDeceleration = config("Search mode", "Slow factor mouse deceleration", defaultValue: 40f, "Mouse camera sensitivity acceleration factor. [Not Synced with Server]" +
+            slowFactorLookDeceleration = config("Search mode", "Slow factor mouse deceleration", defaultValue: 40f, "Mouse camera sensitivity acceleration factor." +
                                                                                                                     "\nIncrease to make mouse acceleration proportionally lower, decrease to make mouse movement faster ", false);
-            slowFactorLookMinimum = config("Search mode", "Slow factor mouse minimum", defaultValue: 0.08f, "Minimum mouse camera sensitivity factor in search mode. [Not Synced with Server]", false);
+            slowFactorLookMinimum = config("Search mode", "Slow factor mouse minimum", defaultValue: 0.08f, "Minimum mouse camera sensitivity factor in search mode.", false);
             fovDelta = config("Search mode", "FoV delta", defaultValue: 40f, "How much camera FoV can be changed both sides using zoom");
 
-            cooldownTime = config("Travel cooldown", "Time", defaultValue: CooldownTime.WorldTime, "Time type to calculate cooldown." +
+            cooldownTime = serverConfig("Travel cooldown", "Time", defaultValue: CooldownTime.WorldTime, "Time type to calculate cooldown." +
                                                                                                      "\nWorld time - calculate from time passed in game world" +
                                                                                                      "\nGlobal time - calculate from real world time");
-            cooldownDistanceMaximum = config("Travel cooldown", "Fast travelling distance maximum", defaultValue: 5000, "If fast travelling distance is larger then that cooldown will be set to maximum. World radius is 10000.");
-            cooldownDistanceMinimum = config("Travel cooldown", "Fast travelling distance minimum", defaultValue: 500, "If fast travelling distance is smaller then that cooldown will be set to minimum. World radius is 10000.");
-            cooldownMaximum = config("Travel cooldown", "Fast travelling cooldown maximum", defaultValue: 7200, "Maximal cooldown to be set after successfull fast travelling");
-            cooldownMinimum = config("Travel cooldown", "Fast travelling cooldown minimum", defaultValue: 600, "Minimal cooldown to be set after successfull fast travelling");
-            cooldownShort = config("Travel cooldown", "Fast travelling interrupted cooldown", defaultValue: 60, "Cooldown to be set if fast travelling was interrupted");
+            cooldownDistanceMaximum = serverConfig("Travel cooldown", "Fast travelling distance maximum", defaultValue: 5000, "If fast travelling distance is larger then that cooldown will be set to maximum. World radius is 10000.");
+            cooldownDistanceMinimum = serverConfig("Travel cooldown", "Fast travelling distance minimum", defaultValue: 500, "If fast travelling distance is smaller then that cooldown will be set to minimum. World radius is 10000.");
+            cooldownMaximum = serverConfig("Travel cooldown", "Fast travelling cooldown maximum", defaultValue: 7200, "Maximal cooldown to be set after successfull fast travelling");
+            cooldownMinimum = serverConfig("Travel cooldown", "Fast travelling cooldown minimum", defaultValue: 600, "Minimal cooldown to be set after successfull fast travelling");
+            cooldownShort = serverConfig("Travel cooldown", "Fast travelling interrupted cooldown", defaultValue: 60, "Cooldown to be set if fast travelling was interrupted");
             cooldownSearchMode = config("Travel cooldown", "Search mode cooldown", defaultValue: 30, "Cooldown to be set on search mode exit");
 
-            chargeDistanceMaximum = config("Travel charge", "Fast travelling distance maximum", defaultValue: 5000, "If fast travelling distance is larger than that, charge cost will be set to maximum. World radius is 10000.");
-            chargeDistanceMinimum = config("Travel charge", "Fast travelling distance minimum", defaultValue: 500, "If fast travelling distance is smaller than that, charge cost will be set to minimum. World radius is 10000.");
-            chargeCostMaximum = config("Travel charge", "Fast travelling charge maximum", defaultValue: 50, new ConfigDescription("Maximum charge cost after successful fast travelling.", new AcceptableValueRange<int>(1, 100000)));
-            chargeCostMinimum = config("Travel charge", "Fast travelling charge minimum", defaultValue: 20, new ConfigDescription("Minimum charge cost after successful fast travelling.", new AcceptableValueRange<int>(1, 100000)));
+            chargeDistanceMaximum = serverConfig("Travel charge", "Fast travelling distance maximum", defaultValue: 5000, "If fast travelling distance is larger than that, charge cost will be set to maximum. World radius is 10000.");
+            chargeDistanceMinimum = serverConfig("Travel charge", "Fast travelling distance minimum", defaultValue: 500, "If fast travelling distance is smaller than that, charge cost will be set to minimum. World radius is 10000.");
+            chargeCostMaximum = serverConfig("Travel charge", "Fast travelling charge maximum", defaultValue: 50, new ConfigDescription("Maximum charge cost after successful fast travelling.", new AcceptableValueRange<int>(1, 100000)));
+            chargeCostMinimum = serverConfig("Travel charge", "Fast travelling charge minimum", defaultValue: 20, new ConfigDescription("Minimum charge cost after successful fast travelling.", new AcceptableValueRange<int>(1, 100000)));
 
-            orientationWaystoneVisibilityDistance = config("Orientation mode", "Waystone visibility distance", defaultValue: 1000, "Maximum distance to show other waystones in orientation mode.");
+            orientationWaystoneVisibilityDistance = serverConfig("Orientation mode", "Waystone visibility distance", defaultValue: 1000, "Maximum distance to show other waystones in orientation mode.");
             orientationDistanceUnit = config("Orientation mode", "Distance unit", defaultValue: DistanceUnit.Meters, "Displayed units for orientation mode distance.");
             orientationShowDistantCurrentSpawn = config("Orientation mode", "Show distant current spawn", defaultValue: true, "Show current spawn marker even if farther than orientation distance.");
             orientationShowDistantLastPoint = config("Orientation mode", "Show distant last location", defaultValue: true, "Show last location marker even if farther than orientation distance.");
@@ -341,17 +378,21 @@ namespace Waystones
                 instance.Logger.LogInfo(data);
         }
 
+#pragma warning disable IDE1006 // Naming Styles
         ConfigEntry<T> config<T>(string group, string name, T defaultValue, ConfigDescription description, bool synchronizedSetting = true)
         {
-            ConfigEntry<T> configEntry = Config.Bind(group, name, defaultValue, description);
+            return configSync.AddConfigEntry(Config, group, name, defaultValue, description, syncMode: ConfigSyncMode.Conditional, serverControlledByDefault: synchronizedSetting).SourceConfig;
+        }
 
-            SyncedConfigEntry<T> syncedConfigEntry = configSync.AddConfigEntry(configEntry);
-            syncedConfigEntry.SynchronizedConfig = synchronizedSetting;
-
-            return configEntry;
+        ConfigEntry<T> serverConfig<T>(string group, string name, T defaultValue, ConfigDescription description)
+        {
+            return configSync.AddConfigEntry(Config, group, name, defaultValue, description, syncMode: ConfigSyncMode.AlwaysServerControlled, serverControlledByDefault: true).SourceConfig;
         }
 
         ConfigEntry<T> config<T>(string group, string name, T defaultValue, string description, bool synchronizedSetting = true) => config(group, name, defaultValue, new ConfigDescription(description), synchronizedSetting);
+
+        ConfigEntry<T> serverConfig<T>(string group, string name, T defaultValue, string description) => serverConfig(group, name, defaultValue, new ConfigDescription(description));
+#pragma warning restore IDE1006 // Naming Styles
 
         private void LoadIcons()
         {
@@ -550,8 +591,8 @@ namespace Waystones
             if (separatorIndex < 0)
                 return key.GetItemName();
 
-            string itemName = key.Substring(0, separatorIndex).Trim();
-            string amount = key.Substring(separatorIndex + 1).Trim();
+            string itemName = key[..separatorIndex].Trim();
+            string amount = key[(separatorIndex + 1)..].Trim();
 
             if (itemName.IsNullOrWhiteSpace())
                 return "";
