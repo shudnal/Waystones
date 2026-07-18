@@ -33,14 +33,14 @@ namespace Waystones
             List<DirectionSearch.Direction> result = new();
 
             WorldData data = GetWorldData(GetState());
-            if (data == null)
-                return result;
+            if (data != null)
+            {
+                if (data.lastShip != Vector3.zero && locationShowLastShip.Value)
+                    result.Add(new DirectionSearch.Direction("$ws_location_last_ship", data.lastShip));
 
-            if (data.lastShip != null && data.lastShip != Vector3.zero && locationShowLastShip.Value)
-                result.Add(new DirectionSearch.Direction("$ws_location_last_ship", data.lastShip));
-
-            if (data.lastPosition != null && data.lastPosition != Vector3.zero && locationShowLastPoint.Value)
-                result.Add(new DirectionSearch.Direction("$ws_location_last_location", data.lastPosition));
+                if (data.lastPosition != Vector3.zero && locationShowLastPoint.Value)
+                    result.Add(new DirectionSearch.Direction("$ws_location_last_location", data.lastPosition));
+            }
 
             if (locationShowWaystones.Value)
                 WaystoneList.activatedWaystones.Do(waystone => result.Add(new DirectionSearch.Direction($"$ws_piece_waystone_name \"{waystone.tag}\"", waystone)));

@@ -1,3 +1,6 @@
+# 1.1.2
+* fixed activated player-built waystones not appearing in Orientation mode when the character had no saved Waystones world data
+
 # 1.1.1
 * migrated to ConditionalConfigSync; server administrators can override the ownership policy of policy-controlled settings, making them server- or client-controlled
 * fixed sparcs config name
