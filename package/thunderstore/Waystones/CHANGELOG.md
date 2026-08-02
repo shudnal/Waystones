@@ -1,3 +1,6 @@
+# 1.2.0
+* added disabled by default precise direction icons for locations and player-built waystones in search mode; icon appearance angle, size and visibility are configurable in the new `Search mode - Icons` config group
+
 # 1.1.2
 * fixed activated player-built waystones not appearing in Orientation mode when the character had no saved Waystones world data
 

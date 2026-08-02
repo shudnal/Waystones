@@ -20,7 +20,7 @@ namespace Waystones
     {
         public const string pluginID = "shudnal.Waystones";
         public const string pluginName = "Waystones";
-        public const string pluginVersion = "1.1.2";
+        public const string pluginVersion = "1.2.0";
 
         private readonly Harmony harmony = new(pluginID);
 
@@ -60,6 +60,9 @@ namespace Waystones
 
         internal static ConfigEntry<float> directionSensitivity;
         internal static ConfigEntry<float> directionSensitivityThreshold;
+        internal static ConfigEntry<bool> showDirectionIcons;
+        internal static ConfigEntry<float> directionIconSize;
+        internal static ConfigEntry<float> iconSensitivityThreshold;
         internal static ConfigEntry<float> fadeMax;
         internal static ConfigEntry<float> fadeMin;
         internal static ConfigEntry<float> slowFactorTime;
@@ -224,7 +227,7 @@ namespace Waystones
             tagCharactersLimit = serverConfig("Restrictions", "Tag characters limit", defaultValue: 15, "Max length of waystone tag. Values less than 10 will be ignored.");
             allowForEveryone = serverConfig("Restrictions", "Allow all players to use activated waystones", defaultValue: false, "If enabled, any player can use a waystone once it has been activated by someone.");
 
-            directionSensitivity = config("Search mode", "Target sensitivity threshold", defaultValue: 2f, "Angle between look direction and target direction for location to appear in search mode");
+            directionSensitivity = config("Search mode", "Target sensitivity threshold", defaultValue: 1.5f, "Angle between look direction and target direction for location to appear in search mode");
             directionSensitivityThreshold = config("Search mode", "Screen sensitivity threshold", defaultValue: 6f, "Angle between look direction and target direction for location to start appearing in search mode");
             fadeMax = config("Search mode", "Screen fade max", defaultValue: 0.98f, "Screen darkness when sensitivity threshold is not met.");
             fadeMin = config("Search mode", "Screen fade min", defaultValue: 0.88f, "Screen darkness when looking at target");
@@ -239,6 +242,10 @@ namespace Waystones
             slowFactorLookMinimum = config("Search mode", "Slow factor mouse minimum", defaultValue: 0.08f, "Minimum mouse camera sensitivity factor in search mode.", false);
             fovDelta = config("Search mode", "FoV delta", defaultValue: 40f, "How much camera FoV can be changed both sides using zoom");
 
+            showDirectionIcons = config("Search mode - Icons", "Show direction icons", defaultValue: false, "Show precise screen-space icons for available locations and player-built waystones when looking near their direction.");
+            directionIconSize = config("Search mode - Icons", "Direction icon size", defaultValue: 32f, new ConfigDescription("Screen-space direction icon size in pixels.", new AcceptableValueRange<float>(16f, 128f)));
+            iconSensitivityThreshold = config("Search mode - Icons", "Icon sensitivity threshold", defaultValue: 8f, "Angle between look direction and target direction for direction icons to be visible.");
+            
             cooldownTime = serverConfig("Travel cooldown", "Time", defaultValue: CooldownTime.WorldTime, "Time type to calculate cooldown." +
                                                                                                      "\nWorld time - calculate from time passed in game world" +
                                                                                                      "\nGlobal time - calculate from real world time");

@@ -1,4 +1,4 @@
-# Waystones
+﻿# Waystones
 Build a waystone network, sit in front of one, locate with your gaze a distant place or another waystone and fast travel there
 
 ![](https://staticdelivery.nexusmods.com/mods/3667/images/headers/2832_1722236465.jpg)
@@ -18,6 +18,8 @@ After building a waystone sit in front of it and activate search mode.
 Your screen will be darken, camera movement slowed and you will be able to hear and locate available distant places. 
 
 Sound pitch and screen brightness will reflect a distance between current look direction and distant place direction. 
+
+Available locations and player-built waystones can appear as precise screen-space icons. Each direction uses its corresponding map icon, becomes visible only within the configurable `Search mode - Icons` threshold and uses an angle-based fade curve: it is fully opaque only when your aim is almost exact and becomes increasingly transparent as the angle grows. If several directions overlap on screen, the target closest to the crosshair is drawn above the others.
 
 "Touch" the direction with your gaze and you can start fast travelling there.
 
@@ -175,6 +177,7 @@ Notable configurable values:
 * screen brightness and sound volume
 * fov delta (how much you can zoom in search mode)
 * screen and sound sensitivity threshold (an angle between location direction and look direction for effect to start showing)
+* waystone direction icons and their screen size
 
 ## Localization
 To add your own localization create a file with the name Waystones.LanguageName.yml or Waystones.LanguageName.json anywhere inside of the Bepinex folder. For example, to add a French translation you could create a Waystones.French.yml file inside of the config folder and add French translations there.

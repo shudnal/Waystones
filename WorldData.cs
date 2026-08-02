@@ -36,10 +36,10 @@ namespace Waystones
             if (data != null)
             {
                 if (data.lastShip != Vector3.zero && locationShowLastShip.Value)
-                    result.Add(new DirectionSearch.Direction("$ws_location_last_ship", data.lastShip));
+                    result.Add(new DirectionSearch.Direction("$ws_location_last_ship", data.lastShip, DirectionSearch.DirectionIconType.Point));
 
                 if (data.lastPosition != Vector3.zero && locationShowLastPoint.Value)
-                    result.Add(new DirectionSearch.Direction("$ws_location_last_location", data.lastPosition));
+                    result.Add(new DirectionSearch.Direction("$ws_location_last_location", data.lastPosition, DirectionSearch.DirectionIconType.Point));
             }
 
             if (locationShowWaystones.Value)

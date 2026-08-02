@@ -61,6 +61,8 @@ namespace Waystones
                     m_name = (Minimap.PinType)pinType,
                     m_icon = iconWaystone,
                 });
+
+                DirectionSearch.InitializeDirectionIcons(__instance);
             }
         }
 

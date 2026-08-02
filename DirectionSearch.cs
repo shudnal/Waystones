@@ -3,14 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 using static Waystones.Waystones;
 
 namespace Waystones
 {
     public static class DirectionSearch
     {
+        internal enum DirectionIconType
+        {
+            None,
+            Waystone,
+            Location,
+            Death,
+            Bed,
+            Point
+        }
+
         public class Direction
         {
             public string name;
@@ -21,28 +33,52 @@ namespace Waystones
             public int arrivalCharge;
             private const int NoArrivalCharge = int.MinValue;
             private readonly WaystoneList.WaystoneData waystone;
+            private readonly DirectionIconType iconType;
+            private readonly string locationIconName;
+
+            internal bool IsWaystone => waystone != null;
+            internal Sprite Icon => GetDirectionIcon(iconType, locationIconName);
+            internal Vector2 IconOffset => iconType switch
+            {
+                DirectionIconType.Death => new Vector2(0.3f, -0.5f),
+                DirectionIconType.Bed => new Vector2(0.5f, -5f / 6f),
+                DirectionIconType.Point => new Vector2(0.05f, -0.10f),
+                _ => Vector2.zero
+            };
 
             public Direction(string name, Vector3 position)
-                : this(name, position, Quaternion.identity, null)
+                : this(name, position, Quaternion.identity, null, DirectionIconType.None, null)
             {
             }
 
             public Direction(string name, Vector3 position, Quaternion rotation)
-                : this(name, position, rotation, null)
+                : this(name, position, rotation, null, DirectionIconType.None, null)
+            {
+            }
+
+            internal Direction(string name, Vector3 position, DirectionIconType iconType)
+                : this(name, position, Quaternion.identity, null, iconType, null)
+            {
+            }
+
+            internal Direction(string name, Vector3 position, string locationIconName)
+                : this(name, position, Quaternion.identity, null, DirectionIconType.Location, locationIconName)
             {
             }
 
             internal Direction(string name, WaystoneList.WaystoneData waystone)
-                : this(name, waystone.searchPosition, waystone.searchRotation, waystone)
+                : this(name, waystone.searchPosition, waystone.searchRotation, waystone, DirectionIconType.Waystone, null)
             {
             }
 
-            private Direction(string name, Vector3 position, Quaternion rotation, WaystoneList.WaystoneData waystone)
+            private Direction(string name, Vector3 position, Quaternion rotation, WaystoneList.WaystoneData waystone, DirectionIconType iconType, string locationIconName)
             {
                 this.name = name;
                 this.position = position;
                 this.rotation = rotation;
                 this.waystone = waystone;
+                this.iconType = iconType;
+                this.locationIconName = locationIconName;
                 cooldown = WorldData.GetCooldownTimeToTarget(position);
 
                 Vector3 from = Player.m_localPlayer ? Player.m_localPlayer.transform.position : Vector3.zero;
@@ -108,8 +144,49 @@ namespace Waystones
         private static float currentAngle;
         private static WaystoneList.WaystoneData sourceWaystone;
 
+        private readonly struct DirectionIconTarget
+        {
+            public readonly Sprite sprite;
+            public readonly Vector2 screenPosition;
+            public readonly Vector2 iconOffset;
+            public readonly float alpha;
+            public readonly float angle;
+
+            public DirectionIconTarget(Sprite sprite, Vector2 screenPosition, Vector2 iconOffset, float alpha, float angle)
+            {
+                this.sprite = sprite;
+                this.screenPosition = screenPosition;
+                this.iconOffset = iconOffset;
+                this.alpha = alpha;
+                this.angle = angle;
+            }
+        }
+
         private static float defaultFoV;
         private static float targetFoV;
+
+        private static RectTransform directionIconLayer;
+        private static Canvas directionIconCanvas;
+        private static readonly List<Image> directionIcons = new();
+        private static readonly List<DirectionIconTarget> visibleDirectionIcons = new();
+        private static readonly Dictionary<string, Sprite> locationDirectionIcons = new(StringComparer.Ordinal);
+        private static Sprite waystoneDirectionIcon;
+        private static Sprite deathDirectionIcon;
+        private static Sprite bedDirectionIcon;
+        private static Sprite pointDirectionIcon;
+        private const int FastInverseSquareRootMagic = 0x5f3759df;
+        private const float DirectionIconAlphaScale = 0.3f;
+        private const float DirectionIconAlphaOffset = -0.1f;
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct FloatIntUnion
+        {
+            [FieldOffset(0)]
+            public float floatValue;
+
+            [FieldOffset(0)]
+            public int intValue;
+        }
 
         public static CanvasGroup screenBlackener;
         public static AudioSource screenBlackenerSfx;
@@ -173,6 +250,7 @@ namespace Waystones
             current = null;
             currentAngle = 0f;
             sourceWaystone = null;
+            SetDirectionIconLayerActive(false);
 
             WaystoneList.UpdatePins();
         }
@@ -182,25 +260,25 @@ namespace Waystones
             directions.Clear();
 
             if (locationShowCurrentSpawn.Value)
-                directions.Add(new Direction("$ws_location_spawn_point", GetSpawnPoint()));
+                directions.Add(new Direction("$ws_location_spawn_point", GetSpawnPoint(), DirectionIconType.Bed));
 
             ZoneSystem.instance.tempIconList.Clear();
             ZoneSystem.instance.GetLocationIcons(ZoneSystem.instance.tempIconList);
             foreach (KeyValuePair<Vector3, string> loc in ZoneSystem.instance.tempIconList)
             {
                 if (loc.Value == "StartTemple" && locationShowStartTemple.Value)
-                    directions.Add(new Direction("$ws_location_start_temple", loc.Key));
+                    directions.Add(new Direction("$ws_location_start_temple", loc.Key, loc.Value));
                 else if (loc.Value == "Vendor_BlackForest" && locationShowHaldor.Value)
-                    directions.Add(new Direction("$npc_haldor", loc.Key));
+                    directions.Add(new Direction("$npc_haldor", loc.Key, loc.Value));
                 else if (loc.Value == "Hildir_camp" && locationShowHildir.Value)
-                    directions.Add(new Direction("$npc_hildir", loc.Key));
+                    directions.Add(new Direction("$npc_hildir", loc.Key, loc.Value));
                 else if (loc.Value == "BogWitch_Camp" && locationShowBogWitch.Value)
-                    directions.Add(new Direction("$npc_bogwitch", loc.Key));
+                    directions.Add(new Direction("$npc_bogwitch", loc.Key, loc.Value));
             }
 
             PlayerProfile profile = Game.instance.GetPlayerProfile();
             if (profile.HaveDeathPoint() && locationShowLastTombstone.Value)
-                directions.Add(new Direction("$ws_location_last_tombstone", profile.GetDeathPoint()));
+                directions.Add(new Direction("$ws_location_last_tombstone", profile.GetDeathPoint(), DirectionIconType.Death));
 
             directions.AddRange(WorldData.GetSavedDirections());
 
@@ -227,7 +305,7 @@ namespace Waystones
                         "$npc_haldor" => !orientationShowDistantHaldor.Value,
                         "$npc_hildir" => !orientationShowDistantHildir.Value,
                         "$npc_bogwitch" => !orientationShowDistantBogWitch.Value,
-                        _ => d.name.Contains("$ws_piece_waystone_name") && !orientationShowDistantWaystones.Value
+                        _ => d.IsWaystone && !orientationShowDistantWaystones.Value
                     };
                 });
             }
@@ -306,6 +384,9 @@ namespace Waystones
             GameCamera.instance.m_fov = Mathf.MoveTowards(GameCamera.instance.m_fov, targetFoV, fovDelta.Value);
 
             Vector3 look = Player.m_localPlayer.GetLookDir();
+            Vector3 pos = Player.m_localPlayer.GetEyePoint();
+            UpdateDirectionIcons(look, pos);
+
             currentAngle = Vector3.Angle(look, Vector3.down);
             if (currentAngle < GetCurrentSensivity() && locationShowRandomPoint.Value)
             {
@@ -316,7 +397,6 @@ namespace Waystones
             if (directions.Count == 0)
                 return;
 
-            Vector3 pos = Player.m_localPlayer.GetEyePoint();
             directions = directions.OrderBy(dir => Vector3.Angle(look, dir.position - pos)).ToList();
 
             currentAngle = Vector3.Angle(look, directions[0].position - pos);
@@ -337,6 +417,192 @@ namespace Waystones
         private static float GetCurrentSfxSensivityThreshold()
         {
             return sfxSensitivityThreshold.Value * targetFoV / defaultFoV;
+        }
+
+        private static float GetCurrentIconSensivityThreshold()
+        {
+            return iconSensitivityThreshold.Value * targetFoV / defaultFoV;
+        }
+
+        internal static void InitializeDirectionIcons(Minimap minimap)
+        {
+            locationDirectionIcons.Clear();
+            waystoneDirectionIcon = WaystoneList.iconWaystone;
+            deathDirectionIcon = GetMapIcon(minimap, Minimap.PinType.Death);
+            bedDirectionIcon = GetMapIcon(minimap, Minimap.PinType.Bed);
+            pointDirectionIcon = null;
+
+            foreach (Minimap.SpriteData icon in minimap.m_icons)
+            {
+                if (!icon.m_icon)
+                    continue;
+
+                if (icon.m_icon.name == "mapicon_pin")
+                    pointDirectionIcon = icon.m_icon;
+            }
+
+            pointDirectionIcon = pointDirectionIcon ? pointDirectionIcon : GetMapIcon(minimap, Minimap.PinType.Icon4);
+
+            foreach (Minimap.LocationSpriteData icon in minimap.m_locationIcons)
+            {
+                if (!string.IsNullOrEmpty(icon.m_name) && icon.m_icon)
+                    locationDirectionIcons[icon.m_name] = icon.m_icon;
+            }
+        }
+
+        internal static void ClearDirectionIcons()
+        {
+            locationDirectionIcons.Clear();
+            waystoneDirectionIcon = null;
+            deathDirectionIcon = null;
+            bedDirectionIcon = null;
+            pointDirectionIcon = null;
+        }
+
+        private static Sprite GetMapIcon(Minimap minimap, Minimap.PinType pinType)
+        {
+            foreach (Minimap.SpriteData icon in minimap.m_icons)
+                if (icon.m_name == pinType)
+                    return icon.m_icon;
+
+            return null;
+        }
+
+        private static Sprite GetDirectionIcon(DirectionIconType iconType, string locationIconName)
+        {
+            return iconType switch
+            {
+                DirectionIconType.Waystone => waystoneDirectionIcon,
+                DirectionIconType.Location => !string.IsNullOrEmpty(locationIconName) && locationDirectionIcons.TryGetValue(locationIconName, out Sprite locationIcon) ? locationIcon : null,
+                DirectionIconType.Death => deathDirectionIcon,
+                DirectionIconType.Bed => bedDirectionIcon,
+                DirectionIconType.Point => pointDirectionIcon,
+                _ => null
+            };
+        }
+
+        private static void UpdateDirectionIcons(Vector3 lookDirection, Vector3 eyePosition)
+        {
+            bool showIcons = activated && showDirectionIcons.Value && directionIconLayer;
+            visibleDirectionIcons.Clear();
+
+            SetDirectionIconLayerActive(showIcons);
+            if (!showIcons)
+                return;
+
+            Camera worldCamera = GameCamera.instance ? GameCamera.instance.m_camera : null;
+            if (!worldCamera)
+            {
+                HideUnusedDirectionIcons(0);
+                return;
+            }
+
+            float visibilityThreshold = GetCurrentIconSensivityThreshold();
+
+            foreach (Direction direction in directions)
+            {
+                Sprite sprite = direction.Icon;
+                if (!sprite)
+                    continue;
+
+                Vector3 targetDirection = direction.position - eyePosition;
+                float angle = Vector3.Angle(lookDirection, targetDirection);
+                if (angle > visibilityThreshold)
+                    continue;
+
+                Vector3 screenPosition = worldCamera.WorldToScreenPoint(direction.position);
+                if (screenPosition.z <= 0f)
+                    continue;
+
+                float alpha = GetDirectionIconAlpha(angle, visibilityThreshold);
+                visibleDirectionIcons.Add(new DirectionIconTarget(sprite, screenPosition, direction.IconOffset, alpha, angle));
+            }
+
+            // Draw larger angles first so the target closest to the crosshair remains on top.
+            visibleDirectionIcons.Sort((left, right) => right.angle.CompareTo(left.angle));
+
+            Camera uiCamera = directionIconCanvas && directionIconCanvas.renderMode != RenderMode.ScreenSpaceOverlay
+                ? directionIconCanvas.worldCamera
+                : null;
+
+            int iconIndex = 0;
+            foreach (DirectionIconTarget target in visibleDirectionIcons)
+            {
+                if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(directionIconLayer, target.screenPosition, uiCamera, out Vector2 localPoint))
+                    continue;
+
+                Image icon = GetDirectionIconImage(iconIndex);
+                RectTransform rectTransform = icon.rectTransform;
+                float iconSize = directionIconSize.Value;
+
+                icon.sprite = target.sprite;
+                rectTransform.anchoredPosition = localPoint + target.iconOffset * iconSize;
+                rectTransform.sizeDelta = new Vector2(iconSize, iconSize);
+                rectTransform.SetSiblingIndex(iconIndex);
+
+                icon.color = new Color(1f, 1f, 1f, target.alpha);
+                icon.gameObject.SetActive(true);
+                iconIndex++;
+            }
+
+            HideUnusedDirectionIcons(iconIndex);
+        }
+
+        private static float GetDirectionIconAlpha(float angle, float visibilityThreshold)
+        {
+            if (visibilityThreshold <= 0f)
+                return 0f;
+
+            float normalizedAngle = Mathf.Clamp01(angle / visibilityThreshold);
+            if (normalizedAngle < 0.08f)
+                return 1f;
+
+            float x = normalizedAngle * 2f;
+            float alpha = 0.3f * FastInverseSquareRoot(x - 0.1f) - 0.2175f;
+            return Mathf.Clamp01(alpha);
+        }
+
+        private static float FastInverseSquareRoot(float value)
+        {
+            FloatIntUnion conversion = new() { floatValue = value };
+            conversion.intValue = FastInverseSquareRootMagic - (conversion.intValue >> 1);
+
+            float estimate = conversion.floatValue;
+            return estimate * (1.5f - 0.5f * value * estimate * estimate);
+        }
+
+        private static Image GetDirectionIconImage(int index)
+        {
+            while (directionIcons.Count <= index)
+            {
+                GameObject iconObject = new("DirectionIcon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+                iconObject.transform.SetParent(directionIconLayer, worldPositionStays: false);
+
+                Image icon = iconObject.GetComponent<Image>();
+                icon.preserveAspect = true;
+                icon.raycastTarget = false;
+
+                RectTransform rectTransform = icon.rectTransform;
+                rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+                rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+                rectTransform.pivot = new Vector2(0.5f, 0.5f);
+
+                directionIcons.Add(icon);
+            }
+
+            return directionIcons[index];
+        }
+
+        private static void HideUnusedDirectionIcons(int firstUnusedIndex)
+        {
+            for (int i = firstUnusedIndex; i < directionIcons.Count; i++)
+                directionIcons[i].gameObject.SetActive(false);
+        }
+
+        private static void SetDirectionIconLayerActive(bool active)
+        {
+            if (directionIconLayer && directionIconLayer.gameObject.activeSelf != active)
+                directionIconLayer.gameObject.SetActive(active);
         }
 
         private static Vector3 GetRandomPoint()
@@ -426,8 +692,34 @@ namespace Waystones
                 screenBlackener = blocker.GetComponent<CanvasGroup>();
                 screenBlackener.gameObject.SetActive(false);
 
-                LogInfo("Blackener panel initialized");
+                directionIcons.Clear();
+                visibleDirectionIcons.Clear();
+
+                GameObject iconLayerObject = new("Waystones_DirectionSearchIcons", typeof(RectTransform), typeof(CanvasGroup));
+                iconLayerObject.transform.SetParent(blocker.transform.parent, worldPositionStays: false);
+                iconLayerObject.transform.SetSiblingIndex(blocker.transform.GetSiblingIndex() + 1);
+
+                directionIconLayer = iconLayerObject.GetComponent<RectTransform>();
+                directionIconLayer.anchorMin = Vector2.zero;
+                directionIconLayer.anchorMax = Vector2.one;
+                directionIconLayer.offsetMin = Vector2.zero;
+                directionIconLayer.offsetMax = Vector2.zero;
+                directionIconLayer.pivot = new Vector2(0.5f, 0.5f);
+
+                CanvasGroup iconCanvasGroup = iconLayerObject.GetComponent<CanvasGroup>();
+                iconCanvasGroup.interactable = false;
+                iconCanvasGroup.blocksRaycasts = false;
+
+                directionIconCanvas = iconLayerObject.GetComponentInParent<Canvas>();
+                iconLayerObject.SetActive(false);
+
             }
+        }
+
+        [HarmonyPatch(typeof(Minimap), nameof(Minimap.OnDestroy))]
+        public static class Minimap_OnDestroy_ClearDirectionIcons
+        {
+            private static void Postfix() => ClearDirectionIcons();
         }
 
         [HarmonyPatch(typeof(Hud), nameof(Hud.UpdateBlackScreen))]
