@@ -1,3 +1,8 @@
+# 1.2.1
+* Updated for the Valheim 1.0.7 release.
+* Updated required dependencies to BepInExPack Valheim 5.4.2350 and ConditionalConfigSync 1.0.5.
+* Rebuild the waystone index for worlds saved in the new chunk format without retaining stale entries.
+
 # 1.2.0
 * added disabled by default precise direction icons for locations and player-built waystones in search mode; icon appearance angle, size and visibility are configurable in the new `Search mode - Icons` config group
 

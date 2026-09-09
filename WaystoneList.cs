@@ -479,11 +479,18 @@ namespace Waystones
             };
         }
 
-        [HarmonyPatch(typeof(ZDOMan), nameof(ZDOMan.Load))]
+        [HarmonyPatch]
         public static class ZDOMan_Load_WaystoneListInit
         {
+            private static IEnumerable<System.Reflection.MethodBase> TargetMethods()
+            {
+                yield return AccessTools.Method(typeof(ZDOMan), nameof(ZDOMan.Load));
+                yield return AccessTools.Method(typeof(ZDOMan), nameof(ZDOMan.LoadChunks));
+            }
+
             private static void Postfix(ZDOMan __instance)
             {
+                waystoneObjects.Clear();
                 foreach (KeyValuePair<ZDOID, ZDO> item in __instance.m_objectsByID)
                     if (item.Value.GetPrefab() == PieceWaystone.waystoneHash)
                         waystoneObjects.Add(item.Value);

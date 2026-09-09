@@ -13,6 +13,8 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 {
     public GameObject m_activeObject;
 
+    public float m_hoverOffset;
+
     public EffectList m_activateEffect = new();
     public EffectList m_deactivateEffect = new();
 
@@ -176,6 +178,11 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
     public string GetHoverName()
     {
         return IsActive() ? "$ws_piece_waystone_activated" : "$ws_piece_waystone_name";
+    }
+
+    public float GetHoverOffset()
+    {
+        return m_hoverOffset;
     }
 
     public bool Interact(Humanoid human, bool hold, bool alt)
@@ -577,7 +584,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
             player.Message(MessageHud.MessageType.Center, "$se_encumbered_start");
             return false;
         }
-        else if (!allowNonTeleportableItems.Value && !player.IsTeleportable())
+        else if (!allowNonTeleportableItems.Value && !player.IsTeleportable(false))
         {
             player.Message(MessageHud.MessageType.Center, "$msg_noteleport");
             return false;

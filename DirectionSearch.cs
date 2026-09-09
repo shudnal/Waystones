@@ -619,8 +619,8 @@ namespace Waystones
 
         private static bool IsValidRandomPointForTeleport(ref Vector3 pos)
         {
-            Heightmap.Biome biome = WorldGenerator.instance.GetBiome(pos);
-            if (biome == Heightmap.Biome.Ocean || biome == Heightmap.Biome.None || !Player.m_localPlayer.m_knownBiome.Contains(biome))
+            BiomeSector biomeSector = WorldGenerator.instance.GetBiomeSector(pos);
+            if (biomeSector.Biome == Heightmap.Biome.Ocean || biomeSector.Biome == Heightmap.Biome.None || !Player.m_localPlayer.IsBiomeKnown(biomeSector))
                 return false;
 
             pos = new Vector3(pos.x, ZoneSystem.c_WaterLevel + 1, pos.z);

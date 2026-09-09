@@ -19,21 +19,15 @@
       <ThunderstoreZipPath>$(ProjectDir)package\thunderstore\$(EffectiveModName).zip</ThunderstoreZipPath>
       <ThunderstoreManifestPath>$(ThunderstorePackageDir)manifest.json</ThunderstoreManifestPath>
 
-      <NexusPackageDir>$(ProjectDir)package\nexus\$(EffectiveModName)\</NexusPackageDir>
-      <NexusZipPath>$(ProjectDir)package\nexus\$(EffectiveModName).zip</NexusZipPath>
 
       <EnglishLocalizationSource>$(ProjectDir)translations\English.json</EnglishLocalizationSource>
       <ThunderstoreEnglishLocalizationDestination>$(ThunderstorePackageDir)$(EffectiveModName).English.json</ThunderstoreEnglishLocalizationDestination>
-      <NexusEnglishLocalizationDestination>$(NexusPackageDir)$(EffectiveModName).English.json</NexusEnglishLocalizationDestination>
 
-      <YamlDotNetAssemblyPath>$(TargetDir)YamlDotNet.dll</YamlDotNetAssemblyPath>
     </PropertyGroup>
 
     <Error Condition="'$(EffectiveModName)' == ''" Text="Mod name was not resolved. Set &lt;ModName&gt;Waystones&lt;/ModName&gt; in ILRepack.targets." />
     <Error Condition="'$(ThunderstorePackageDir)' == ''" Text="Thunderstore package directory was not resolved." />
     <Error Condition="'$(ThunderstoreZipPath)' == ''" Text="Thunderstore ZIP path was not resolved." />
-    <Error Condition="'$(NexusPackageDir)' == ''" Text="Nexus package directory was not resolved." />
-    <Error Condition="'$(NexusZipPath)' == ''" Text="Nexus ZIP path was not resolved." />
     <Error Condition="'$(ResolvedR2ModManProfilePluginsDir)' == ''" Text="r2modman profile plugins directory was not resolved." />
   </Target>
 
@@ -130,66 +124,9 @@
   </Target>
 
   <Target
-    Name="RepackWaystonesForNexus"
-    DependsOnTargets="CopyWaystonesToR2ModMan">
-
-    <Error Condition="!Exists('$(YamlDotNetAssemblyPath)')" Text="YamlDotNet.dll was not found: $(YamlDotNetAssemblyPath)" />
-
-    <ItemGroup>
-      <_WaystonesNexusInputAssemblies Include="$(TargetPath)" />
-      <_WaystonesNexusInputAssemblies Include="$(YamlDotNetAssemblyPath)" />
-    </ItemGroup>
-
-    <ILRepack
-      Parallel="true"
-      DebugInfo="true"
-      Internalize="true"
-      InputAssemblies="@(_WaystonesNexusInputAssemblies)"
-      OutputFile="$(TargetPath)"
-      TargetKind="SameAsPrimaryAssembly"
-      LibraryPath="$(TargetDir)" />
-
-    <Message Text="Repacked Waystones.dll with YamlDotNet for Nexus." Importance="High" />
-  </Target>
-
-  <Target
-    Name="PrepareWaystonesNexusPackage"
-    DependsOnTargets="RepackWaystonesForNexus">
-
-    <Error Condition="!Exists('$(TargetPath)')" Text="Repacked mod DLL was not found: $(TargetPath)" />
-    <Error Condition="!Exists('$(EnglishLocalizationSource)')" Text="English localization was not found: $(EnglishLocalizationSource)" />
-
-    <MakeDir Directories="$(NexusPackageDir)" />
-
-    <Copy
-      SourceFiles="$(TargetPath)"
-      DestinationFolder="$(NexusPackageDir)"
-      OverwriteReadOnlyFiles="true" />
-
-    <Copy
-      SourceFiles="$(EnglishLocalizationSource)"
-      DestinationFiles="$(NexusEnglishLocalizationDestination)"
-      OverwriteReadOnlyFiles="true" />
-
-    <Message Text="Nexus package directory updated: $(NexusPackageDir)" Importance="High" />
-  </Target>
-
-  <Target
-    Name="ZipWaystonesNexusPackage"
-    DependsOnTargets="PrepareWaystonesNexusPackage">
-
-    <ZipDirectory
-      SourceDirectory="$(NexusPackageDir)"
-      DestinationFile="$(NexusZipPath)"
-      Overwrite="true" />
-
-    <Message Text="Nexus archive created: $(NexusZipPath)" Importance="High" />
-  </Target>
-
-  <Target
     Name="PublishWaystonesAfterBuild"
     AfterTargets="Build"
     Condition="'$(DesignTimeBuild)' != 'true'"
-    DependsOnTargets="ZipWaystonesNexusPackage" />
+    DependsOnTargets="CopyWaystonesToR2ModMan" />
 
 </Project>

@@ -14,13 +14,13 @@ using YamlDotNet.Serialization;
 
 namespace Waystones
 {
-    [BepInDependency("_shudnal.ConditionalConfigSync", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("_shudnal.ConditionalConfigSync", "1.0.5")]
     [BepInPlugin(pluginID, pluginName, pluginVersion)]
     public class Waystones : BaseUnityPlugin
     {
         public const string pluginID = "shudnal.Waystones";
         public const string pluginName = "Waystones";
-        public const string pluginVersion = "1.2.0";
+        public const string pluginVersion = "1.2.1";
 
         private readonly Harmony harmony = new(pluginID);
 
