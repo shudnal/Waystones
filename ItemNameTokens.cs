@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,35 +8,63 @@ namespace Waystones
     {
         public static readonly Dictionary<string, string> itemNames = new(StringComparer.OrdinalIgnoreCase);
 
-        [HarmonyPatch(typeof(Player), nameof(Player.Load))]
-        private static class Player_Load_UpdateRegisters
-        {
-            private static void Prefix() => UpdateRegisters();
-        }
-
         public static void UpdateRegisters()
         {
+            itemNames.Clear();
             if (!ObjectDB.instance)
                 return;
 
-            itemNames.Clear();
             foreach (GameObject item in ObjectDB.instance.m_items)
             {
-                if (item == null || item.GetComponent<ItemDrop>() is not ItemDrop itemDrop)
+                ItemDrop itemDrop = item ? item.GetComponent<ItemDrop>() : null;
+                string sharedName = itemDrop?.m_itemData?.m_shared?.m_name;
+                if (string.IsNullOrWhiteSpace(sharedName))
                     continue;
 
-                ItemDrop.ItemData itemData = itemDrop.m_itemData;
-                ItemDrop.ItemData.SharedData shared = itemData?.m_shared;
-                if (shared == null || string.IsNullOrWhiteSpace(shared.m_name) || !shared.m_name.StartsWith("$"))
-                    continue;
-
-                itemNames[item.name] = shared.m_name;
-                itemNames[shared.m_name] = shared.m_name;
+                itemNames[item.name] = sharedName;
+                itemNames[sharedName] = sharedName;
             }
-
-            Waystones.ReadInitialConfigs();
         }
 
-        public static string GetItemName(this string input) => itemNames.TryGetValue((input ?? "").Trim(), out string name) ? name : input;
+        public static string GetItemName(this string input)
+        {
+            string itemName = (input ?? "").Trim();
+            if (itemName.Length == 0)
+                return itemName;
+
+            if (itemNames.TryGetValue(itemName, out string name))
+                return name;
+
+            if (itemName.StartsWith("$", StringComparison.Ordinal))
+            {
+                itemNames[itemName] = itemName;
+                return itemName;
+            }
+
+            if (!ObjectDB.instance)
+                return itemName;
+
+            GameObject itemPrefab = ObjectDB.instance.GetItemPrefab(itemName);
+            if (!itemPrefab)
+            {
+                foreach (GameObject prefab in ObjectDB.instance.m_items)
+                {
+                    if (prefab && string.Equals(prefab.name, itemName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        itemPrefab = prefab;
+                        break;
+                    }
+                }
+            }
+
+            ItemDrop itemDrop = itemPrefab ? itemPrefab.GetComponent<ItemDrop>() : null;
+            string sharedName = itemDrop?.m_itemData?.m_shared?.m_name;
+            if (string.IsNullOrWhiteSpace(sharedName))
+                return itemName;
+
+            itemNames[itemName] = sharedName;
+            itemNames[sharedName] = sharedName;
+            return sharedName;
+        }
     }
 }

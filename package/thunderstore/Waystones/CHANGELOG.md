@@ -1,3 +1,12 @@
+# 1.2.2
+* fixed Charge and Cooldown sacrifice items configured by prefab name not matching reliably on dedicated servers
+* sacrifice item matching no longer depends on Player.Load or item-token registry initialization order
+* fixed stacked sacrifices consuming too few items when the required amount spans multiple inventory stacks
+* sacrifice config hot reload now watches subdirectories, rebuilds the full merged list on changes and keeps the previous runtime list when a file is temporarily unreadable
+* multiple JSON/YAML sacrifice files are merged deterministically; deleted or renamed files no longer clear unrelated entries
+* fixed Player charge storage allowing repeated overcharge beyond the configured maximum when one-time overcharge is enabled
+* cooldown sacrifices are no longer consumed when there is no active cooldown to reduce
+
 # 1.2.1
 * Updated for the Valheim 1.0.7 release.
 * Updated required dependencies to BepInExPack Valheim 5.4.2350 and ConditionalConfigSync 1.0.5.

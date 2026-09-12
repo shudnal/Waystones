@@ -20,7 +20,7 @@ namespace Waystones
     {
         public const string pluginID = "shudnal.Waystones";
         public const string pluginName = "Waystones";
-        public const string pluginVersion = "1.2.1";
+        public const string pluginVersion = "1.2.2";
 
         private readonly Harmony harmony = new(pluginID);
 
@@ -156,7 +156,7 @@ namespace Waystones
 
         public static string configDirectory;
         internal static FileSystemWatcher configWatcher;
-        private const string itemsToReduceCooldownFilter = $"{pluginID}.reduce_cooldowns.*";
+        private const float sacrificeConfigReloadDelay = 0.2f;
 
         public enum CooldownTime { WorldTime, GlobalTime }
         public enum WaystoneMode { Cooldown, Charge, Orientation }
@@ -385,6 +385,11 @@ namespace Waystones
                 instance.Logger.LogInfo(data);
         }
 
+        public static void LogWarning(object data)
+        {
+            instance.Logger.LogWarning(data);
+        }
+
 #pragma warning disable IDE1006 // Naming Styles
         ConfigEntry<T> config<T>(string group, string name, T defaultValue, ConfigDescription description, bool synchronizedSetting = true)
         {
@@ -528,86 +533,108 @@ namespace Waystones
 
             if (configWatcher == null)
             {
-                configWatcher = new FileSystemWatcher(Paths.ConfigPath, itemsToReduceCooldownFilter);
+                configWatcher = new FileSystemWatcher(Paths.ConfigPath)
+                {
+                    Filter = "*.*",
+                    IncludeSubdirectories = true,
+                    SynchronizingObject = ThreadingHelper.SynchronizingObject
+                };
                 configWatcher.Changed += new FileSystemEventHandler(ReadConfigs);
                 configWatcher.Created += new FileSystemEventHandler(ReadConfigs);
                 configWatcher.Renamed += new RenamedEventHandler(ReadConfigs);
                 configWatcher.Deleted += new FileSystemEventHandler(ReadConfigs);
-                configWatcher.IncludeSubdirectories = false;
-                configWatcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
             }
 
             configWatcher.EnableRaisingEvents = enabled;
+            if (!enabled && instance != null)
+                instance.CancelInvoke(nameof(ReloadSacrificeConfigs));
+        }
+
+        private void ReloadSacrificeConfigs()
+        {
+            ReadInitialConfigs();
+        }
+
+        private static void ScheduleSacrificeConfigReload()
+        {
+            if (instance == null)
+                return;
+
+            instance.CancelInvoke(nameof(ReloadSacrificeConfigs));
+            instance.Invoke(nameof(ReloadSacrificeConfigs), sacrificeConfigReloadDelay);
         }
 
         internal static void ReadInitialConfigs()
         {
-            foreach (FileInfo file in new DirectoryInfo(Paths.ConfigPath).GetFiles(itemsToReduceCooldownFilter, SearchOption.AllDirectories))
-                ReadConfigFile(file.Name, file.FullName);
+            if (!Directory.Exists(Paths.ConfigPath))
+                return;
+
+            FileInfo[] files = new DirectoryInfo(Paths.ConfigPath)
+                .GetFiles($"{pluginID}.reduce_cooldowns.*", SearchOption.AllDirectories)
+                .Where(file => SacrificeItems.IsSupportedConfigFile(file.Name))
+                .OrderBy(file => file.FullName, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(file => file.FullName, StringComparer.Ordinal)
+                .ToArray();
+
+            Dictionary<string, int> newValue = new(StringComparer.OrdinalIgnoreCase);
+            foreach (FileInfo file in files)
+            {
+                if (!TryReadConfigFile(file, newValue))
+                {
+                    LogWarning("Sacrifice item configuration reload skipped because at least one file could not be read. Keeping the previous runtime list.");
+                    return;
+                }
+            }
+
+            itemsToReduceCooldown.AssignLocalValueIfChanged(newValue);
+            LogInfo($"Loaded {newValue.Count} sacrifice item entr{(newValue.Count == 1 ? "y" : "ies")} from {files.Length} config file{(files.Length == 1 ? "" : "s")}");
         }
 
         private static void ReadConfigs(object sender, FileSystemEventArgs eargs)
         {
-            if (eargs is RenamedEventArgs)
-                ReadInitialConfigs();
-            else
-                ReadConfigFile(eargs.Name, eargs.FullPath);
+            bool relevant = SacrificeItems.IsSupportedConfigFile(eargs.FullPath);
+            if (eargs is RenamedEventArgs renamed)
+                relevant |= SacrificeItems.IsSupportedConfigFile(renamed.OldFullPath);
+
+            if (relevant)
+                ScheduleSacrificeConfigReload();
         }
 
-        private static void ReadConfigFile(string filename, string fullname)
+        private static bool TryReadConfigFile(FileInfo file, Dictionary<string, int> target)
         {
-            Dictionary<string, int> newValue = new();
-
             try
             {
-                string content = File.ReadAllText(fullname);
+                string content = File.ReadAllText(file.FullName);
 
 #nullable enable
-                if (content is not null)
-                {
-                    foreach (KeyValuePair<string, int> kv in new DeserializerBuilder().IgnoreFields().Build().Deserialize<Dictionary<string, int>?>(content) ?? new Dictionary<string, int>())
-                    {
-                        if (kv.Value <= 0)
-                            continue;
-
-                        string itemKey = NormalizeSacrificeItemKey(kv.Key);
-                        if (!itemKey.IsNullOrWhiteSpace())
-                            newValue[itemKey] = kv.Value;
-                    }
-                }
+                Dictionary<string, int> entries = new DeserializerBuilder()
+                    .IgnoreFields()
+                    .Build()
+                    .Deserialize<Dictionary<string, int>?>(content) ?? new Dictionary<string, int>();
 #nullable disable
+
+                int loaded = 0;
+                foreach (KeyValuePair<string, int> entry in entries)
+                {
+                    if (entry.Value <= 0 || !SacrificeItems.TryNormalizeConfigKey(entry.Key, out string itemKey))
+                    {
+                        LogWarning($"Ignoring invalid sacrifice item entry '{entry.Key}' in {file.FullName}");
+                        continue;
+                    }
+
+                    target[itemKey] = entry.Value;
+                    loaded++;
+                }
+
+                LogInfo($"Loaded {loaded} sacrifice item entr{(loaded == 1 ? "y" : "ies")} from file {file.FullName}");
+                return true;
             }
             catch (Exception e)
             {
-                LogInfo($"Error reading file ({fullname})! Error: {e.Message}");
+                LogWarning($"Error reading sacrifice item file ({file.FullName})! Error: {e.Message}");
+                return false;
             }
-
-            itemsToReduceCooldown.AssignLocalValueIfChanged(newValue);
-
-            LogInfo($"Loaded {newValue.Count} items from file {filename}");
         }
 
-        private static string NormalizeSacrificeItemKey(string key)
-        {
-            if (key.IsNullOrWhiteSpace())
-                return "";
-
-            key = key.Trim();
-
-            int separatorIndex = key.LastIndexOf(':');
-            if (separatorIndex < 0)
-                return key.GetItemName();
-
-            string itemName = key[..separatorIndex].Trim();
-            string amount = key[(separatorIndex + 1)..].Trim();
-
-            if (itemName.IsNullOrWhiteSpace())
-                return "";
-
-            if (amount.IsNullOrWhiteSpace())
-                return itemName.GetItemName();
-
-            return $"{itemName.GetItemName()}:{amount}";
-        }
     }
 }

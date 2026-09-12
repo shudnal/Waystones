@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using HarmonyLib;
-using System.Linq;
 using Splatform;
 
 public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactable
@@ -229,10 +228,13 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
     public bool UseItem(Humanoid user, ItemDrop.ItemData item)
     {
+        if (user == null || item == null)
+            return false;
+
         if (waystoneMode.Value == WaystoneMode.Cooldown && itemSacrifitionReduceCooldown.Value)
         {
             int cooldown = 0;
-            if (TryReduceCooldownOnItemSacrifice(user, item, item.m_shared.m_name, ref cooldown))
+            if (TryReduceCooldownOnItemSacrifice(user, item, ref cooldown))
             {
                 user.Message(MessageHud.MessageType.Center, Localization.instance.Localize("$ws_piece_waystone_cooldown_reduced", cooldown.ToString()));
                 if (WorldData.IsOnCooldown())
@@ -244,7 +246,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         if (waystoneMode.Value == WaystoneMode.Charge)
         {
             int charges = 0;
-            if (TryChargeWaystoneOnItemSacrifice(user, item, item.m_shared.m_name, ref charges))
+            if (TryChargeWaystoneOnItemSacrifice(user, item, ref charges))
             {
                 user.Message(MessageHud.MessageType.Center, Localization.instance.Localize("$ws_piece_waystone_charge_added", charges.ToString()));
                 return true;
@@ -254,60 +256,41 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
         return false;
     }
 
-    private bool TryReduceCooldownOnItemSacrifice(Humanoid user, ItemDrop.ItemData item, string itemName, ref int cooldown)
+    private bool TryReduceCooldownOnItemSacrifice(Humanoid user, ItemDrop.ItemData item, ref int cooldown)
     {
-        if (itemName == null)
+        if (!WorldData.IsOnCooldown() || !SacrificeItems.TryGetDefinition(itemsToReduceCooldown.Value, item, out SacrificeItems.Definition definition))
             return false;
 
-        itemName = itemName.GetItemName();
-        if (itemsToReduceCooldown.Value.TryGetValue(itemName, out int reduceCooldown) && (cooldown = reduceCooldown) > 0)
-            return user.GetInventory().RemoveOneItem(item) && WorldData.TryReduceCooldown(reduceCooldown);
+        Inventory inventory = user.GetInventory();
+        if (!SacrificeItems.RemoveItems(inventory, item, definition.itemName, definition.amount))
+            return false;
 
-        if (itemsToReduceCooldown.Value.Keys.FirstOrDefault(key => key.StartsWith(itemName)) is string itemKey && itemsToReduceCooldown.Value.TryGetValue(itemKey, out int reduce) && (cooldown = reduce) > 0)
-        {
-            string[] pair = itemKey.Split(':');
-            return pair.Length > 1 && pair[0] == itemName && int.TryParse(pair[1], out int amount) && CountItems(user.GetInventory(), itemName) >= amount && user.GetInventory().RemoveItem(item, amount) && WorldData.TryReduceCooldown(reduce);
-        }
+        if (!WorldData.TryReduceCooldown(definition.value))
+            return false;
 
-        return false;
+        cooldown = definition.value;
+        return true;
     }
 
-    private bool TryChargeWaystoneOnItemSacrifice(Humanoid user, ItemDrop.ItemData item, string itemName, ref int charge)
+    private bool TryChargeWaystoneOnItemSacrifice(Humanoid user, ItemDrop.ItemData item, ref int charge)
     {
-        if (itemName == null || !m_nview.IsValid())
+        if (!m_nview.IsValid() || !SacrificeItems.TryGetDefinition(itemsToReduceCooldown.Value, item, out SacrificeItems.Definition definition))
             return false;
 
-        itemName = itemName.GetItemName();
-        if (itemsToReduceCooldown.Value.TryGetValue(itemName, out int addCharge) && addCharge > 0)
-            return TryConsumeChargeItem(user, item, itemName, addCharge, 1, ref charge);
-
-        if (itemsToReduceCooldown.Value.Keys.FirstOrDefault(key => key == itemName || key.StartsWith(itemName + ":")) is string itemKey && itemsToReduceCooldown.Value.TryGetValue(itemKey, out int add) && add > 0)
-        {
-            string[] pair = itemKey.Split(':');
-            if (pair.Length > 1 && pair[0] == itemName && int.TryParse(pair[1], out int amount))
-                return TryConsumeChargeItem(user, item, itemName, add, amount, ref charge);
-        }
-
-        return false;
+        return TryConsumeChargeItem(user, item, definition, ref charge);
     }
 
-    private bool TryConsumeChargeItem(Humanoid user, ItemDrop.ItemData item, string itemName, int addCharge, int amount, ref int charge)
+    private bool TryConsumeChargeItem(Humanoid user, ItemDrop.ItemData item, SacrificeItems.Definition definition, ref int charge)
     {
-        if (amount <= 0 || CountItems(user.GetInventory(), itemName) < amount)
-            return false;
-
-        charge = WaystoneList.GetPotentialChargeAdded(m_nview.GetZDO(), addCharge);
+        charge = WaystoneList.GetPotentialChargeAdded(m_nview.GetZDO(), definition.value);
         if (charge <= 0)
             return false;
 
-        bool removed = amount == 1
-            ? user.GetInventory().RemoveOneItem(item)
-            : user.GetInventory().RemoveItem(item, amount);
-
-        if (!removed)
+        Inventory inventory = user.GetInventory();
+        if (!SacrificeItems.RemoveItems(inventory, item, definition.itemName, definition.amount))
             return false;
 
-        AddCharge(addCharge);
+        AddCharge(definition.value);
         return true;
     }
 
@@ -334,30 +317,14 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
             WaystoneList.AddWaystoneCharge(m_nview.GetZDO(), amount);
     }
 
-    private int CountItems(Inventory inventory, string itemName)
-    {
-        return CountOwnInventoryItems(inventory, itemName);
-    }
-
     private static int CountOwnInventoryItems(Inventory inventory, string itemName)
     {
-        if (inventory == null)
-            return 0;
-
-        int count = 0;
-        foreach (ItemDrop.ItemData item in inventory.m_inventory)
-            if (item.m_shared.m_name.GetItemName() == itemName && item.m_worldLevel >= Game.m_worldLevel)
-                count += item.m_stack;
-
-        return count;
+        return SacrificeItems.CountOwnInventoryItems(inventory, itemName);
     }
 
     private static int CountAvailableItems(Inventory inventory, string itemName)
     {
-        if (inventory == null)
-            return 0;
-
-        return inventory.CountItems(itemName);
+        return SacrificeItems.CountAvailableItems(inventory, itemName);
     }
 
     private static void AppendSacrificeItemsHoverText(Player player)
@@ -424,7 +391,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
             sacrificeHoverItems.Add(new SacrificeHoverItem
             {
-                itemName = itemName,
+                itemName = itemName.GetItemName(),
                 amount = amount,
                 value = entry.Value,
                 inventoryCount = inventoryCount,
@@ -435,21 +402,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
 
     private static bool TryParseSacrificeEntry(string key, out string itemName, out int amount)
     {
-        itemName = key;
-        amount = 1;
-
-        if (string.IsNullOrWhiteSpace(key))
-            return false;
-
-        string[] pair = key.Split(':');
-        if (pair.Length == 1)
-            return true;
-
-        if (pair.Length != 2 || string.IsNullOrWhiteSpace(pair[0]) || !int.TryParse(pair[1], out amount) || amount <= 0)
-            return false;
-
-        itemName = pair[0];
-        return true;
+        return SacrificeItems.TryParseKey(key, out itemName, out amount);
     }
 
     private static string BuildConfiguredSacrificeItemsText()
@@ -472,7 +425,7 @@ public class WaystoneSmall : MonoBehaviour, TextReceiver, Hoverable, Interactabl
                 continue;
 
             builder.Append("\n - ");
-            builder.Append(itemName);
+            builder.Append(itemName.GetItemName());
             if (amount > 1)
                 builder.Append($" x{amount}");
             builder.Append($" - {valueToken}: <color=#add8e6>{(waystoneMode.Value == WaystoneMode.Charge ? "+" : "-")}{entry.Value}</color>");

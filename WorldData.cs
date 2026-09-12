@@ -160,7 +160,7 @@ namespace Waystones
 
             int current = GetPlayerCharge();
             if (allowWaystoneChargeOverflow.Value)
-                return amount;
+                return current < MaxWaystoneCharge ? amount : 0;
 
             int next = Mathf.Min(current + amount, MaxWaystoneCharge);
             return Mathf.Max(0, next - current);
@@ -242,7 +242,7 @@ namespace Waystones
 
         public static bool TryReduceCooldown(int seconds)
         {
-            if (!ZNet.instance)
+            if (seconds <= 0 || !ZNet.instance)
                 return false;
 
             List<WorldData> state = GetState();
@@ -251,7 +251,11 @@ namespace Waystones
             if (data == null)
                 return false;
 
-            data.SetCooldownTime(Math.Max(data.GetCooldownTime() - seconds, 0));
+            double currentCooldown = data.GetCooldownTime();
+            if (currentCooldown <= 0)
+                return false;
+
+            data.SetCooldownTime(Math.Max(currentCooldown - seconds, 0));
 
             Player.m_localPlayer.m_customData[customDataKey] = SaveWorldDataList(state);
 
