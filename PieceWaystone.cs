@@ -85,6 +85,7 @@ namespace Waystones
                 piece.m_notOnTiltingSurface = true;
                 piece.m_noClipping = false;
                 piece.m_randomTarget = false;
+                piece.m_usage = Piece.UsageTagFlags.Transport;
 
                 WearNTear wnt = CustomPrefabs.AddComponent(waystonePrefab, typeof(WearNTear)) as WearNTear;
 
