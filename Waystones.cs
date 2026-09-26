@@ -165,6 +165,8 @@ namespace Waystones
 
         private void Awake()
         {
+            LocalizationManager.Localizer.Initialize();
+
             harmony.PatchAll();
 
             instance = this;
@@ -177,8 +179,6 @@ namespace Waystones
             configDirectory = Path.Combine(Paths.ConfigPath, pluginID);
             
             LoadIcons();
-
-            StartCoroutine(Localizer.Load());
         }
 
         public void ConfigInit()
