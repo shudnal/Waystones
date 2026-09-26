@@ -173,6 +173,7 @@ namespace Waystones
 
             ConfigInit();
             _ = configSync.AddLockingConfigEntry(configLocked);
+            LocalizationManager.Localizer.ApplyCurrentLocalization();
 
             Game.isModded = true;
 
