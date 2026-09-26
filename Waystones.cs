@@ -165,20 +165,21 @@ namespace Waystones
 
         private void Awake()
         {
+            LocalizationManager.Localizer.Initialize();
+
             harmony.PatchAll();
 
             instance = this;
 
             ConfigInit();
             _ = configSync.AddLockingConfigEntry(configLocked);
+            LocalizationManager.Localizer.ApplyCurrentLocalization();
 
             Game.isModded = true;
 
             configDirectory = Path.Combine(Paths.ConfigPath, pluginID);
             
             LoadIcons();
-
-            StartCoroutine(Localizer.Load());
         }
 
         public void ConfigInit()
