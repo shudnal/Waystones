@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="DirectionSearch.cs" />
     <Compile Include="ItemNameTokens.cs" />
+    <Compile Include="SacrificeItems.cs" />
     <Compile Include="LocalizationManager.cs" />
     <Compile Include="WaystoneList.cs" />
     <Compile Include="PieceWaystone.cs" />
